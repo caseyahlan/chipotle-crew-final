@@ -4,6 +4,7 @@ library("ggplot2")
 library("dplyr")
 
 ui <- fluidPage(
-  titlePanel("Title"),
-  h3(em("By Kelsey Kua, Casey Lum, and Devin Reich"))
+  titlePanel(em("Title")),
+  h3("By Kelsey Kua, Casey Lum, and Devin Reich"),
+  h5("This report is about blah blah blah")
 )
