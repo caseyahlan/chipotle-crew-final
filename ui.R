@@ -1,7 +1,11 @@
-library("shiny")
-library("plotly")
-library("ggplot2")
-library("dplyr")
+library(httr)
+library(jsonlite)
+library(knitr)
+library(dplyr)
+library(jpeg)
+library(ggplot2)
+library(plotly)
+library(shiny)
 
 ui <- fluidPage(
   titlePanel(em("Title")),

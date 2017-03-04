@@ -1,7 +1,12 @@
-library("dplyr")
-library("ggplot2")
-library("shiny")
-library("plotly")
+library(httr)
+library(jsonlite)
+library(knitr)
+library(dplyr)
+library(jpeg)
+library(ggplot2)
+library(plotly)
+library(shiny)
+
 
 base <- ("https://congress.api.sunlightfoundation.com/")
 
