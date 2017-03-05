@@ -2,12 +2,12 @@ library(httr)
 library(jsonlite)
 library(knitr)
 library(dplyr)
-library(jpeg)
 library(ggplot2)
 library(plotly)
 library(shiny)
+library(maps)
 
-
+counties <- map_data("state")
 base <- ("https://congress.api.sunlightfoundation.com/")
 
 server <- function(input, output) {
@@ -24,8 +24,19 @@ server <- function(input, output) {
     return(legislators())
   })
   
-  output$zipcode <- reactive({
-    return(paste0(input$zip, ":"))
+  output$map <- renderPlot({
+    ggplot(data = counties) +
+      geom_polygon(aes(x = long, y = lat, group = group, fill = region)) +
+      coord_quickmap() + 
+      guides(fill = FALSE) +
+      theme(axis.text = element_blank()) +
+      theme(axis.ticks = element_blank()) +
+      theme(axis.title = element_blank())
+  })
+  
+  # Handle clicks on the plot
+  output$info <- renderPrint({
+    return(input$my_click_key)    
   })
   
   output$photos <- renderUI({

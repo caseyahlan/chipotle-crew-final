@@ -2,7 +2,6 @@ library(httr)
 library(jsonlite)
 library(knitr)
 library(dplyr)
-library(jpeg)
 library(ggplot2)
 library(plotly)
 library(shiny)
@@ -26,6 +25,8 @@ ui <- fluidPage(
       tabsetPanel(type="tabs",
                   tabPanel("Your Representatives",
                            h3("Your Representatives"),
+                           plotOutput("map", click='my_click_key'),
+                           verbatimTextOutput('info'),
                            ("Below are the members of Congress that represent the zipcode"),
                            textOutput('zipcode', inline=TRUE),
                            tableOutput('reps'),
