@@ -11,9 +11,12 @@ library(mapdata)
 library(sp)
 library(geojsonio)
 library(curlconverter)
+
 state <- geojson_read("stateData.geojson", what = "sp")
 
 class(state)
+
+
 
 base <- ("https://congress.api.sunlightfoundation.com/")
 source("apikey.R")
@@ -59,6 +62,21 @@ server <- function(input, output) {
     return(legislators())
   })
   
+  congressmen <- reactive({
+    resource <- ("legislators?chamber=house&per_page=all")
+    response <- GET(paste0(sunlight.base, resource))
+    body <- fromJSON(content(response, "text"))
+    house <- flatten(body$results) %>% select(state_name)
+    return(house)
+  })
+  
+ output$districts <- renderPrint({
+    body <- congressmen()
+    body$state_name <- as.factor(body$state_name)
+    districts <- tally(group_by(body, state_name))
+    View(districts)
+    })
+  
   legislators.click <- reactive({
     click <- input$leaflet_shape_click
     if (is.null(click))
@@ -72,6 +90,22 @@ server <- function(input, output) {
     legislators <- flatten(body$results) %>% mutate(name = paste(first_name, last_name)) %>% select(name, chamber, party, state, phone, website)
     return(legislators)
   })
+  
+
+  resource <- ("legislators?chamber=house&per_page=all")
+  response <- GET(paste0(sunlight.base, resource))
+  body <- fromJSON(content(response, "text"))
+  house <- flatten(body$results) %>% filter(state_name != "American Samoa") %>% 
+    filter(state_name != "Northern Mariana Islands") %>% 
+    filter(state_name != "Puerto Rico") %>% filter(state_name != "US Virgin Islands") %>% 
+    filter(state_name != "District of Columbia") %>% 
+    select(state_name) 
+  house$state_name <- as.factor(house$state_name)
+  districts <- tally(group_by(house, state_name))
+
+  
+
+  
   
   output$clickleg <- renderTable({
      return(legislators.click()) 
@@ -103,15 +137,27 @@ server <- function(input, output) {
       coord_map()
   })
   
+#  markers.on("click", function (event) {
+ #   // Assuming the clicked feature is a shape, not a point marker.
+  #  map.fitBounds(event.layer.getBounds());
+#  });
+  
+
+  
+  
   output$leaflet <- renderLeaflet({
+
+
     leaflet(data = state) %>% addTiles() %>%
-      addPolygons(fillColor = topo.colors(10, alpha = NULL), stroke = FALSE,   highlight = highlightOptions(
+      addPolygons(fillColor = topo.colors(20, alpha = NULL), stroke= FALSE,
+        highlight = highlightOptions(
         weight = 5,
         color = "#666",
         dashArray = "",
         fillOpacity = 0.7,
         bringToFront = TRUE))
   })
+  
   
   output$infoo <- renderPrint({
     return(input$leafletclick)

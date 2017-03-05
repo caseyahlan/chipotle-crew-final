@@ -28,7 +28,7 @@ ui <- fluidPage(
       tabsetPanel(type="tabs",
                   tabPanel("Your Representatives",
                            h3("Your Representatives"),
-                           leafletOutput('leaflet', height = 800),
+                           leafletOutput('leaflet', height = 500),
                            #plotOutput('alaska', click ='my.click'),
                           # splitLayout(
                            #  plotOutput('hawaii', click ='my.click'),
@@ -41,10 +41,10 @@ ui <- fluidPage(
                            tableOutput('reps'),
                            uiOutput('photos')),
                   
-                  tabPanel("Compare Representatives",
-                           verbatimTextOutput('senate')),
+                  tabPanel("Compare Representatives"),
                   
-                  tabPanel("Voting Record"),
+                  tabPanel("Voting Record",
+                           verbatimTextOutput('districts')),
                   
                   tabPanel("View a Vote"),
                   
