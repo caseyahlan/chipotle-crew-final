@@ -16,7 +16,25 @@ sunlight.base <- ("https://congress.api.sunlightfoundation.com/")
 # Propublica API Base
 propublica.base <- ("https://api.propublica.org/congress/v1/")
 
+usa <- data("fifty_states")
+map <- map_data("world")
+hawaii <- read.csv("hawaii.csv", stringsAsFactors = FALSE)
+alaska <- read.csv("alaska.csv", stringsAsFactors = FALSE)
+forty8states <- fifty_states %>% filter(id != "hawaii") %>% filter(id !="alaska") %>% select(long, lat, id, group)
+# hawaii.world <- map %>% filter(subregion== "Hawaii")
+# write.csv(hawaii.world, "hawaii.csv")
+# alaska.world <- map %>% filter(subregion == "Alaska")
+# write.csv(alaska.world, "alaska.csv")
+
+alaska <- read.csv("alaska.csv", stringsAsFactors = FALSE)
+hawaii <- read.csv("hawaii.csv", stringsAsFactors = FALSE)
+
+usa <- rbind(forty8states, alaska, hawaii)
+usa <- usa %>% mutate(longitude = round(long, digits = 2)) 
+usa <- usa %>% mutate(latitude = round(lat, digits = 2))
+
 server <- function(input, output) {
+  
   legislators <- reactive({
     resource <- ("legislators/locate")
     query <- paste0("?zip=", input$zip)
@@ -30,20 +48,37 @@ server <- function(input, output) {
     return(legislators())
   })
   
+  legislators.click <- reactive({
+    resource <- ("legislators/locate?latitude=")
+    resource2 <- ("&longitude=")
+    longitude <- round(input$my.click$x, digits = 2)
+    latitude <- round(input$my.click$y, digits = 2)
+    response <- GET(paste0(sunlight.base, resource, latitude, resource2, longitude))
+    body <- fromJSON(content(response, "text"))
+    legislators <- flatten(body$results) %>% mutate(name = paste(first_name, last_name)) %>% select(name, chamber, party, state, phone, website)
+    return(legislators)
+  })
+  
+  output$clickleg <- renderTable({
+     return(legislators.click()) 
+  })
+
+  
   output$map <- renderPlot({
-    ggplot(data = fifty_states) +
-      geom_polygon(aes(x = long, y = lat, group = group, fill = id)) +
+  ggplot(data = usa) +
+      geom_polygon(aes(x = longitude, y = latitude, group = group, fill = id)) +
       coord_quickmap() + 
       guides(fill = FALSE) +
       theme(axis.text = element_blank()) +
       theme(axis.ticks = element_blank()) +
-      theme(axis.title = element_blank())
+      theme(axis.title = element_blank()) +
+      xlim(-169, -67) +
+      ylim(19,72)+
+      scale_fill_discrete()
+
   })
   
-  # Handle clicks on the plot
-  output$info <- renderPrint({
-    return(input$my_click_key)    
-  })
+
   
   output$photos <- renderUI({
     resource <- ("legislators/locate")

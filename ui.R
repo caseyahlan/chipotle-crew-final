@@ -26,8 +26,8 @@ ui <- fluidPage(
       tabsetPanel(type="tabs",
                   tabPanel("Your Representatives",
                            h3("Your Representatives"),
-                           plotOutput("map", click='my_click_key'),
-                           verbatimTextOutput('info'),
+                           plotOutput("map", click ='my.click', height = 750), 
+                          tableOutput('clickleg'),
                            ("Below are the members of Congress that represent the zipcode"),
                            textOutput('zipcode', inline=TRUE),
                            tableOutput('reps'),
@@ -56,5 +56,5 @@ ui <- fluidPage(
   ("|"),
   tags$a(href="https://www.brookings.edu/multi-chapter-report/vital-statistics-on-congress/", "Brookings", target = "_blank"), br()
   
-  
-  )
+)
+   
