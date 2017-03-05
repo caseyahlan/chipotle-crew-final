@@ -19,7 +19,7 @@ ui <- fluidPage(
     
     sidebarPanel(
       h3("Parameters"),
-      textInput('zip', "Zipcode", value="90210"),
+      textInput('zip', "Zip code", value="90210"),
       h5(em("Enter a zipcode to view legislators from the district(s) within that zipcode.")) 
       ),
     mainPanel(

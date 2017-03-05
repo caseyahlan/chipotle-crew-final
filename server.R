@@ -10,18 +10,29 @@ library(maps)
 source("apikey.R")
 
 # Sunlight API base
-sunlight.base <- ("https://congress.api.sunlightfoundation.com/")
+sunlight.base <- "https://congress.api.sunlightfoundation.com/"
 # Propublica API Base
-propublica.base <- ("https://api.propublica.org/congress/v1/")
+propublica.base <- "https://api.propublica.org/congress/v1/"
 
 server <- function(input, output) {
   legislators <- reactive({
-    resource <- ("legislators/locate")
+    resource <- "legislators/locate"
     query <- paste0("?zip=", input$zip)
     response <- GET(paste0(sunlight.base, resource, query))
     body <- fromJSON(content(response, "text"))
     legislators <- flatten(body$results) %>% mutate(name = paste(first_name, last_name)) %>% select(name, chamber, party, state, phone, website)
     return(legislators)
+  })
+  
+  members <- reactive({
+    resource <- "members.json"
+    query.params <- list("congress"=115, "chamber"="senate")
+    
+    response <- GET(paste0(propublica.base, resource), query=query.params, add_headers(.headers = c(api.key)))
+    print(response)
+    
+    #response <- GET(paste0(propublica.base, ))
+    body <- fromJSON(content(response, "text"))
   })
   
   output$reps <- renderTable({
@@ -35,7 +46,7 @@ server <- function(input, output) {
   output$photos <- renderUI({
     resource <- ("legislators/locate")
     query <- paste0("?zip=", input$zip)
-    response <- GET(paste0(base, resource, query))
+    response <- GET(paste0(sunlight.base, resource, query))
     body <- fromJSON(content(response, "text"))
     bio.ids <- flatten(body$results) %>% select(bioguide_id)
     picture.base <- ("https://theunitedstates.io/images/congress/225x275/")
