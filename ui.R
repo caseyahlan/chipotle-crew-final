@@ -6,9 +6,11 @@ library(ggplot2)
 library(plotly)
 library(shiny)
 library(maps)
+library(mapdata)
+library(devtools)
 
 ui <- fluidPage(
-  titlePanel(em("Title")),
+  titlePanel("Title"),
   h3("By Kelsey Kua, Casey Lum, and Devin Reich"),
   h5("This report is about blah blah blah"),
   img(src="flag.jpg", height=245), 
@@ -26,10 +28,12 @@ ui <- fluidPage(
       tabsetPanel(type="tabs",
                   tabPanel("Your Representatives",
                            h3("Your Representatives"),
-                           plotOutput("map", click ='my.click', height = 750), 
+                           plotOutput("map", click ='my.click', height=800), 
+                          verbatimTextOutput('info'),
                           tableOutput('clickleg'),
                            ("Below are the members of Congress that represent the zipcode"),
                            textOutput('zipcode', inline=TRUE),
+                          uiOutput('photosclick'),
                            tableOutput('reps'),
                            uiOutput('photos')),
                   
