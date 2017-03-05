@@ -2,13 +2,16 @@ library(httr)
 library(jsonlite)
 library(knitr)
 library(dplyr)
-library(jpeg)
 library(ggplot2)
 library(plotly)
 library(shiny)
+library(maps)
+library(mapdata)
+library(devtools)
+library(leaflet)
 
 ui <- fluidPage(
-  titlePanel(em("Title")),
+  titlePanel("Title"),
   h3("By Kelsey Kua, Casey Lum, and Devin Reich"),
   h5("This report is about blah blah blah"),
   img(src="flag.jpg", height=245), 
@@ -26,12 +29,21 @@ ui <- fluidPage(
       tabsetPanel(type="tabs",
                   tabPanel("Your Representatives",
                            h3("Your Representatives"),
+                           leafletOutput('leaflet', height = 800),
+                           #plotOutput('alaska', click ='my.click'),
+                          # splitLayout(
+                           #  plotOutput('hawaii', click ='my.click'),
+                            # plotOutput("map", click ='my.click')), 
+                         # verbatimTextOutput('info'),
+                          tableOutput('clickleg'),
                            ("Below are the members of Congress that represent the zipcode"),
                            textOutput('zipcode', inline=TRUE),
+                          uiOutput('photosclick'),
                            tableOutput('reps'),
                            uiOutput('photos')),
                   
-                  tabPanel("Compare Representatives"),
+                  tabPanel("Compare Representatives",
+                           verbatimTextOutput('senate')),
                   
                   tabPanel("Voting Record"),
                   
@@ -54,5 +66,5 @@ ui <- fluidPage(
   ("|"),
   tags$a(href="https://www.brookings.edu/multi-chapter-report/vital-statistics-on-congress/", "Brookings", target = "_blank"), br()
   
-  
-  )
+)
+   
