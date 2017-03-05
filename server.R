@@ -9,12 +9,18 @@ library(maps)
 library(fiftystater)
 
 base <- ("https://congress.api.sunlightfoundation.com/")
+source("apikey.R")
+
+# Sunlight API base
+sunlight.base <- ("https://congress.api.sunlightfoundation.com/")
+# Propublica API Base
+propublica.base <- ("https://api.propublica.org/congress/v1/")
 
 server <- function(input, output) {
   legislators <- reactive({
     resource <- ("legislators/locate")
     query <- paste0("?zip=", input$zip)
-    response <- GET(paste0(base, resource, query))
+    response <- GET(paste0(sunlight.base, resource, query))
     body <- fromJSON(content(response, "text"))
     legislators <- flatten(body$results) %>% mutate(name = paste(first_name, last_name)) %>% select(name, chamber, party, state, phone, website)
     return(legislators)
