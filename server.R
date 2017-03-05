@@ -154,13 +154,17 @@ server <- function(input, output) {
     picture.base <- ("https://theunitedstates.io/images/congress/225x275/")
     picture.query <- (".jpg")
     num.reps <- nrow(bio.ids)
+    size <- 200
+    if (num.reps > 3) {
+      size <- 200 - (18*num.reps)
+    }
     picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
-    images <- tags$img(src=picture1)
+    images <- tags$img(src=picture1, width = size)
     if (num.reps > 1) {
       num.reps <- 2:num.reps
       for (val in num.reps) {
         picture <-paste0(picture.base, bio.ids[val,1], picture.query)
-        images <- tagAppendChild(images, tags$img(src=picture))
+        images <- tagAppendChild(images, tags$img(src=picture, width = size))
       }
     }
     return(images)
