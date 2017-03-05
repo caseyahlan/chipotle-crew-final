@@ -28,8 +28,12 @@ ui <- fluidPage(
       tabsetPanel(type="tabs",
                   tabPanel("Your Representatives",
                            h3("Your Representatives"),
-                           plotOutput("map", click ='my.click', height=800), 
-                          verbatimTextOutput('info'),
+                           leafletOutput('leaflet', height = 800),
+                           #plotOutput('alaska', click ='my.click'),
+                          # splitLayout(
+                           #  plotOutput('hawaii', click ='my.click'),
+                            # plotOutput("map", click ='my.click')), 
+                         # verbatimTextOutput('info'),
                           tableOutput('clickleg'),
                            ("Below are the members of Congress that represent the zipcode"),
                            textOutput('zipcode', inline=TRUE),
@@ -37,7 +41,8 @@ ui <- fluidPage(
                            tableOutput('reps'),
                            uiOutput('photos')),
                   
-                  tabPanel("Compare Representatives"),
+                  tabPanel("Compare Representatives",
+                           verbatimTextOutput('senate')),
                   
                   tabPanel("Voting Record"),
                   

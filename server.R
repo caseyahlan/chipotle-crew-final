@@ -8,20 +8,25 @@ library(shiny)
 library(maps)
 library(fiftystater)
 library(mapdata)
+library(sp)
+library(geojsonio)
+library(curlconverter)
+state <- geojson_read("stateData.geojson", what = "sp")
 
-
+class(state)
 
 base <- ("https://congress.api.sunlightfoundation.com/")
 source("apikey.R")
+
 
 # Sunlight API base
 sunlight.base <- ("https://congress.api.sunlightfoundation.com/")
 # Propublica API Base
 propublica.base <- ("https://api.propublica.org/congress/v1/")
 
-usa <- data("fifty_states")
 
-usa.cities <- world.cities %>% filter(country.etc=="USA") %>% filter(pop >= 100000 && capital == 0)
+usa <- data("fifty_states")
+data("us.cities")
 map <- map_data("world")
 hawaii <- read.csv("hawaii.csv", stringsAsFactors = FALSE)
 alaska <- read.csv("alaska.csv", stringsAsFactors = FALSE)
@@ -32,12 +37,13 @@ forty8states <- fifty_states %>% filter(id != "hawaii") %>% filter(id !="alaska"
 # write.csv(alaska.world, "alaska.csv")
 
 alaska <- read.csv("alaska.csv", stringsAsFactors = FALSE)
+
 hawaii <- read.csv("hawaii.csv", stringsAsFactors = FALSE)
 
 usa <- rbind(forty8states, alaska, hawaii)
-usa <- usa %>% mutate(longitude = round(long, digits = 2)) 
-usa <- usa %>% mutate(latitude = round(lat, digits = 2))
-View(usa)
+
+
+
 server <- function(input, output) {
   
   legislators <- reactive({
@@ -54,10 +60,13 @@ server <- function(input, output) {
   })
   
   legislators.click <- reactive({
+    click <- input$leaflet_shape_click
+    if (is.null(click))
+      return()
     resource <- ("legislators/locate?latitude=")
     resource2 <- ("&longitude=")
-    longitude <- input$my.click$x
-    latitude <- input$my.click$y
+    longitude <- click$lng
+    latitude <- click$lat
     response <- GET(paste0(sunlight.base, resource, latitude, resource2, longitude))
     body <- fromJSON(content(response, "text"))
     legislators <- flatten(body$results) %>% mutate(name = paste(first_name, last_name)) %>% select(name, chamber, party, state, phone, website)
@@ -74,21 +83,48 @@ server <- function(input, output) {
     
     
   output$map <- renderPlot({
-  ggplot(data = usa) +
+  ggplot(data = forty8states) +
       geom_polygon(aes(x = long, y = lat, group = group, fill = id)) +
-      coord_map(xlim=c(-180, -60)) + 
+      coord_map(xlim=c(-130, -60), ylim=c(20,50)) + 
       guides(fill = FALSE) +
       labs(x="longitude", y="latitude")+
-      geom_point(data=usa.cities, aes(x=long, y = lat))
+      geom_point(data=us.cities, aes(x=long, y = lat))
     })
-  
 
+  output$alaska <- renderPlot({
+    ggplot(data=alaska) +
+      geom_polygon(aes(x=long, y = lat, group = group)) +
+      coord_map(xlim=c(-180, -130), ylim= c(50, 74)) 
+  })
+  
+  output$hawaii <- renderPlot({
+    ggplot(data=hawaii) +
+      geom_polygon(aes(x=long, y = lat, group = group))+
+      coord_map()
+  })
+  
+  output$leaflet <- renderLeaflet({
+    leaflet(data = state) %>% addTiles() %>%
+      addPolygons(fillColor = topo.colors(10, alpha = NULL), stroke = FALSE,   highlight = highlightOptions(
+        weight = 5,
+        color = "#666",
+        dashArray = "",
+        fillOpacity = 0.7,
+        bringToFront = TRUE))
+  })
+  
+  output$infoo <- renderPrint({
+    return(input$leafletclick)
+  })
   
   output$photosclick <- renderUI({
+    click <- input$leaflet_shape_click
+    if (is.null(click))
+      return()
     resource <- ("legislators/locate?latitude=")
     resource2 <- ("&longitude=")
-    longitude <- round(input$my.click$x, digits = 2)
-    latitude <- round(input$my.click$y, digits = 2)
+    longitude <- click$lng
+    latitude <- click$lat
     response <- GET(paste0(sunlight.base, resource, latitude, resource2, longitude))
     body <- fromJSON(content(response, "text"))
     bio.ids <- flatten(body$results) %>% select(bioguide_id)
@@ -102,7 +138,12 @@ server <- function(input, output) {
             tags$img(src=picture3))
   })
   
-
+  output$senate <- renderPrint({
+    response <- GET("https://api.propublica.org/congress/v1/115/senate/members.json",
+                    add_headers(X-Api-Key : "ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"))
+    body <- fromJSON(content(response, "text"))
+    return(body)
+  })
   
   output$photos <- renderUI({
     resource <- ("legislators/locate")
