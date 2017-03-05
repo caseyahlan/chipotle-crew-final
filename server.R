@@ -47,17 +47,14 @@ server <- function(input, output) {
     bio.ids <- flatten(body$results) %>% select(bioguide_id)
     picture.base <- ("https://theunitedstates.io/images/congress/225x275/")
     picture.query <- (".jpg")
-    num.reps <- nrow(bio.ids)
+    num.reps <- 2:nrow(bio.ids)
     picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
-    tags$img(src=picture1)
-    if (num.reps > 1) {
-      num.reps <- c(2:num.reps)
+    images <- tags$img(src=picture1)
+    for (val in num.reps) {
+      picture <-paste0(picture.base, bio.ids[val,1], picture.query)
+      images <- tagAppendChild(images, tags$img(src=picture))
     }
-   # for (val in num.reps) {
-   #   picture <-paste0(picture.base, bio.ids[val,1], picture.query)
-   #   tags[[length(lst)+1]] <- tags$img(src=picture1)
-    #}
-    return(tags)
+    return(images)
   })
   
 }
