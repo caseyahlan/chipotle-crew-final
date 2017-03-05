@@ -6,8 +6,8 @@ library(ggplot2)
 library(plotly)
 library(shiny)
 library(maps)
+library(fiftystater)
 
-counties <- map_data("state")
 base <- ("https://congress.api.sunlightfoundation.com/")
 
 server <- function(input, output) {
@@ -25,8 +25,8 @@ server <- function(input, output) {
   })
   
   output$map <- renderPlot({
-    ggplot(data = counties) +
-      geom_polygon(aes(x = long, y = lat, group = group, fill = region)) +
+    ggplot(data = fifty_states) +
+      geom_polygon(aes(x = long, y = lat, group = group, fill = id)) +
       coord_quickmap() + 
       guides(fill = FALSE) +
       theme(axis.text = element_blank()) +
