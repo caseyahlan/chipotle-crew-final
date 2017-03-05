@@ -13,7 +13,7 @@ library(mapdata)
 
 base <- ("https://congress.api.sunlightfoundation.com/")
 source("apikey.R")
-View(usa)
+
 # Sunlight API base
 sunlight.base <- ("https://congress.api.sunlightfoundation.com/")
 # Propublica API Base
@@ -79,9 +79,8 @@ server <- function(input, output) {
       coord_map(xlim=c(-180, -60)) + 
       guides(fill = FALSE) +
       labs(x="longitude", y="latitude")+
-      geom_point(data=usa.cities, aes(x=long, y = lat))+
-      scale_y_continuous(breaks=c(20, 30, 40, 50, 60, 70), labels = c(23, 28.9, 34, 41.9, 50, 62)) 
-  })
+      geom_point(data=usa.cities, aes(x=long, y = lat))
+    })
   
 
   
