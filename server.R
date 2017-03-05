@@ -199,73 +199,14 @@ server <- function(input, output) {
     bio.ids <- flatten(body$results) %>% select(bioguide_id)
     picture.base <- ("https://theunitedstates.io/images/congress/225x275/")
     picture.query <- (".jpg")
-    num.reps <- nrow(bio.ids)
-    if (num.reps ==1 ) {
-      picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
-      tags$img(src=picture1)
-    } else if (num.reps == 2) {
-      picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
-      picture2 <-paste0(picture.base, bio.ids[2,1], picture.query)
-      tagList(tags$img(src=picture1), 
-              tags$img(src=picture2))
-    } else if (num.reps == 3) {
-      picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
-      picture2 <-paste0(picture.base, bio.ids[2,1], picture.query)
-      picture3 <- paste0(picture.base, bio.ids[3,1], picture.query)
-      tagList(tags$img(src=picture1), 
-              tags$img(src=picture2), 
-              tags$img(src=picture3)) }
-    else if (num.reps == 4) {
-      picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
-      picture2 <-paste0(picture.base, bio.ids[2,1], picture.query)
-      picture3 <- paste0(picture.base, bio.ids[3,1], picture.query)
-      picture4 <- paste0(picture.base, bio.ids[4,1], picture.query)
-      tagList(tags$img(src=picture1, width = 187.5),
-              tags$img(src=picture2, width = 187.5),
-              tags$img(src=picture3, width = 187.5), 
-              tags$img(src=picture4, width = 187.5)) 
-    } else if (num.reps == 5) {
-      picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
-      picture2 <-paste0(picture.base, bio.ids[2,1], picture.query)
-      picture3 <- paste0(picture.base, bio.ids[3,1], picture.query)
-      picture4 <- paste0(picture.base, bio.ids[4,1], picture.query)
-      picture5 <- paste0(picture.base, bio.ids[5,1], picture.query)
-      tagList(tags$img(src=picture1, width=150), 
-              tags$img(src=picture2, width=150), 
-              tags$img(src=picture3, width=150), 
-              tags$img(src=picture4, width=150), 
-              tags$img(src=picture5, width=150)) 
-    } else if (num.reps == 6) {
-      picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
-      picture2 <-paste0(picture.base, bio.ids[2,1], picture.query)
-      picture3 <- paste0(picture.base, bio.ids[3,1], picture.query)
-      picture4 <- paste0(picture.base, bio.ids[4,1], picture.query)
-      picture5 <- paste0(picture.base, bio.ids[5,1], picture.query)
-      picture6 <- paste0(picture.base, bio.ids[6,1], picture.query)
-      tagList(tags$img(src=picture1, width=125), 
-              tags$img(src=picture2, width=125),
-              tags$img(src=picture3, width=125), 
-              tags$img(src=picture4, width=125), 
-              tags$img(src=picture5, width=125), 
-              tags$img(src=picture6, width=125))
-    } else if (num.reps == 7) {
-      picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
-      picture2 <-paste0(picture.base, bio.ids[2,1], picture.query)
-      picture3 <- paste0(picture.base, bio.ids[3,1], picture.query)
-      picture4 <- paste0(picture.base, bio.ids[4,1], picture.query)
-      picture5 <- paste0(picture.base, bio.ids[5,1], picture.query)
-      picture6 <- paste0(picture.base, bio.ids[6,1], picture.query)
-      picture7 <- paste0(picture.base, bio.ids[7,1], picture.query)
-      tagList(tags$img(src=picture1, width=107),
-              tags$img(src=picture2, width=107),
-              tags$img(src=picture3, width=107),
-              tags$img(src=picture4, width=107),
-              tags$img(src=picture5, width=107), 
-              tags$img(src=picture6, width=107), 
-              tags$img(src=picture7, width=107))
+    num.reps <- 2:nrow(bio.ids)
+    picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
+    images <- tags$img(src=picture1)
+    for (val in num.reps) {
+      picture <-paste0(picture.base, bio.ids[val,1], picture.query)
+      images <- tagAppendChild(images, tags$img(src=picture))
     }
-    
+    return(images)
   })
-  
   
 }

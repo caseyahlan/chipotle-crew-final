@@ -8,6 +8,7 @@ library(shiny)
 library(maps)
 library(mapdata)
 library(devtools)
+library(leaflet)
 
 ui <- fluidPage(
   titlePanel("Title"),
