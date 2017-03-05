@@ -6,6 +6,7 @@ library(jpeg)
 library(ggplot2)
 library(plotly)
 library(shiny)
+library(maps)
 
 ui <- fluidPage(
   titlePanel(em("Title")),
