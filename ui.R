@@ -66,12 +66,16 @@ ui <- fluidPage(
                   
                   tabPanel("Vote Breakdown"),
                   
-                  tabPanel("Gender Makeup"),
+                  tabPanel("Gender Makeup",
+                           h3("Gender Makeup"),
+                           "This page shows how the gender makeup has changed from 2009 to 2017 for both the house and the senate.",
+                           br(),
+                           br()),
                   
                   tabPanel("Party Makeup"),
                   
                   tabPanel("Voting Reliability")
-                  ))
+                  )
       ),
   hr(),
   ("Image credits for header photos (L to R):"), 
