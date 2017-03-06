@@ -25,6 +25,7 @@ ui <- fluidPage(
       textInput('zip', "Zip code", value="90210"),
       h5(em("Enter a zipcode to view legislators from the district(s) within that zipcode.")) 
       ),
+      radioButtons('format', label = "Find representatives by...", choices = c("zipcode", "map"), selected = NULL)      ),
     mainPanel(
       tabsetPanel(type="tabs",
                   tabPanel("Your Representatives",
@@ -42,13 +43,24 @@ ui <- fluidPage(
                            ("Below are the members of Congress that represent the zipcode"),
                            textOutput('zipcode', inline=TRUE),
                           uiOutput('photosclick'),
+                           conditionalPanel(
+                             condition = "input.format == 'map'",
+                              leafletOutput('leaflet', height = 500),
+                             verbatimTextOutput('info'),
+                              tableOutput('clickleg'),
+                              uiOutput('photosclick')
+                           ),
+                           conditionalPanel(
+                             condition = "input.format == 'zipcode'",
+                             uiOutput('choice'),
                            tableOutput('reps'),
-                           uiOutput('photos')),
+                           uiOutput('photos'))
+                           ),
                   
-                  tabPanel("Compare Representatives",
-                           verbatimTextOutput('senate')),
+                  tabPanel("Compare Representatives"),
                   
-                  tabPanel("Voting Record"),
+                  tabPanel("Voting Record",
+                           verbatimTextOutput('districts')),
                   
                   tabPanel("View a Vote"),
                   
