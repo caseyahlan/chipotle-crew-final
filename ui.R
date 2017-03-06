@@ -16,12 +16,7 @@ ui <- fluidPage(
   img(src="capitolbuilding.jpg", height=245), 
   img(src="congress.jpg", height=245), hr(),
   
-#  sidebarLayout(
-    
-#    sidebarPanel(
- #     h3("Parameters"),
- #     radioButtons('format', label = "Find representatives by...", choices = c("zipcode", "map"), selected = NULL)),     
- #   mainPanel(
+
       tabsetPanel(type="tabs",
                   tabPanel("Welcome",
                            h1("Welcome")),
@@ -99,7 +94,6 @@ ui <- fluidPage(
 )
 )
      ),
-#    )),
   hr(),
   ("Image credits for header photos (L to R):"), 
   tags$a(href="http://feelgrafix.com/group/american-flag.html", "feelgrafix", target = "_blank"), 
