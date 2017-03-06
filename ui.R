@@ -22,25 +22,24 @@ ui <- fluidPage(
     
     sidebarPanel(
       h3("Parameters"),
-      textInput('zip', "Zipcode", value="90210"),
-      h5(em("Enter a zipcode to view legislators from the district(s) within that zipcode.")) 
-      ),
+      radioButtons('format', label = "Find representatives by...", choices = c("zipcode", "map"), selected = NULL)      ),
     mainPanel(
       tabsetPanel(type="tabs",
                   tabPanel("Your Representatives",
                            h3("Your Representatives"),
-                           leafletOutput('leaflet', height = 500),
-                           #plotOutput('alaska', click ='my.click'),
-                          # splitLayout(
-                           #  plotOutput('hawaii', click ='my.click'),
-                            # plotOutput("map", click ='my.click')), 
-                         # verbatimTextOutput('info'),
-                          tableOutput('clickleg'),
-                           ("Below are the members of Congress that represent the zipcode"),
-                           textOutput('zipcode', inline=TRUE),
-                          uiOutput('photosclick'),
+                           conditionalPanel(
+                             condition = "input.format == 'map'",
+                              leafletOutput('leaflet', height = 500),
+                             verbatimTextOutput('info'),
+                              tableOutput('clickleg'),
+                              uiOutput('photosclick')
+                           ),
+                           conditionalPanel(
+                             condition = "input.format == 'zipcode'",
+                             uiOutput('choice'),
                            tableOutput('reps'),
-                           uiOutput('photos')),
+                           uiOutput('photos'))
+                           ),
                   
                   tabPanel("Compare Representatives"),
                   
