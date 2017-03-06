@@ -292,7 +292,7 @@ output$leaf.let <- renderLeaflet({
         color = "#666",
         dashArray = "",
         fillOpacity = 0.7,
-        bringToFront = TRUE)) %>% setView(lng=-115, lat = 52, zoom = 3.4)
+        bringToFront = TRUE)) %>% setView(lng=-115, lat = 52, zoom = 3.4) %>% setMaxBounds(-185, 15, -65, 75) 
   })
     
     
