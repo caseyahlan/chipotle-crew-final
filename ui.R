@@ -30,7 +30,7 @@ ui <- fluidPage(
                            conditionalPanel(
                              condition = "input.format == 'map'",
                               leafletOutput('leaflet', height = 500),
-                             verbatimTextOutput('info'),
+                          #   verbatimTextOutput('info'),
                               tableOutput('clickleg'),
                               uiOutput('photosclick')
                            ),
