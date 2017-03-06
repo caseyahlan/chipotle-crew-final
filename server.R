@@ -25,7 +25,6 @@ propublica.base <- "https://api.propublica.org/congress/v1/"
 
 house.makeup <- read.csv("house.makeup", stringsAsFactors = FALSE)
 
-
 # 'GENDERS IN CONGRESS' SECTION
 # Function that finds the gender composition by examining votes
 GetGenderMakeup <- function(roll.id) {
@@ -56,26 +55,30 @@ for (year in years) {
   body <- flatten(body$results)
   legislators.by.gender <- cbind(legislators.by.gender, select(GetGenderMakeup(body[1, "roll_id"]), n))
 }
-#colnames(legislators.by.gender) <- c("Gender", 1:9)
-
-#voter.party <- c("D", "I","R")
-#x <- select(x, -voter.party)
-#x <- gather(x, key = Year,
-   #         value  = Members,
-   #         1:26, convert = TRUE)
-#x <- data.frame(voter.party,x)
-#ggplot(x, aes(x=Year, y=Members, fill=voter.party)) + 
-#  geom_area()
 
 # Server function
 server <- function(input, output) {
+  output$senate.party.makeup <- renderPlot({
+    h.makeup <- house.makeup
+    party <- c("D", "I","R")
+    h.makeup <- select(h.makeup, -X, -party)
+    colnames(h.makeup) <- 102:115
+    h.makeup  <- gather(h.makeup , key = Year,
+                        value  = Members,
+                        `102`:`115`, convert = TRUE)
+    h.makeup  <- data.frame(party, h.makeup)
+    p <- ggplot(h.makeup, aes(x=Year, y=Members, fill=party)) + 
+      geom_area()
+    return(p)
+  })
+  
   output$choice <- renderUI({
       textInput('zip', "Zipcode", value = "90210")
   })
   
   legislators <- reactive({
     resource <- "legislators/locate"
-    query <- paste0("?zip=", 98502)
+    query <- paste0("?zip=", input$zip)
     response <- GET(paste0(sunlight.base, resource, query))
     body <- fromJSON(content(response, "text"))
     legislators <- flatten(body$results) %>% mutate(name = paste(first_name, last_name)) %>% select(name, chamber, party, state, phone, website)
