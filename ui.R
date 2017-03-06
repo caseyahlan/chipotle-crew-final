@@ -42,8 +42,7 @@ ui <- fluidPage(
                   
                   tabPanel("Compare Representatives"),
                   
-                  tabPanel("Voting Record",
-                           verbatimTextOutput('districts')),
+                  tabPanel("Voting Record"),
                   
                   tabPanel("View a Vote"),
                   

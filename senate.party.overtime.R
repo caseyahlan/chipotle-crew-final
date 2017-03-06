@@ -8,13 +8,9 @@ request.body.list <- content(actual_function())
 members.list <- request.body.list$results[[1]]$members
 names(members.list) <- NULL
 members.json <- toJSON(members.list)
-senate.members.115 <- flatten(fromJSON(members.json, flatten = TRUE)) %>% select(state)
-senate.state <- tally(group_by(senate.members.115, state))
-View(senate.members.115)
-senate.members.115$state <- as.factor(unlist(senate.members.115$state))
-View(senate.state)
+senate.members.115 <- flatten(fromJSON(members.json, flatten = TRUE)) %>% select(party)
 senate.members.115$party <- as.factor(unlist(senate.members.115$party))
-senate.115 <- tally(group_by(senate.members.115, party))
+senate.115 <- tally(group_by(senate.members.115, party)) %>% 
 colnames(senate.115)[1] <- "115"
 
 

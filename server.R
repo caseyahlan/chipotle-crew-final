@@ -190,12 +190,7 @@ server <- function(input, output) {
     }
   })
   
-  output$senate <- renderPrint({
-    response <- GET("https://api.propublica.org/congress/v1/115/senate/members.json",
-                    add_headers(X-Api-Key : "ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"))
-    body <- fromJSON(content(response, "text"))
-    return(body)
-  })
+
   
   output$photos <- renderUI({
     resource <- ("legislators/locate")
@@ -222,4 +217,25 @@ server <- function(input, output) {
     return(images)
   })
   
+  house.missed <- reactive({
+    cmd <- 'curl "https://api.propublica.org/congress/v1/115/house/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
+    parsed_cmd <- straighten(cmd)
+    str(parsed_cmd)
+    actual_function <- make_req(parsed_cmd)[[1]]
+    request.body.list <- content(actual_function())
+    members.list <- request.body.list$results[[1]]$members
+    names(members.list) <- NULL
+    members.json <- toJSON(members.list)
+    house.members.115 <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
+      select(first_name, last_name, party, missed_votes_pct)
+    house.members.115 <- house.members.115 %>% mutate(name = paste(first_name, last_name))
+    return(house.members.115)
+  })
+  
+  output$house.missed <- renderPlot({
+    ggplot(data = house.missed(), fill = party) +
+      geom_col(y = missed_votes_pct)
+  })
+  
 }
+
