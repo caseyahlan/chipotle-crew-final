@@ -22,21 +22,7 @@ sunlight.base <- "https://congress.api.sunlightfoundation.com/"
 # Propublica API Base
 propublica.base <- "https://api.propublica.org/congress/v1/"
 
-
-# Map data
-usa <- data("fifty_states")
-data("us.cities")
-map <- map_data("world")
-hawaii <- read.csv("hawaii.csv", stringsAsFactors = FALSE)
-alaska <- read.csv("alaska.csv", stringsAsFactors = FALSE)
-forty8states <- fifty_states %>% filter(id != "hawaii") %>% filter(id !="alaska") %>% select(long, lat, id, group)
-# hawaii.world <- map %>% filter(subregion== "Hawaii")
-# write.csv(hawaii.world, "hawaii.csv")
-# alaska.world <- map %>% filter(subregion == "Alaska")
-# write.csv(alaska.world, "alaska.csv")
-alaska <- read.csv("alaska.csv", stringsAsFactors = FALSE)
-hawaii <- read.csv("hawaii.csv", stringsAsFactors = FALSE)
-usa <- rbind(forty8states, alaska, hawaii)
+house.makeup <- read.csv("house.makeup", stringsAsFactors = FALSE)
 
 
 # 'GENDERS IN CONGRESS' SECTION
