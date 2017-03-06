@@ -92,7 +92,6 @@ server <- function(input, output) {
   })
   
   
-  # Would look better as percentage instead of members
   output$house.pie <- renderPlot({
     house.makeup$X102 <- round(((house.makeup$X102 / sum(house.makeup$X102))*100), digits = 2)
     house.makeup$X103 <- round(((house.makeup$X103 / sum(house.makeup$X103))*100), digits = 2)
@@ -116,7 +115,6 @@ server <- function(input, output) {
                         value  = Members,
                         `102`:`115`, convert = TRUE)
     h.makeup  <- data.frame(party, h.makeup)
-    View(h.makeup)
     plot <- ggplot(h.makeup, aes(x=factor(1), y=Members, fill=party)) + 
       geom_bar(width = 1, stat="identity") +
       coord_polar(theta="y")+
@@ -124,7 +122,8 @@ server <- function(input, output) {
       facet_wrap(~Congress, nrow = 2)+
       theme(axis.ticks = element_blank())+
       theme(axis.text = element_blank())+
-      theme(axis.title = element_blank())
+      theme(axis.title = element_blank())+
+      theme_void()
       
     return(plot)
   })
@@ -213,7 +212,8 @@ server <- function(input, output) {
       facet_wrap(~Congress, nrow = 3)+
       theme(axis.ticks = element_blank())+
       theme(axis.text = element_blank())+
-      theme(axis.title = element_blank())
+      theme(axis.title = element_blank())+
+      theme_void()
     return(plot)
   })
   
@@ -242,13 +242,7 @@ server <- function(input, output) {
     return(house)
   })
   
- output$districts <- renderPrint({
-    body <- congressmen()
-    body$state_name <- as.factor(body$state_name)
-    districts <- tally(group_by(body, state_name))
-    View(districts)
-    })
-  
+
   legislators.click <- reactive({
     click <- input$leaf.let_shape_click
     if (is.null(click))
@@ -292,7 +286,7 @@ output$leaf.let <- renderLeaflet({
         color = "#666",
         dashArray = "",
         fillOpacity = 0.7,
-        bringToFront = TRUE)) %>% setView(lng=-115, lat = 52, zoom = 3.4) %>% setMaxBounds(-185, 15, -65, 75) 
+        bringToFront = TRUE)) %>% setView(lng=-115, lat = 52, zoom = 3.4)
   })
     
     
@@ -398,6 +392,7 @@ output$leaf.let <- renderLeaflet({
     geom_bar(width = 1, stat = "identity") +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
     theme(axis.ticks.x = element_blank()) +
+    scale_y_continuous(limits = c(0, 100))+
     scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
     ggtitle("House of Representatives % of Votes Missed")
     pp <- ggplotly(p)
@@ -480,6 +475,7 @@ output$leaf.let <- renderLeaflet({
       geom_bar(width = 1, stat = "identity") +
       theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
       theme(axis.ticks.x = element_blank()) +
+      scale_y_continuous(limits = c(0, 100))+
       scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
       ggtitle("House of Representatives Votes With Party %")
     pp <- ggplotly(p)
@@ -567,6 +563,7 @@ output$leaf.let <- renderLeaflet({
       geom_bar(width = 1, stat = "identity") +
       theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
       theme(axis.ticks.x = element_blank()) +
+      scale_y_continuous(limits = c(0, 100))+
       scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican")) +
       ggtitle("House of Representatives % of Votes Missed")
     pp <- ggplotly(p)
