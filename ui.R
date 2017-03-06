@@ -5,8 +5,6 @@ library(dplyr)
 library(ggplot2)
 library(plotly)
 library(shiny)
-library(maps)
-library(mapdata)
 library(devtools)
 library(leaflet)
 
@@ -18,7 +16,7 @@ ui <- fluidPage(
   img(src="capitolbuilding.jpg", height=245), 
   img(src="congress.jpg", height=245), hr(),
   
-  sidebarLayout(
+#  sidebarLayout(
     
     sidebarPanel(
       h3("Parameters"),
@@ -27,40 +25,35 @@ ui <- fluidPage(
       ),
       radioButtons('format', label = "Find representatives by...", choices = c("zipcode", "map"), selected = NULL)      ),
     mainPanel(
+#    sidebarPanel(
+ #     h3("Parameters"),
+ #     radioButtons('format', label = "Find representatives by...", choices = c("zipcode", "map"), selected = NULL)),     
+ #   mainPanel(
+      
       tabsetPanel(type="tabs",
+                  tabPanel("Welcome",
+                           h1("Welcome")),
                   tabPanel("Your Representatives",
-                           h3("Your Representatives"),
-                           "Input a zip code to the left or select a state from the map to see information about the representatives from that area.",
-                           br(),
-                           br(),
-                           leafletOutput('leaflet', height = 800),
-                           #plotOutput('alaska', click ='my.click'),
-                          # splitLayout(
-                           #  plotOutput('hawaii', click ='my.click'),
-                            # plotOutput("map", click ='my.click')), 
-                         # verbatimTextOutput('info'),
-                          tableOutput('clickleg'),
-                           ("Below are the members of Congress that represent the zipcode"),
-                           textOutput('zipcode', inline=TRUE),
-                          uiOutput('photosclick'),
+                           h2("Your Representatives"),
+                           radioButtons('format', label = "Find representatives by...", choices = c("zipcode", "map"), selected = character(0)),
                            conditionalPanel(
-                             condition = "input.format == 'map'",
-                              leafletOutput('leaflet', height = 500),
-                          #   verbatimTextOutput('info'),
-                              tableOutput('clickleg'),
-                              uiOutput('photosclick')
+                             condition = "input.format == 'map'", 
+                             actionButton('reset', "Reset View"), br(), br(), 
+                             leafletOutput('leaf.let', height = 650),
+                             uiOutput('explanation'),
+                             tableOutput('clickleg'),
+                             uiOutput('photosclick')
                            ),
                            conditionalPanel(
                              condition = "input.format == 'zipcode'",
                              uiOutput('choice'),
-                           tableOutput('reps'),
-                           uiOutput('photos'))
-                           ),
+                             tableOutput('reps'),
+                             uiOutput('photos'))
+                  ),
                   
                   tabPanel("Compare Representatives"),
                   
-                  tabPanel("Voting Record",
-                           verbatimTextOutput('districts')),
+                  tabPanel("Voting Record"),
                   
                   tabPanel("View a Vote"),
                   
@@ -72,12 +65,60 @@ ui <- fluidPage(
                            br(),
                            br(),
                            plotOutput("genderPlot")),
+
+                  tabPanel("Gender Makeup"),
                   
-                  tabPanel("Party Makeup"),
+                  tabPanel("Party Makeup", 
+                           h3("House"),
+                           plotlyOutput("house.area"), br(),
+                           plotlyOutput("house.line"), br(),
+                           plotOutput("house.pie"),
+                           h3("Senate"),
+                           plotlyOutput("senate.area"), br(),
+                           plotlyOutput("senate.line"), br(),
+                           plotOutput("senate.pie")),
                   
                   tabPanel("Voting Reliability")
                   )
       ),
+                  tabPanel("Voting Reliability",
+                           h2("Voting Reliability: Missed Votes and Party Loyalty"), br(),
+                           radioButtons('party', "View by party:", 
+                                                    choices = c("all", "Democrat", "Republican", "Independent"), selected = "all"),
+                            radioButtons('congress', "Congress:",
+                                                    choices = c("114th", "115th")),
+                           selectInput('order', "Show Members:", choices = c("alphabetically", "decreasing", "increasing")),
+                           conditionalPanel(
+                              condition = "input.congress == '115th'", 
+                              h3("Percent of Votes Missed"),
+                              strong("Note:"), ("all percentages are inflated by 0.5% so that members with 0 missed
+                                             votes are still shown on the graph"),
+                              plotlyOutput('house.missed'),
+                              strong("Note:"), ("all percentages are inflated by 0.2% so that members with 0 missed
+                                             votes are still shown on the graph"),
+                              plotlyOutput('senate.missed'),
+                              h3("Percent of Votes With Party"),
+                              plotlyOutput('house.with'),
+                              plotlyOutput('senate.with')
+                             
+                           ),
+                           
+                           conditionalPanel(
+                             condition = "input.congress == '114th'",
+                             h3("Percent of Votes Missed"),
+                             strong("Note:"), ("all percentages are inflated by 0.5% so that members with 0 missed
+                                             votes are still shown on the graph"),         
+                          plotlyOutput('house.missed.114'),
+                          strong("Note:"), ("all percentages are inflated by 0.2% so that members with 0 missed
+                                             votes are still shown on the graph"),
+                          plotlyOutput('senate.missed.114'),
+                          h3("Percent of Votes With Party"),
+                          plotlyOutput('house.with.114'),
+                          plotlyOutput('senate.with.114')
+)
+)
+     ),
+#    )),
   hr(),
   ("Image credits for header photos (L to R):"), 
   tags$a(href="http://feelgrafix.com/group/american-flag.html", "feelgrafix", target = "_blank"), 
@@ -87,4 +128,3 @@ ui <- fluidPage(
   tags$a(href="https://www.brookings.edu/multi-chapter-report/vital-statistics-on-congress/", "Brookings", target = "_blank"), br()
   
 )
-   

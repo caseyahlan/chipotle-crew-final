@@ -77,10 +77,11 @@ names(members.list5) <- NULL
 members.json5 <- toJSON(members.list5)
 house.members.110 <- flatten(fromJSON(members.json5, flatten = TRUE)) %>% select(party)
 house.members.110$party <- as.factor(unlist(house.members.110$party))
-house.110.members <- tally(group_by(house.members.110, party))
+house.110.members <- tally(group_by(house.members.110, party), sort = TRUE)
 independents <- data.frame("party" = "I", "n" = "0")
-house.110 <- rbind(house.110.members, independents)
-house.110  <- house.110 %>% select(n)
+house.110a <- rbind(house.110.members, independents)
+house.110 <- house.110a %>% select(n)
+house.110 <- house.110[c(1,3,2),]
 colnames(house.110)[1] <- "110"
 
 cmd6 <- 'curl "https://api.propublica.org/congress/v1/109/house/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
