@@ -68,10 +68,11 @@ server <- function(input, output) {
                         value  = Members,
                         `102`:`115`, convert = TRUE)
     h.makeup  <- data.frame(party, h.makeup)
+    View(h.makeup)
     plot <- ggplot(h.makeup, aes(x=Congress, y=Members, fill=party)) + 
       geom_area()+
       scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30")) +
-      scale_x_continuous(breaks = c(102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115))
+      scale_x_continuous(breaks = c(102:115))
     pplot <- ggplotly(plot)
     return(pplot)
   })
@@ -87,7 +88,8 @@ server <- function(input, output) {
   h.makeup  <- data.frame(party, h.makeup)
   plot <- ggplot(h.makeup, aes(x=Congress, y=Members, color=party)) + 
     geom_line()+
-    scale_color_manual(values = c("#002868", "#6D1FA7", "#BF0A30"))
+    scale_color_manual(values = c("#002868", "#6D1FA7", "#BF0A30")) +
+    scale_x_continuous(breaks = c(102:115))
   pplot <- ggplotly(plot)
   return(pplot)
   })
@@ -140,7 +142,8 @@ server <- function(input, output) {
     s.makeup  <- data.frame(party, s.makeup)
     plot <- ggplot(s.makeup, aes(x=Congress, y=Members, fill=party)) + 
       geom_area()+
-      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"))
+      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30")) +
+      scale_x_continuous(breaks = c(80:115))
     pplot <- ggplotly(plot)
     return(pplot)
   })
@@ -156,7 +159,8 @@ server <- function(input, output) {
     s.makeup  <- data.frame(party, s.makeup)
     plot <- ggplot(s.makeup, aes(x=Congress, y=Members, color=party)) + 
       geom_line()+
-      scale_color_manual(values = c("#002868", "#6D1FA7", "#BF0A30"))
+      scale_color_manual(values = c("#002868", "#6D1FA7", "#BF0A30")) +
+      scale_x_continuous(breaks = c(80:115))
     pplot <- ggplotly(plot)
     return(pplot)
   })
