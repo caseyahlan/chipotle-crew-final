@@ -5,9 +5,6 @@ library(dplyr)
 library(ggplot2)
 library(plotly)
 library(shiny)
-library(maps)
-library(fiftystater)
-library(mapdata)
 library(sp)
 library(geojsonio)
 library(curlconverter)
@@ -401,7 +398,8 @@ output$leaf.let <- renderLeaflet({
     geom_bar(width = 1, stat = "identity") +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
     theme(axis.ticks.x = element_blank()) +
-    scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))
+    scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
+    ggtitle("House of Representatives % of Votes Missed")
     pp <- ggplotly(p)
   return(pp)
   
@@ -443,7 +441,8 @@ output$leaf.let <- renderLeaflet({
       theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
       theme(axis.ticks.x = element_blank()) +
       scale_y_continuous(limits = c(0, 100))+
-      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))
+      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))+
+      ggtitle("Senate % of Votes Missed")
     pp <- ggplotly(p)
     return(pp)
     
@@ -481,7 +480,8 @@ output$leaf.let <- renderLeaflet({
       geom_bar(width = 1, stat = "identity") +
       theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
       theme(axis.ticks.x = element_blank()) +
-      scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))
+      scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
+      ggtitle("House of Representatives Votes With Party %")
     pp <- ggplotly(p)
     return(pp)
     
@@ -522,7 +522,8 @@ output$leaf.let <- renderLeaflet({
       theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
       theme(axis.ticks.x = element_blank()) +
       scale_y_continuous(limits = c(0, 100))+
-      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))
+      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))+
+      ggtitle("Senate Votes With Party %")
     pp <- ggplotly(p)
     return(pp)
   })
@@ -554,12 +555,20 @@ output$leaf.let <- renderLeaflet({
     house.members$last_name <- as.factor(unlist(house.members$last_name))
     house.members$party <- as.factor(unlist(house.members$party))
     house.members$percent <- (house.members$missed_votes_pct + 0.5)
-    house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
+    if (input$order == "alphabetically") {
+      house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
+    } else if (input$order == "increasing") {
+      house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent)])
+    } else if (input$order == "decreasing") {
+      house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent, 
+                                                                                        decreasing = TRUE)])
+    }
     p <- ggplot(house.members, aes(x = name, y = percent, fill = party)) +
       geom_bar(width = 1, stat = "identity") +
       theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
       theme(axis.ticks.x = element_blank()) +
-      scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))
+      scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican")) +
+      ggtitle("House of Representatives % of Votes Missed")
     pp <- ggplotly(p)
     return(pp)
     
@@ -594,14 +603,21 @@ output$leaf.let <- renderLeaflet({
     senate.members$last_name <- as.factor(unlist(senate.members$last_name))
     senate.members$party <- as.factor(unlist(senate.members$party))
     senate.members$percent <- (senate.members$missed_votes_pct + 0.2)
-    senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$last_name)])
-    
+    if (input$order == "alphabetically") {
+      senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$last_name)])
+    } else if (input$order == "increasing") {
+      senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent)])
+    } else if (input$order == "decreasing") {
+      senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent, 
+                                                                                           decreasing = TRUE)])
+    }    
     p <- ggplot(senate.members, aes(x = name, y = percent, fill = party)) +
       geom_bar(width = 1, stat = "identity") +
       theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
       theme(axis.ticks.x = element_blank()) +
       scale_y_continuous(limits = c(0, 100))+
-      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))
+      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))+
+      ggtitle("Senate % of Votes Missed")
     pp <- ggplotly(p)
     return(pp)
     
@@ -633,13 +649,20 @@ output$leaf.let <- renderLeaflet({
     house.members$name <- as.factor(unlist(house.members$name))
     house.members$last_name <- as.factor(unlist(house.members$last_name))
     house.members$party <- as.factor(unlist(house.members$party))
-    house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent, 
-                                                                                      decreasing = TRUE)])
+    if (input$order == "alphabetically") {
+    house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
+    } else if (input$order == "increasing") {
+    house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent)])
+    } else if (input$order == "decreasing") {
+      house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent, 
+                                                                                        decreasing = TRUE)])
+    }
     p <- ggplot(house.members, aes(x = name, y = percent, fill = party)) +
       geom_bar(width = 1, stat = "identity") +
       theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
       theme(axis.ticks.x = element_blank()) +
-      scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))
+      scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
+      ggtitle("House of Representatives Votes With Party %")
     pp <- ggplotly(p)
     return(pp)
     
@@ -673,14 +696,23 @@ output$leaf.let <- renderLeaflet({
     senate.members$name <- as.factor(unlist(senate.members$name))
     senate.members$last_name <- as.factor(unlist(senate.members$last_name))
     senate.members$party <- as.factor(unlist(senate.members$party))
-    senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent, decreasing = TRUE)])
+    senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$last_name)])
     
+    if (input$order == "alphabetically") {
+      senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$last_name)])
+    } else if (input$order == "increasing") {
+      senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent)])
+    } else if (input$order == "decreasing") {
+      senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent, 
+                                                                                           decreasing = TRUE)])
+    }
     p <- ggplot(senate.members, aes(x = name, y = percent, fill = party)) +
       geom_bar(width = 1, stat = "identity") +
       theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
       theme(axis.ticks.x = element_blank()) +
       scale_y_continuous(limits = c(0, 100))+
-      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))
+      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))+
+      ggtitle("Senate Votes With Party %")
     pp <- ggplotly(p)
     return(pp)
   })

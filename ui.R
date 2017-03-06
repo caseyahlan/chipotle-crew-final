@@ -5,8 +5,6 @@ library(dplyr)
 library(ggplot2)
 library(plotly)
 library(shiny)
-library(maps)
-library(mapdata)
 library(devtools)
 library(leaflet)
 
@@ -25,6 +23,8 @@ ui <- fluidPage(
  #     radioButtons('format', label = "Find representatives by...", choices = c("zipcode", "map"), selected = NULL)),     
  #   mainPanel(
       tabsetPanel(type="tabs",
+                  tabPanel("Welcome",
+                           h1("Welcome")),
                   tabPanel("Your Representatives",
                            h2("Your Representatives"),
                            radioButtons('format', label = "Find representatives by...", choices = c("zipcode", "map"), selected = character(0)),
@@ -67,15 +67,18 @@ ui <- fluidPage(
                            radioButtons('party', "View by party:", 
                                                     choices = c("all", "Democrat", "Republican", "Independent"), selected = "all"),
                             radioButtons('congress', "Congress:",
-                                                    choices = c("114th", "115th"), selected = character(0)),
+                                                    choices = c("114th", "115th")),
+                           selectInput('order', "Show Members:", choices = c("alphabetically", "decreasing", "increasing")),
                            conditionalPanel(
                               condition = "input.congress == '115th'", 
+                              h3("Percent of Votes Missed"),
                               strong("Note:"), ("all percentages are inflated by 0.5% so that members with 0 missed
                                              votes are still shown on the graph"),
                               plotlyOutput('house.missed'),
                               strong("Note:"), ("all percentages are inflated by 0.2% so that members with 0 missed
                                              votes are still shown on the graph"),
                               plotlyOutput('senate.missed'),
+                              h3("Percent of Votes With Party"),
                               plotlyOutput('house.with'),
                               plotlyOutput('senate.with')
                              
@@ -83,12 +86,14 @@ ui <- fluidPage(
                            
                            conditionalPanel(
                              condition = "input.congress == '114th'",
+                             h3("Percent of Votes Missed"),
                              strong("Note:"), ("all percentages are inflated by 0.5% so that members with 0 missed
                                              votes are still shown on the graph"),         
                           plotlyOutput('house.missed.114'),
                           strong("Note:"), ("all percentages are inflated by 0.2% so that members with 0 missed
                                              votes are still shown on the graph"),
                           plotlyOutput('senate.missed.114'),
+                          h3("Percent of Votes With Party"),
                           plotlyOutput('house.with.114'),
                           plotlyOutput('senate.with.114')
 )
