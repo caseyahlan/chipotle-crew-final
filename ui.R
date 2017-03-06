@@ -22,31 +22,14 @@ ui <- fluidPage(
     
     sidebarPanel(
       h3("Parameters"),
-      textInput('zip', "Zip code", value="90210"),
-      h5(em("Enter a zipcode to view legislators from the district(s) within that zipcode.")) 
-      ),
-      radioButtons('format', label = "Find representatives by...", choices = c("zipcode", "map"), selected = NULL)      ),
+      radioButtons('format', label = "Find representatives by...", choices = c("zipcode", "map"), selected = NULL)),     
     mainPanel(
       tabsetPanel(type="tabs",
                   tabPanel("Your Representatives",
                            h3("Your Representatives"),
-                           "Input a zip code to the left or select a state from the map to see information about the representatives from that area.",
-                           br(),
-                           br(),
-                           leafletOutput('leaflet', height = 800),
-                           #plotOutput('alaska', click ='my.click'),
-                          # splitLayout(
-                           #  plotOutput('hawaii', click ='my.click'),
-                            # plotOutput("map", click ='my.click')), 
-                         # verbatimTextOutput('info'),
-                          tableOutput('clickleg'),
-                           ("Below are the members of Congress that represent the zipcode"),
-                           textOutput('zipcode', inline=TRUE),
-                          uiOutput('photosclick'),
                            conditionalPanel(
                              condition = "input.format == 'map'",
                               leafletOutput('leaflet', height = 500),
-                          #   verbatimTextOutput('info'),
                               tableOutput('clickleg'),
                               uiOutput('photosclick')
                            ),
@@ -71,8 +54,8 @@ ui <- fluidPage(
                   tabPanel("Party Makeup"),
                   
                   tabPanel("Voting Reliability")
-                  ))
-      ),
+                  )
+      )),
   hr(),
   ("Image credits for header photos (L to R):"), 
   tags$a(href="http://feelgrafix.com/group/american-flag.html", "feelgrafix", target = "_blank"), 

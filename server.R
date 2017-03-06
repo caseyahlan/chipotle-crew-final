@@ -62,13 +62,14 @@ colnames(legislators.by.gender) <- c("Gender", 1:9)
 
 # Server function
 server <- function(input, output) {
+  
   output$choice <- renderUI({
       textInput('zip', "Zipcode", value = "90210")
   })
   
   legislators <- reactive({
     resource <- "legislators/locate"
-    query <- paste0("?zip=", 98502)
+    query <- paste0("?zip=", input$zip)
     response <- GET(paste0(sunlight.base, resource, query))
     body <- fromJSON(content(response, "text"))
     legislators <- flatten(body$results) %>% mutate(name = paste(first_name, last_name)) %>% select(name, chamber, party, state, phone, website)
