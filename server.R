@@ -23,7 +23,6 @@ propublica.base <- "https://api.propublica.org/congress/v1/"
 house.makeup <- read.csv("data/house.makeup", stringsAsFactors = FALSE)
 senate.makeup <- read.csv("data/senate.makeup", stringsAsFactors = FALSE)
 
-
 # 'GENDERS IN CONGRESS' SECTION
 # Function that finds the gender composition by examining votes
 GetGenderMakeup <- function(roll.id) {
@@ -94,20 +93,10 @@ server <- function(input, output) {
   
   
   output$house.pie <- renderPlot({
-    house.makeup$X102 <- round(((house.makeup$X102 / sum(house.makeup$X102))*100), digits = 2)
-    house.makeup$X103 <- round(((house.makeup$X103 / sum(house.makeup$X103))*100), digits = 2)
-    house.makeup$X104 <- round(((house.makeup$X104 / sum(house.makeup$X104))*100), digits = 2)
-    house.makeup$X105 <- round(((house.makeup$X105 / sum(house.makeup$X105))*100), digits = 2)
-    house.makeup$X106 <- round(((house.makeup$X106 / sum(house.makeup$X106))*100), digits = 2)
-    house.makeup$X107 <- round(((house.makeup$X107 / sum(house.makeup$X107))*100), digits = 2)
-    house.makeup$X108 <- round(((house.makeup$X108 / sum(house.makeup$X108))*100), digits = 2)
-    house.makeup$X109 <- round(((house.makeup$X109 / sum(house.makeup$X109))*100), digits = 2)
-    house.makeup$X110 <- round(((house.makeup$X110 / sum(house.makeup$X110))*100), digits = 2)
-    house.makeup$X111 <- round(((house.makeup$X111 / sum(house.makeup$X111))*100), digits = 2)
-    house.makeup$X112 <- round(((house.makeup$X112 / sum(house.makeup$X112))*100), digits = 2)
-    house.makeup$X113 <- round(((house.makeup$X113 / sum(house.makeup$X113))*100), digits = 2)
-    house.makeup$X114 <- round(((house.makeup$X114 / sum(house.makeup$X114))*100), digits = 2)
-    house.makeup$X115 <- round(((house.makeup$X115 / sum(house.makeup$X115))*100), digits = 2)
+    times <- 3:16
+    for (val in times) {
+      house.makeup[,val] <- round(((house.makeup[,val] / sum(house.makeup[,val]))*100), digits = 2)
+    }
     h.makeup <- house.makeup
     party <- c("D","I","R")
     h.makeup <- select(h.makeup, -X, -party)
