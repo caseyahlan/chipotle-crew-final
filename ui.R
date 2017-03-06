@@ -29,16 +29,16 @@ ui <- fluidPage(
                            h3("Your Representatives"),
                            conditionalPanel(
                              condition = "input.format == 'map'",
-                              leafletOutput('leaflet', height = 500),
-                              tableOutput('clickleg'),
-                              uiOutput('photosclick')
+                             leafletOutput('leaflet', height = 500),
+                             tableOutput('clickleg'),
+                             uiOutput('photosclick')
                            ),
                            conditionalPanel(
                              condition = "input.format == 'zipcode'",
                              uiOutput('choice'),
-                           tableOutput('reps'),
-                           uiOutput('photos'))
-                           ),
+                             tableOutput('reps'),
+                             uiOutput('photos'))
+                  ),
                   
                   tabPanel("Compare Representatives"),
                   
@@ -50,11 +50,12 @@ ui <- fluidPage(
                   
                   tabPanel("Gender Makeup"),
                   
-                  tabPanel("Party Makeup"),
+                  tabPanel("Party Makeup", 
+                           plotOutput("senate.party.makeup")),
                   
                   tabPanel("Voting Reliability")
-                  )
-      )),
+      )
+    )),
   hr(),
   ("Image credits for header photos (L to R):"), 
   tags$a(href="http://feelgrafix.com/group/american-flag.html", "feelgrafix", target = "_blank"), 
@@ -64,4 +65,3 @@ ui <- fluidPage(
   tags$a(href="https://www.brookings.edu/multi-chapter-report/vital-statistics-on-congress/", "Brookings", target = "_blank"), br()
   
 )
-   

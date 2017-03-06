@@ -11,6 +11,7 @@ library(mapdata)
 library(sp)
 library(geojsonio)
 library(curlconverter)
+library(tidyr)
 source("apikey.R")
 
 state <- geojson_read("stateData.geojson", what = "sp")
@@ -23,7 +24,6 @@ sunlight.base <- "https://congress.api.sunlightfoundation.com/"
 propublica.base <- "https://api.propublica.org/congress/v1/"
 
 house.makeup <- read.csv("house.makeup", stringsAsFactors = FALSE)
-
 
 # 'GENDERS IN CONGRESS' SECTION
 # Function that finds the gender composition by examining votes
@@ -55,13 +55,22 @@ for (year in years) {
   body <- flatten(body$results)
   legislators.by.gender <- cbind(legislators.by.gender, select(GetGenderMakeup(body[1, "roll_id"]), n))
 }
-colnames(legislators.by.gender) <- c("Gender", 1:9)
-
-
-
 
 # Server function
 server <- function(input, output) {
+  output$senate.party.makeup <- renderPlot({
+    h.makeup <- house.makeup
+    party <- c("D", "I","R")
+    h.makeup <- select(h.makeup, -X, -party)
+    colnames(h.makeup) <- 102:115
+    h.makeup  <- gather(h.makeup , key = Year,
+                        value  = Members,
+                        `102`:`115`, convert = TRUE)
+    h.makeup  <- data.frame(party, h.makeup)
+    p <- ggplot(h.makeup, aes(x=Year, y=Members, fill=party)) + 
+      geom_area()
+    return(p)
+  })
   
   output$choice <- renderUI({
       textInput('zip', "Zipcode", value = "90210")
@@ -141,8 +150,6 @@ server <- function(input, output) {
   
   
   output$leaflet <- renderLeaflet({
-
-
     leaflet(data = state) %>% addTiles() %>%
       addPolygons(fillColor = topo.colors(20, alpha = NULL), stroke= FALSE,
         highlight = highlightOptions(
