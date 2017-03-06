@@ -64,9 +64,7 @@ ui <- fluidPage(
                            "This page shows how the gender makeup has changed from 2009 to 2017 for both the house and the senate.",
                            br(),
                            br(),
-                           plotOutput("genderPlot")),
-
-                  tabPanel("Gender Makeup"),
+                           plotlyOutput("genderPlot")),
                   
                   tabPanel("Party Makeup", 
                            h3("House"),
@@ -78,9 +76,8 @@ ui <- fluidPage(
                            plotlyOutput("senate.line"), br(),
                            plotOutput("senate.pie")),
                   
-                  tabPanel("Voting Reliability")
-                  )
-      ),
+
+      
                   tabPanel("Voting Reliability",
                            h2("Voting Reliability: Missed Votes and Party Loyalty"), br(),
                            radioButtons('party', "View by party:", 
@@ -117,7 +114,7 @@ ui <- fluidPage(
                           plotlyOutput('senate.with.114')
 )
 )
-     ),
+     )
 #    )),
   hr(),
   ("Image credits for header photos (L to R):"), 

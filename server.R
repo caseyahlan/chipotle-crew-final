@@ -48,26 +48,27 @@ resource <- "votes"
 legislators.by.gender <- data.frame(c("F", "M"))
 years <- c(2009 : 2017)
 for (year in years) {
-  query <- paste0("?chamber=", "house", "&per_page=", "all", "&year=", 2009)
+  query <- paste0("?chamber=", "house", "&per_page=", "all", "&year=", year)
   response <- GET(paste0(sunlight.base, resource, query))
   body <- fromJSON(content(response, "text"))
   body <- flatten(body$results)
   legislators.by.gender <- cbind(legislators.by.gender, select(GetGenderMakeup(body[1, "roll_id"]), n))
 }
 colnames(legislators.by.gender) <- c("Gender", 2009:2017)
+legislators.by.gender <- gather(legislators.by.gender, key = "Year", value = "Value",
+       `2009`:`2017`, convert = TRUE)
+
 
 
 
 # Server function
 server <- function(input, output) {
-  
-  
   output$house.area <- renderPlotly({
     h.makeup <- house.makeup
     party <- c("D","I","R")
     h.makeup <- select(h.makeup, -X, -party)
     colnames(h.makeup) <- 102:115
-    h.makeup  <- gather(h.makeup , key = Congress,
+    h.makeup  <- gather(h.makeup, key = Congress,
                         value  = Members,
                         `102`:`115`, convert = TRUE)
     h.makeup  <- data.frame(party, h.makeup)
@@ -76,6 +77,14 @@ server <- function(input, output) {
       scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"))
     pplot <- ggplotly(plot)
     return(pplot)
+  })
+  
+  output$genderPlot <- renderPlotly({
+    gender.plot <- ggplot(data = legislators.by.gender, mapping = aes(x = "Year", y = "Value", fill = "Gender")) +
+      geom_area() +
+      scale_fill_manual(values = c("#7B241C", "#17A589"))
+    gender.plot <- ggplotly(gender.plot)
+    return(gender.plot)
   })
   
   output$house.line <- renderPlotly({
@@ -362,12 +371,7 @@ output$leaf.let <- renderLeaflet({
     return(images)
   })
   
-  output$genderPlot <- renderPlot({
-    gender.plot <- ggplot(data = legislators.by.gender, mapping = aes(x = "Year", y = "Number")) +
-      geom_point()
-    plot(gender.plot)
-    return(gender.plot)
-  })
+  
 
   output$house.missed <- renderPlotly({
     cmd <- 'curl "https://api.propublica.org/congress/v1/115/house/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
