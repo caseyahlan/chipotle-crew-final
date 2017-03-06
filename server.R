@@ -11,11 +11,8 @@ library(mapdata)
 library(sp)
 library(geojsonio)
 library(curlconverter)
-<<<<<<< HEAD
 library(tidyr)
-=======
 source("apikey.R")
->>>>>>> 8004af08ae07a8da938ee6de4f0f5bb0daa323f2
 
 state <- geojson_read("stateData.geojson", what = "sp")
 class(state)
@@ -59,14 +56,14 @@ for (year in years) {
   body <- flatten(body$results)
   legislators.by.gender <- cbind(legislators.by.gender, select(GetGenderMakeup(body[1, "roll_id"]), n))
 }
-colnames(legislators.by.gender) <- c("Gender", 1:9)
+#colnames(legislators.by.gender) <- c("Gender", 1:9)
 
-voter.party <- c("D", "I","R")
-x <- select(x, -voter.party)
-x <- gather(x, key = Year,
-            value  = Members,
-            1:26, convert = TRUE)
-x <- data.frame(voter.party,x)
+#voter.party <- c("D", "I","R")
+#x <- select(x, -voter.party)
+#x <- gather(x, key = Year,
+   #         value  = Members,
+   #         1:26, convert = TRUE)
+#x <- data.frame(voter.party,x)
 #ggplot(x, aes(x=Year, y=Members, fill=voter.party)) + 
 #  geom_area()
 
@@ -150,8 +147,6 @@ server <- function(input, output) {
   
   
   output$leaflet <- renderLeaflet({
-
-
     leaflet(data = state) %>% addTiles() %>%
       addPolygons(fillColor = topo.colors(20, alpha = NULL), stroke= FALSE,
         highlight = highlightOptions(

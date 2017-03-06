@@ -71,7 +71,7 @@ ui <- fluidPage(
                   tabPanel("Party Makeup"),
                   
                   tabPanel("Voting Reliability")
-                  ))
+                  )
       ),
   hr(),
   ("Image credits for header photos (L to R):"), 
