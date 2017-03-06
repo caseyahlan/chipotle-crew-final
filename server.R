@@ -449,6 +449,241 @@ output$leaf.let <- renderLeaflet({
     
   })
 
+  output$house.with <- renderPlotly({
+    cmd <- 'curl "https://api.propublica.org/congress/v1/115/house/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
+    parsed_cmd <- straighten(cmd)
+    str(parsed_cmd)
+    actual_function <- make_req(parsed_cmd)[[1]]
+    request.body.list <- content(actual_function())
+    members.list <- request.body.list$results[[1]]$members
+    names(members.list) <- NULL
+    members.json <- toJSON(members.list)
+    house <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
+      select(first_name, last_name, party, votes_with_party_pct)
+    if (input$party == "all") {
+      house.members.115 <- house
+    } else if (input$party == "Democrat") {
+      house.members.115 <- house %>% filter(party == "D")
+    } else if (input$party == "Independent") {
+      house.members.115 <- house %>% filter(party == "I")
+    } else if (input$party == "Republican") {
+      house.members.115 <- house %>% filter(party == "R")
+    }
+    house.members.115 <- house.members.115 %>% mutate(name = paste(first_name, last_name))
+    house.members <- house.members.115[!sapply(house.members.115$votes_with_party_pct,is.null),]
+    house.members$percent <- as.numeric(unlist(house.members$votes_with_party_pct))
+    house.members$name <- as.factor(unlist(house.members$name))
+    house.members$last_name <- as.factor(unlist(house.members$last_name))
+    house.members$party <- as.factor(unlist(house.members$party))
+    house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent, 
+                                                                                      decreasing = TRUE)])
+    p <- ggplot(house.members, aes(x = name, y = percent, fill = party)) +
+      geom_bar(width = 1, stat = "identity") +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
+      theme(axis.ticks.x = element_blank()) +
+      scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))
+    pp <- ggplotly(p)
+    return(pp)
+    
+  })
+  
+  
+  
+  output$senate.with <- renderPlotly({
+    cmd <- 'curl "https://api.propublica.org/congress/v1/115/senate/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
+    parsed_cmd <- straighten(cmd)
+    str(parsed_cmd)
+    actual_function <- make_req(parsed_cmd)[[1]]
+    request.body.list <- content(actual_function())
+    members.list <- request.body.list$results[[1]]$members
+    names(members.list) <- NULL
+    members.json <- toJSON(members.list)
+    senate <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
+      select(first_name, last_name, party, votes_with_party_pct)
+    if (input$party == "all") {
+      senate.members.115 <- senate
+    } else if (input$party == "Democrat") {
+      senate.members.115 <- senate %>% filter(party == "D")
+    } else if (input$party == "Independent") {
+      senate.members.115 <- senate %>% filter(party == "I")
+    } else if (input$party == "Republican") {
+      senate.members.115 <- senate %>% filter(party == "R")
+    }
+    senate.members.115 <- senate.members.115 %>% mutate(name = paste(first_name, last_name))
+    senate.members <- senate.members.115[!sapply(senate.members.115$votes_with_party_pct,is.null),]
+    senate.members$percent <- as.numeric(unlist(senate.members$votes_with_party_pct))
+    senate.members$name <- as.factor(unlist(senate.members$name))
+    senate.members$last_name <- as.factor(unlist(senate.members$last_name))
+    senate.members$party <- as.factor(unlist(senate.members$party))
+    senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent, decreasing = TRUE)])
+    
+    p <- ggplot(senate.members, aes(x = name, y = percent, fill = party)) +
+      geom_bar(width = 1, stat = "identity") +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
+      theme(axis.ticks.x = element_blank()) +
+      scale_y_continuous(limits = c(0, 100))+
+      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))
+    pp <- ggplotly(p)
+    return(pp)
+  })
+  
+  output$house.missed.114 <- renderPlotly({
+    cmd <- 'curl "https://api.propublica.org/congress/v1/114/house/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
+    parsed_cmd <- straighten(cmd)
+    str(parsed_cmd)
+    actual_function <- make_req(parsed_cmd)[[1]]
+    request.body.list <- content(actual_function())
+    members.list <- request.body.list$results[[1]]$members
+    names(members.list) <- NULL
+    members.json <- toJSON(members.list)
+    house <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
+      select(first_name, last_name, party, missed_votes_pct)
+    if (input$party == "all") {
+      house.members.115 <- house
+    } else if (input$party == "Democrat") {
+      house.members.115 <- house %>% filter(party == "D")
+    } else if (input$party == "Independent") {
+      house.members.115 <- house %>% filter(party == "I")
+    } else if (input$party == "Republican") {
+      house.members.115 <- house %>% filter(party == "R")
+    }
+    house.members.115 <- house.members.115 %>% mutate(name = paste(first_name, last_name))
+    house.members <- house.members.115[!sapply(house.members.115$missed_votes_pct,is.null),]
+    house.members$missed_votes_pct <- as.numeric(unlist(house.members$missed_votes_pct))
+    house.members$name <- as.factor(unlist(house.members$name))
+    house.members$last_name <- as.factor(unlist(house.members$last_name))
+    house.members$party <- as.factor(unlist(house.members$party))
+    house.members$percent <- (house.members$missed_votes_pct + 0.5)
+    house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
+    p <- ggplot(house.members, aes(x = name, y = percent, fill = party)) +
+      geom_bar(width = 1, stat = "identity") +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
+      theme(axis.ticks.x = element_blank()) +
+      scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))
+    pp <- ggplotly(p)
+    return(pp)
+    
+  })
+  
+  
+  
+  output$senate.missed.114 <- renderPlotly({
+    cmd <- 'curl "https://api.propublica.org/congress/v1/114/senate/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
+    parsed_cmd <- straighten(cmd)
+    str(parsed_cmd)
+    actual_function <- make_req(parsed_cmd)[[1]]
+    request.body.list <- content(actual_function())
+    members.list <- request.body.list$results[[1]]$members
+    names(members.list) <- NULL
+    members.json <- toJSON(members.list)
+    senate <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
+      select(first_name, last_name, party, missed_votes_pct)
+    if (input$party == "all") {
+      senate.members.115 <- senate
+    } else if (input$party == "Democrat") {
+      senate.members.115 <- senate %>% filter(party == "D")
+    } else if (input$party == "Independent") {
+      senate.members.115 <- senate %>% filter(party == "I")
+    } else if (input$party == "Republican") {
+      senate.members.115 <- senate %>% filter(party == "R")
+    }
+    senate.members.115 <- senate.members.115 %>% mutate(name = paste(first_name, last_name))
+    senate.members <- senate.members.115[!sapply(senate.members.115$missed_votes_pct,is.null),]
+    senate.members$missed_votes_pct <- as.numeric(unlist(senate.members$missed_votes_pct))
+    senate.members$name <- as.factor(unlist(senate.members$name))
+    senate.members$last_name <- as.factor(unlist(senate.members$last_name))
+    senate.members$party <- as.factor(unlist(senate.members$party))
+    senate.members$percent <- (senate.members$missed_votes_pct + 0.2)
+    senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$last_name)])
+    
+    p <- ggplot(senate.members, aes(x = name, y = percent, fill = party)) +
+      geom_bar(width = 1, stat = "identity") +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
+      theme(axis.ticks.x = element_blank()) +
+      scale_y_continuous(limits = c(0, 100))+
+      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))
+    pp <- ggplotly(p)
+    return(pp)
+    
+  })
+  
+  output$house.with.114 <- renderPlotly({
+    cmd <- 'curl "https://api.propublica.org/congress/v1/114/house/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
+    parsed_cmd <- straighten(cmd)
+    str(parsed_cmd)
+    actual_function <- make_req(parsed_cmd)[[1]]
+    request.body.list <- content(actual_function())
+    members.list <- request.body.list$results[[1]]$members
+    names(members.list) <- NULL
+    members.json <- toJSON(members.list)
+    house <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
+      select(first_name, last_name, party, votes_with_party_pct)
+    if (input$party == "all") {
+      house.members.115 <- house
+    } else if (input$party == "Democrat") {
+      house.members.115 <- house %>% filter(party == "D")
+    } else if (input$party == "Independent") {
+      house.members.115 <- house %>% filter(party == "I")
+    } else if (input$party == "Republican") {
+      house.members.115 <- house %>% filter(party == "R")
+    }
+    house.members.115 <- house.members.115 %>% mutate(name = paste(first_name, last_name))
+    house.members <- house.members.115[!sapply(house.members.115$votes_with_party_pct,is.null),]
+    house.members$percent <- as.numeric(unlist(house.members$votes_with_party_pct))
+    house.members$name <- as.factor(unlist(house.members$name))
+    house.members$last_name <- as.factor(unlist(house.members$last_name))
+    house.members$party <- as.factor(unlist(house.members$party))
+    house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent, 
+                                                                                      decreasing = TRUE)])
+    p <- ggplot(house.members, aes(x = name, y = percent, fill = party)) +
+      geom_bar(width = 1, stat = "identity") +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
+      theme(axis.ticks.x = element_blank()) +
+      scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))
+    pp <- ggplotly(p)
+    return(pp)
+    
+  })
+  
+  
+  
+  output$senate.with.114 <- renderPlotly({
+    cmd <- 'curl "https://api.propublica.org/congress/v1/114/senate/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
+    parsed_cmd <- straighten(cmd)
+    str(parsed_cmd)
+    actual_function <- make_req(parsed_cmd)[[1]]
+    request.body.list <- content(actual_function())
+    members.list <- request.body.list$results[[1]]$members
+    names(members.list) <- NULL
+    members.json <- toJSON(members.list)
+    senate <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
+      select(first_name, last_name, party, votes_with_party_pct)
+    if (input$party == "all") {
+      senate.members.115 <- senate
+    } else if (input$party == "Democrat") {
+      senate.members.115 <- senate %>% filter(party == "D")
+    } else if (input$party == "Independent") {
+      senate.members.115 <- senate %>% filter(party == "I")
+    } else if (input$party == "Republican") {
+      senate.members.115 <- senate %>% filter(party == "R")
+    }
+    senate.members.115 <- senate.members.115 %>% mutate(name = paste(first_name, last_name))
+    senate.members <- senate.members.115[!sapply(senate.members.115$votes_with_party_pct,is.null),]
+    senate.members$percent <- as.numeric(unlist(senate.members$votes_with_party_pct))
+    senate.members$name <- as.factor(unlist(senate.members$name))
+    senate.members$last_name <- as.factor(unlist(senate.members$last_name))
+    senate.members$party <- as.factor(unlist(senate.members$party))
+    senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent, decreasing = TRUE)])
+    
+    p <- ggplot(senate.members, aes(x = name, y = percent, fill = party)) +
+      geom_bar(width = 1, stat = "identity") +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
+      theme(axis.ticks.x = element_blank()) +
+      scale_y_continuous(limits = c(0, 100))+
+      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))
+    pp <- ggplotly(p)
+    return(pp)
+  })
   
   
    

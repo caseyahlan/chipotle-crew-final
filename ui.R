@@ -64,13 +64,34 @@ ui <- fluidPage(
                   
                   tabPanel("Voting Reliability",
                            h2("Voting Reliability: Missed Votes and Party Loyalty"), br(),
-                           radioButtons('party', "View by party:", choices = c("all", "Democrat", "Republican", "Independent"), selected = "all"),
-                           strong("Note:"), ("all percentages are inflated by 0.5% so that members with 0 missed
+                           radioButtons('party', "View by party:", 
+                                                    choices = c("all", "Democrat", "Republican", "Independent"), selected = "all"),
+                            radioButtons('congress', "Congress:",
+                                                    choices = c("114th", "115th"), selected = character(0)),
+                           conditionalPanel(
+                              condition = "input.congress == '115th'", 
+                              strong("Note:"), ("all percentages are inflated by 0.5% so that members with 0 missed
                                              votes are still shown on the graph"),
-                           plotlyOutput('house.missed'),
+                              plotlyOutput('house.missed'),
+                              strong("Note:"), ("all percentages are inflated by 0.2% so that members with 0 missed
+                                             votes are still shown on the graph"),
+                              plotlyOutput('senate.missed'),
+                              plotlyOutput('house.with'),
+                              plotlyOutput('senate.with')
+                             
+                           ),
+                           
+                           conditionalPanel(
+                             condition = "input.congress == '114th'",
+                             strong("Note:"), ("all percentages are inflated by 0.5% so that members with 0 missed
+                                             votes are still shown on the graph"),         
+                          plotlyOutput('house.missed.114'),
                           strong("Note:"), ("all percentages are inflated by 0.2% so that members with 0 missed
                                              votes are still shown on the graph"),
-                           plotlyOutput('senate.missed')
+                          plotlyOutput('senate.missed.114'),
+                          plotlyOutput('house.with.114'),
+                          plotlyOutput('senate.with.114')
+)
 )
      ),
 #    )),
