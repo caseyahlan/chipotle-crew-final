@@ -29,6 +29,9 @@ ui <- fluidPage(
       tabsetPanel(type="tabs",
                   tabPanel("Your Representatives",
                            h3("Your Representatives"),
+                           "Input a zip code to the left or select a state from the map to see information about the representatives from that area.",
+                           br(),
+                           br(),
                            leafletOutput('leaflet', height = 800),
                            #plotOutput('alaska', click ='my.click'),
                           # splitLayout(

@@ -11,12 +11,10 @@ library(mapdata)
 library(sp)
 library(geojsonio)
 library(curlconverter)
+source("apikey.R")
 state <- geojson_read("stateData.geojson", what = "sp")
 
 class(state)
-
-base <- ("https://congress.api.sunlightfoundation.com/")
-source("apikey.R")
 
 
 # Sunlight API base
@@ -25,6 +23,7 @@ sunlight.base <- "https://congress.api.sunlightfoundation.com/"
 propublica.base <- "https://api.propublica.org/congress/v1/"
 
 
+# Map data
 usa <- data("fifty_states")
 data("us.cities")
 map <- map_data("world")
@@ -35,35 +34,53 @@ forty8states <- fifty_states %>% filter(id != "hawaii") %>% filter(id !="alaska"
 # write.csv(hawaii.world, "hawaii.csv")
 # alaska.world <- map %>% filter(subregion == "Alaska")
 # write.csv(alaska.world, "alaska.csv")
-
 alaska <- read.csv("alaska.csv", stringsAsFactors = FALSE)
-
 hawaii <- read.csv("hawaii.csv", stringsAsFactors = FALSE)
-
 usa <- rbind(forty8states, alaska, hawaii)
 
 
+# 'GENDERS IN CONGRESS' SECTION
+# Function that finds the gender composition by examining votes
+GetGenderMakeup <- function(roll.id) {
+  base <- ("https://congress.api.sunlightfoundation.com/")
+  votes.resource <- ("votes?roll_id=")
+  votes.filters <- ("&fields=voters")
+  votes.response <- GET(paste0(base, votes.resource, roll.id, votes.filters))
+  request.body.as.list <- content(votes.response)
+  voters.list <- request.body.as.list$results[[1]]$voters
+  names(voters.list) <- NULL
+  voters.json <- toJSON(voters.list)
+  voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
+  voters <- voters.as.data.frame %>% select(voter.party, voter.gender, vote)
+  voters$voter.gender <- as.factor(unlist(voters$voter.gender))
+  voters.gender <- tally(group_by(voters, voter.gender))
+  return(voters.gender)
+}
 
+# Creates a data frame of gender breakdown from 2009 to 2017
+resource <- "votes"
+legislators.by.gender <- data.frame(c("F", "M"))
+years <- c(2009 : 2017)
+for (year in years) {
+  query <- paste0("?chamber=", "house", "&per_page=", "all", "&year=", year)
+  response <- GET(paste0(sunlight.base, resource, query))
+  body <- fromJSON(content(response, "text"))
+  body <- flatten(body$results)
+  legislators.by.gender <- cbind(legislators.by.gender, select(GetGenderMakeup(body[1, "roll_id"]), n))
+}
+colnames(legislators.by.gender) <- c("Gender", 1:9)
+
+
+
+# Server function
 server <- function(input, output) {
-  
   legislators <- reactive({
     resource <- "legislators/locate"
-    query <- paste0("?zip=", input$zip)
+    query <- paste0("?zip=", 98502)
     response <- GET(paste0(sunlight.base, resource, query))
     body <- fromJSON(content(response, "text"))
     legislators <- flatten(body$results) %>% mutate(name = paste(first_name, last_name)) %>% select(name, chamber, party, state, phone, website)
     return(legislators)
-  })
-  
-  members <- reactive({
-    resource <- "members.json"
-    query.params <- list("congress"=115, "chamber"="senate")
-    
-    response <- GET(paste0(propublica.base, resource), query=query.params, add_headers(.headers = c(api.key)))
-    print(response)
-    
-    #response <- GET(paste0(propublica.base, ))
-    body <- fromJSON(content(response, "text"))
   })
   
   output$reps <- renderTable({
