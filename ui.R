@@ -23,7 +23,7 @@ ui <- fluidPage(
     sidebarPanel(
       h3("Parameters"),
       textInput('zip', "Zip code", value="90210"),
-      h5(em("Enter a zipcode to view legislators from the district(s) within that zipcode.")) 
+      h5(em("Enter a zip code to view legislators from the district(s) within that zip code.")) 
       ),
       radioButtons('format', label = "Find representatives by...", choices = c("zipcode", "map"), selected = NULL)      ),
     mainPanel(
@@ -70,7 +70,8 @@ ui <- fluidPage(
                            h3("Gender Makeup"),
                            "This page shows how the gender makeup has changed from 2009 to 2017 for both the house and the senate.",
                            br(),
-                           br()),
+                           br(),
+                           plotOutput("genderPlot")),
                   
                   tabPanel("Party Makeup"),
                   

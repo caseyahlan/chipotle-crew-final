@@ -11,6 +11,7 @@ library(mapdata)
 library(sp)
 library(geojsonio)
 library(curlconverter)
+library(tidyr)
 source("apikey.R")
 
 state <- geojson_read("stateData.geojson", what = "sp")
@@ -49,13 +50,13 @@ resource <- "votes"
 legislators.by.gender <- data.frame(c("F", "M"))
 years <- c(2009 : 2017)
 for (year in years) {
-  query <- paste0("?chamber=", "house", "&per_page=", "all", "&year=", year)
+  query <- paste0("?chamber=", "house", "&per_page=", "all", "&year=", 2009)
   response <- GET(paste0(sunlight.base, resource, query))
   body <- fromJSON(content(response, "text"))
   body <- flatten(body$results)
   legislators.by.gender <- cbind(legislators.by.gender, select(GetGenderMakeup(body[1, "roll_id"]), n))
 }
-colnames(legislators.by.gender) <- c("Gender", 1:9)
+colnames(legislators.by.gender) <- c("Gender", 2009:2017)
 
 
 
@@ -63,7 +64,7 @@ colnames(legislators.by.gender) <- c("Gender", 1:9)
 # Server function
 server <- function(input, output) {
   output$choice <- renderUI({
-      textInput('zip', "Zipcode", value = "90210")
+      textInput('zip', "Zip code", value = "90210")
   })
   
   legislators <- reactive({
@@ -221,4 +222,10 @@ server <- function(input, output) {
     return(images)
   })
   
+  output$genderPlot <- renderPlot({
+    gender.plot <- ggplot(data = legislators.by.gender, mapping = aes(x = "Year", y = "Number")) +
+      geom_point()
+    plot(gender.plot)
+    return(gender.plot)
+  })
 }
