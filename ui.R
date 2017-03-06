@@ -16,20 +16,7 @@ ui <- fluidPage(
   img(src="capitolbuilding.jpg", height=245), 
   img(src="congress.jpg", height=245), hr(),
   
-#  sidebarLayout(
-    
-    sidebarPanel(
-      h3("Parameters"),
-      textInput('zip', "Zip code", value="90210"),
-      h5(em("Enter a zip code to view legislators from the district(s) within that zip code.")) 
-      ),
-      radioButtons('format', label = "Find representatives by...", choices = c("zipcode", "map"), selected = NULL)      ),
-    mainPanel(
-#    sidebarPanel(
- #     h3("Parameters"),
- #     radioButtons('format', label = "Find representatives by...", choices = c("zipcode", "map"), selected = NULL)),     
- #   mainPanel(
-      
+
       tabsetPanel(type="tabs",
                   tabPanel("Welcome",
                            h1("Welcome")),
@@ -113,9 +100,8 @@ ui <- fluidPage(
                           plotlyOutput('house.with.114'),
                           plotlyOutput('senate.with.114')
 )
-)
-     )
-#    )),
+),
+
   hr(),
   ("Image credits for header photos (L to R):"), 
   tags$a(href="http://feelgrafix.com/group/american-flag.html", "feelgrafix", target = "_blank"), 
