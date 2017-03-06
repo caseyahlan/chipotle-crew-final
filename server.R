@@ -70,7 +70,8 @@ server <- function(input, output) {
     h.makeup  <- data.frame(party, h.makeup)
     plot <- ggplot(h.makeup, aes(x=Congress, y=Members, fill=party)) + 
       geom_area()+
-      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"))
+      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30")) +
+      scale_x_continuous(breaks = c(102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115))
     pplot <- ggplotly(plot)
     return(pplot)
   })
@@ -393,10 +394,19 @@ output$leaf.let <- renderLeaflet({
     theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
     theme(axis.ticks.x = element_blank()) +
     scale_y_continuous(limits = c(0, 100))+
-    scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
     ggtitle("House of Representatives % of Votes Missed")
-    pp <- ggplotly(p)
-  return(pp)
+  if (input$party == "all") {
+    pp <- p + scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
+      theme(axis.text.x = element.blank())
+  } else if (input$party == "Democrat") {
+    pp <- p + scale_fill_manual(values = "#002868", labels = "Democrat")
+  } else if (input$party == "Republican") {
+    pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
+  } else if (input$party == "Independent") {
+    pp <- p
+  }
+    ppp <- ggplotly(pp)
+  return(ppp)
   
   })
   
@@ -436,10 +446,18 @@ output$leaf.let <- renderLeaflet({
       theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
       theme(axis.ticks.x = element_blank()) +
       scale_y_continuous(limits = c(0, 100))+
-      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))+
       ggtitle("Senate % of Votes Missed")
-    pp <- ggplotly(p)
-    return(pp)
+    if (input$party == "all") {
+      pp <- p + scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))
+    } else if (input$party == "Democrat") {
+      pp <- p + scale_fill_manual(values = "#002868", labels = "Democrat")
+    } else if (input$party == "Republican") {
+      pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
+    } else if (input$party == "Independent") {
+      pp <- p + scale_fill_manual(values = "#6D1FA7", labels = "Independent")
+    }    
+    ppp <- ggplotly(pp)
+    return(ppp)
     
   })
 
@@ -476,10 +494,19 @@ output$leaf.let <- renderLeaflet({
       theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
       theme(axis.ticks.x = element_blank()) +
       scale_y_continuous(limits = c(0, 100))+
-      scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
       ggtitle("House of Representatives Votes With Party %")
-    pp <- ggplotly(p)
-    return(pp)
+    if (input$party == "all") {
+      pp <- p + scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
+        theme(axis.text.x = element_blank())
+    } else if (input$party == "Democrat") {
+      pp <- p + scale_fill_manual(values = "#002868", labels = "Democrat")
+    } else if (input$party == "Republican") {
+      pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
+    }else if (input$party == "Independent") {
+      pp <- p
+    }
+    ppp <- ggplotly(pp)
+    return(ppp)
     
   })
   
@@ -518,10 +545,17 @@ output$leaf.let <- renderLeaflet({
       theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
       theme(axis.ticks.x = element_blank()) +
       scale_y_continuous(limits = c(0, 100))+
-      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))+
       ggtitle("Senate Votes With Party %")
-    pp <- ggplotly(p)
-    return(pp)
+    if (input$party == "all") {
+      pp <- p + scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))    } else if (input$party == "Democrat") {
+      pp <- p + scale_fill_manual(values = "#002868", labels = "Democrat")
+    } else if (input$party == "Republican") {
+      pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
+    } else if (input$party == "Independent") {
+      pp <- p + scale_fill_manual(values = "#6D1FA7", labels = "Independent")
+    }    
+    ppp <- ggplotly(pp)
+    return(ppp)
   })
   
   output$house.missed.114 <- renderPlotly({
@@ -564,11 +598,19 @@ output$leaf.let <- renderLeaflet({
       theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
       theme(axis.ticks.x = element_blank()) +
       scale_y_continuous(limits = c(0, 100))+
-      scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican")) +
       ggtitle("House of Representatives % of Votes Missed")
-    pp <- ggplotly(p)
-    return(pp)
-    
+    if (input$party == "all") {
+      pp <- p + scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
+        theme(axis.text.x = element_blank())
+    } else if (input$party == "Democrat") {
+      pp <- p + scale_fill_manual(values = "#002868", labels = "Democrat")
+    } else if (input$party == "Republican") {
+      pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
+    } else if (input$party == "Independent") {
+      pp <- p
+    }
+    ppp <- ggplotly(pp)
+    return(ppp)
   })
   
   
@@ -613,10 +655,20 @@ output$leaf.let <- renderLeaflet({
       theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
       theme(axis.ticks.x = element_blank()) +
       scale_y_continuous(limits = c(0, 100))+
-      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))+
       ggtitle("Senate % of Votes Missed")
-    pp <- ggplotly(p)
-    return(pp)
+    if (input$party == "all") {
+      pp <- p + scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))
+    } else if (input$party == "Democrat") {
+      pp <- p + scale_fill_manual(values = "#002868", labels = "Democrat")
+    } else if (input$party == "Republican") {
+      pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
+    } else if (input$party == "Independent") {
+      pp <- p + scale_fill_manual(values = "#6D1FA7", labels = "Independent")
+    }   else if (input$party == "Independent") {
+      pp <- p
+    }
+    ppp <- ggplotly(pp)
+    return(ppp)
     
   })
   
@@ -658,10 +710,19 @@ output$leaf.let <- renderLeaflet({
       geom_bar(width = 1, stat = "identity") +
       theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
       theme(axis.ticks.x = element_blank()) +
-      scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
       ggtitle("House of Representatives Votes With Party %")
-    pp <- ggplotly(p)
-    return(pp)
+    if (input$party == "all") {
+      pp <- p + scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
+        theme(axis.text.x = element_blank())
+    } else if (input$party == "Democrat") {
+      pp <- p + scale_fill_manual(values = "#002868", labels = "Democrat")
+    } else if (input$party == "Republican") {
+      pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
+    } else if (input$party == "Independent") {
+      pp <- p
+    }
+    ppp <- ggplotly(pp)
+    return(ppp)
     
   })
   
@@ -708,10 +769,18 @@ output$leaf.let <- renderLeaflet({
       theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
       theme(axis.ticks.x = element_blank()) +
       scale_y_continuous(limits = c(0, 100))+
-      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))+
       ggtitle("Senate Votes With Party %")
-    pp <- ggplotly(p)
-    return(pp)
+    if (input$party == "all") {
+      pp <- p + scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))
+    } else if (input$party == "Democrat") {
+      pp <- p + scale_fill_manual(values = "#002868", labels = "Democrat")
+    } else if (input$party == "Republican") {
+      pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
+    } else if (input$party == "Independent") {
+      pp <- p + scale_fill_manual(values = "#6D1FA7", labels = "Independent")
+    }    
+    ppp <- ggplotly(pp)
+    return(ppp)
   })
   
   
