@@ -32,11 +32,12 @@ ui <- fluidPage(
                              actionButton('reset', "Reset View", icon = icon("undo", lib = "font-awesome")), br(), br(), 
                              fluidRow(
                                column(6,
-                             leafletOutput('leaf.let')),
-                             column(6,
+                                      leafletOutput('leaf.let')),
+                               column(6,
                              tableOutput('clickleg'),
-                             uiOutput('photosclick'))
-                           )),
+                             uiOutput('photosclick')))
+                           ),
+
                            conditionalPanel(
                              condition = "input.format == 'zipcode'",
                              uiOutput('choice'),
@@ -55,11 +56,17 @@ ui <- fluidPage(
                            h3("Gender Makeup"),
                            "This page shows how the gender makeup has changed from 2009 to 2017 for both the house and the senate.",
                            br(), br(),
-                           plotlyOutput("genderArea"),
+                           plotlyOutput("genderHouseArea"),
                            br(), br(),
-                           plotlyOutput("genderLine"),
+                           plotlyOutput("genderHouseLine"),
                            br(), br(),
-                           plotOutput("genderPie")),
+                           plotOutput("genderHousePie"),
+                           br(), br(),
+                           plotlyOutput("genderSenateArea"),
+                           br(), br(),
+                           plotlyOutput("genderSenateLine"),
+                           br(), br(),
+                           plotOutput("genderSenatePie")),
                   
                   tabPanel("Party Makeup", icon = icon("birthday-cake", lib = "font-awesome"),
                            h3("House"),
@@ -73,7 +80,8 @@ ui <- fluidPage(
                   
 
       
-                  tabPanel("Voting Reliability", icon = icon("check-square-o", lib = "font-awesome"),
+                  tabPanel("Voting Reliability", 
+                           icon = icon("check-square-o", lib = "font-awesome"),
                            h2("Voting Reliability: Missed Votes and Party Loyalty"), br(),
                           fluidRow(
                             column(3,
@@ -83,43 +91,41 @@ ui <- fluidPage(
                                    radioButtons('party', "Party:", 
                                                     choices = c("all", "Democrat", "Republican", "Independent"), selected = "all")),
                             column(3,
-                           selectInput('order', "Show Members:", choices = c("alphabetically", "decreasing", "increasing")))),
+                                    selectInput('order', "Show Members:", 
+                                                    choices = c("alphabetically", "decreasing", "increasing")))),
                           actionButton('table.button', "Show Table", icon = icon("table", lib = "font-awesome")),
                           hidden(actionButton('graph.button', "Return to Graph", icon = icon("bar-chart", lib = "font-awesome"))),
+
                            conditionalPanel(
                               condition = "input.congress == '115th'", 
-                              h3("Percent of Votes Missed"),
 
                               plotlyOutput('house.missed'),
 
                               plotlyOutput('senate.missed'),
-                              h3("Percent of Votes With Party"),
                               plotlyOutput('house.with'),
                               plotlyOutput('senate.with'),
                               fluidRow(
                                 column(6,
-                              hidden(tableOutput('house.115'))),
+                              hidden(dataTableOutput('house.115'))),
                               column(6,
-                              hidden(tableOutput('senate.115'))))
+                              hidden(dataTableOutput('senate.115'))))
 
                              
                            ),
                            
                            conditionalPanel(
                              condition = "input.congress == '114th'",
-                             h3("Percent of Votes Missed"),
        
                           plotlyOutput('house.missed.114'),
 
                           plotlyOutput('senate.missed.114'),
-                          h3("Percent of Votes With Party"),
                           plotlyOutput('house.with.114'),
                           plotlyOutput('senate.with.114')),
                           fluidRow(
                             column(6,
-                                   hidden(tableOutput('house.114'))),
+                                   hidden(dataTableOutput('house.114'))),
                             column(6,
-                          hidden(tableOutput('senate.114'))))
+                          hidden(dataTableOutput('senate.114'))))
 )
 ),
 
