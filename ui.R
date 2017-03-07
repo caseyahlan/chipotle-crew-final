@@ -85,12 +85,12 @@ ui <- fluidPage(
                           hidden(uiOutput('graph.button')),
                            conditionalPanel(
                               condition = "input.congress == '115th'", 
-                              h3("Percent of Votes Missed"),
+                         #     h3("Percent of Votes Missed"),
 
                               plotlyOutput('house.missed'),
 
                               plotlyOutput('senate.missed'),
-                              h3("Percent of Votes With Party"),
+                      #        h3("Percent of Votes With Party"),
                               plotlyOutput('house.with'),
                               plotlyOutput('senate.with'),
                               fluidRow(
@@ -104,12 +104,12 @@ ui <- fluidPage(
                            
                            conditionalPanel(
                              condition = "input.congress == '114th'",
-                             h3("Percent of Votes Missed"),
+                     #        h3("Percent of Votes Missed"),
        
                           plotlyOutput('house.missed.114'),
 
                           plotlyOutput('senate.missed.114'),
-                          h3("Percent of Votes With Party"),
+                     #     h3("Percent of Votes With Party"),
                           plotlyOutput('house.with.114'),
                           plotlyOutput('senate.with.114')),
                           fluidRow(
