@@ -8,6 +8,7 @@ library(shiny)
 library(devtools)
 library(leaflet)
 library(shinyjs)
+library(xtable)
 
 ui <- fluidPage(
   useShinyjs(),
@@ -24,6 +25,7 @@ ui <- fluidPage(
                            h3("This app will allow you to explore congress data"),
                            actionButton('welcome', "Awesome!"),
                            textOutput("hi")),
+                  
                   tabPanel("Your Representatives", icon = icon("handshake-o", lib = "font-awesome"),
                            h2("Your Representatives"),
                            radioButtons('format', label = "Find representatives by...", choices = c("zipcode", "map"), selected = character(0)),
@@ -56,30 +58,46 @@ ui <- fluidPage(
                   
                   tabPanel("View a Vote", icon = icon("eye", lib = "font-awesome")),
                   
-
                   tabPanel("Gender Makeup", icon = icon("venus-mars", lib = "font-awesome"),
                            h3("Gender Makeup"),
                            "This page shows how the gender makeup has changed from 2009 to 2017 for both the house of representatives and the senate.",
-                           br(), br(),
-                           h4(em("Gender Makeup in the House of Representatives")),
-                           br(), br(),
-                           tableOutput("genderHouseTable"),
-                           br(), br(),
-                           plotlyOutput("genderHouseArea"),
-                           br(), br(),
-                           plotlyOutput("genderHouseLine"),
-                           br(), br(),
-                           plotOutput("genderHousePie"),
-                           br(), br(),
-                           h4(em("Gender Makeup in the Senate")),
-                           br(), br(),
-                           tableOutput("genderSenateTable"),
-                           br(), br(),
-                           plotlyOutput("genderSenateArea"),
-                           br(), br(),
-                           plotlyOutput("genderSenateLine"),
-                           br(), br(),
-                           plotOutput("genderSenatePie")),
+                           br(), br(), br(),
+                           fluidRow(
+                             column(12, 
+                                    radioButtons('chamber',
+                                                 label = "Chamber",
+                                                 choices = c("House of Representatives", "Senate")
+                                                 )
+                                    )
+                           ),
+                           br(),
+                           conditionalPanel(
+                             condition = "input.chamber == 'House of Representatives'",
+                             h4(em("Gender Makeup in the House of Representatives"), align = "center"),
+                             br(), br(),
+                             tableOutput("genderHouseTable"),
+                             br(), br(),
+                             plotlyOutput("genderHouseArea"),
+                             br(), br(),
+                             plotlyOutput("genderHouseLine"),
+                             br(), br(),
+                             plotOutput("genderHousePie"),
+                             align = "center"
+                           ),
+                           conditionalPanel(
+                             condition = "input.chamber == 'Senate'",
+                             h4(em("Gender Makeup in the Senate"), align = "center"),
+                             br(), br(),
+                             tableOutput("genderSenateTable"),
+                             br(), br(),
+                             plotlyOutput("genderSenateArea"),
+                             br(), br(),
+                             plotlyOutput("genderSenateLine"),
+                             br(), br(),
+                             plotOutput("genderSenatePie"),
+                             align = "center"
+                           )
+                  ),
                   
                   tabPanel("Party Makeup", icon = icon("birthday-cake", lib = "font-awesome"),
                            h3("House"),
@@ -93,8 +111,6 @@ ui <- fluidPage(
                            plotlyOutput("senate.line"), br(),
                            plotOutput("senate.pie")),
                   
-
-      
                   tabPanel("Voting Reliability", 
                            icon = icon("check-square-o", lib = "font-awesome"),
                            h2("Voting Reliability: Missed Votes and Party Loyalty"), br(),
