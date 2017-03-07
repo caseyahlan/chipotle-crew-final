@@ -7,6 +7,7 @@ library(plotly)
 library(shiny)
 library(devtools)
 library(leaflet)
+library(shinyjs)
 
 ui <- fluidPage(
   useShinyjs(),
