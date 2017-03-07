@@ -96,9 +96,9 @@ ui <- fluidPage(
                               plotlyOutput('senate.with'),
                               fluidRow(
                                 column(6,
-                              hidden(tableOutput('house.115'))),
+                              hidden(dataTableOutput('house.115'))),
                               column(6,
-                              hidden(tableOutput('senate.115'))))
+                              hidden(dataTableOutput('senate.115'))))
 
                              
                            ),
@@ -115,9 +115,9 @@ ui <- fluidPage(
                           plotlyOutput('senate.with.114')),
                           fluidRow(
                             column(6,
-                                   hidden(tableOutput('house.114'))),
+                                   hidden(dataTableOutput('house.114'))),
                             column(6,
-                          hidden(tableOutput('senate.114'))))
+                          hidden(dataTableOutput('senate.114'))))
 )
 ),
 
