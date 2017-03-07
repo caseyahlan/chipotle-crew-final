@@ -238,19 +238,19 @@ server <- function(input, output) {
   
 output$leaf.let <- renderLeaflet({
     leaflet(data = state, options = leafletOptions(minZoom = 3)) %>% addTiles() %>%
-      addPolygons(fillColor = rainbow(50, alpha = NULL), stroke= FALSE,
+      addPolygons(fillColor = heat.colors(20, alpha = NULL), stroke= FALSE,
         highlight = highlightOptions(
         weight = 5,
         color = "#666",
         dashArray = "",
         fillOpacity = 0.7,
-        bringToFront = TRUE)) %>% setView(lng=-115, lat = 52, zoom = 3.4)
+        bringToFront = TRUE)) %>% setView(lng=-115, lat = 48, zoom = 3.7)
   })
     
     
   observe({
     input$reset
-    leafletProxy("leaf.let") %>% setView(lng = -115, lat = 52, zoom = 3.4)
+    leafletProxy("leaf.let") %>% setView(lng = -115, lat = 48, zoom = 3.7)
   })
   
   
@@ -354,7 +354,7 @@ output$leaf.let <- renderLeaflet({
     ggtitle("House of Representatives % of Votes Missed")
   if (input$party == "all") {
     pp <- p + scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
-      theme(axis.text.x = element.blank())
+      theme(axis.text.x = element_blank())
   } else if (input$party == "Democrat") {
     pp <- p + scale_fill_manual(values = "#002868", labels = "Democrat")
   } else if (input$party == "Republican") {
