@@ -62,6 +62,11 @@ legislators.by.gender.tall <- gather(legislators.by.gender, key = "Year", value 
 
 # Server function
 server <- function(input, output) {
+  output$hi <- eventReactive(input$welcome, {
+      return("We think so too!")
+    })
+  
+  
   output$house.area <- renderPlotly({
     h.makeup <- house.makeup
     party <- c("D","I","R")
@@ -71,7 +76,6 @@ server <- function(input, output) {
                         value  = Members,
                         `102`:`115`, convert = TRUE)
     h.makeup  <- data.frame(party, h.makeup)
-    View(h.makeup)
     plot <- ggplot(h.makeup, aes(x=Congress, y=Members, fill=party)) + 
       geom_area()+
       scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30")) +
@@ -291,13 +295,13 @@ output$leaf.let <- renderLeaflet({
         color = "#666",
         dashArray = "",
         fillOpacity = 0.7,
-        bringToFront = TRUE)) %>% setView(lng=-115, lat = 48, zoom = 3.7)
+        bringToFront = TRUE)) %>% setView(lng=-105, lat = 48, zoom = 3.7)
   })
     
     
   observe({
     input$reset
-    leafletProxy("leaf.let") %>% setView(lng = -115, lat = 48, zoom = 3.7)
+    leafletProxy("leaf.let") %>% setView(lng = -105, lat = 48, zoom = 3.7)
   })
   
   

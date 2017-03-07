@@ -12,15 +12,17 @@ ui <- fluidPage(
   titlePanel("Title"),
   h3("By Kelsey Kua, Casey Lum, and Devin Reich"),
   h5("This report is about blah blah blah"),
-  img(src="flag.jpg", height=245), 
-  img(src="capitolbuilding.jpg", height=245), 
-  img(src="congress.jpg", height=245), hr(),
+  img(src = "header.jpg", height = 255),
+   hr(),
   
 
       tabsetPanel(type="tabs",
-                  tabPanel("Welcome",
-                           h1("Welcome")),
-                  tabPanel("Your Representatives",
+                  tabPanel("Welcome", icon = icon("hand-spock-o", lib = "font-awesome"),
+                           h1("Welcome"),
+                           h2("This app will allow you to explore congress data"),
+                           actionButton('welcome', "Awesome!"),
+                           textOutput("hi")),
+                  tabPanel("Your Representatives", icon = icon("university", lib = "font-awesome"),
                            h2("Your Representatives"),
                            radioButtons('format', label = "Find representatives by...", choices = c("zipcode", "map"), selected = character(0)),
                            conditionalPanel(
@@ -38,15 +40,14 @@ ui <- fluidPage(
                              uiOutput('photos'))
                   ),
                   
-                  tabPanel("Compare Representatives"),
+                  tabPanel("Compare Representatives", icon = icon("balance-scale", lib ="font-awesome")),
                   
                   tabPanel("Voting Record"),
                   
-                  tabPanel("View a Vote"),
+                  tabPanel("View a Vote", icon = icon("eye", lib = "font-awesome")),
                   
-                  tabPanel("Vote Breakdown"),
-                  
-                  tabPanel("Gender Makeup",
+
+                  tabPanel("Gender Makeup", icon = icon("venus-mars", lib = "font-awesome"),
                            h3("Gender Makeup"),
                            "This page shows how the gender makeup has changed from 2009 to 2017 for both the house and the senate.",
                            br(), br(),
@@ -56,7 +57,7 @@ ui <- fluidPage(
                            br(), br(),
                            plotOutput("genderPie")),
                   
-                  tabPanel("Party Makeup", 
+                  tabPanel("Party Makeup", icon = icon("pie-chart", lib = "font-awesome"),
                            h3("House"),
                            plotlyOutput("house.area"), br(),
                            plotlyOutput("house.line"), br(),
@@ -68,7 +69,7 @@ ui <- fluidPage(
                   
 
       
-                  tabPanel("Voting Reliability",
+                  tabPanel("Voting Reliability", icon = icon("check-square-o", lib = "font-awesome"),
                            h2("Voting Reliability: Missed Votes and Party Loyalty"), br(),
                            radioButtons('party', "View by party:", 
                                                     choices = c("all", "Democrat", "Republican", "Independent"), selected = "all"),
@@ -111,6 +112,8 @@ ui <- fluidPage(
   ("|"),
   tags$a(href="https://en.wikipedia.org/wiki/United_States_Congress", "Wikipedia", target = "_blank"), 
   ("|"),
-  tags$a(href="https://www.brookings.edu/multi-chapter-report/vital-statistics-on-congress/", "Brookings", target = "_blank"), br()
+  tags$a(href="https://www.brookings.edu/multi-chapter-report/vital-statistics-on-congress/", "Brookings", target = "_blank"), br(),
+
+theme = "creative.css"
   
 )
