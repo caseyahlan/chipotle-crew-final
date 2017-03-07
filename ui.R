@@ -120,13 +120,13 @@ ui <- fluidPage(
 
                           plotlyOutput('senate.missed.114'),
                           plotlyOutput('house.with.114'),
-                          plotlyOutput('senate.with.114')),
+                          plotlyOutput('senate.with.114'),
                           fluidRow(
                             column(6,
                                    hidden(dataTableOutput('house.114'))),
                             column(6,
                           hidden(dataTableOutput('senate.114'))))
-)
+))
 ),
 
   hr(),

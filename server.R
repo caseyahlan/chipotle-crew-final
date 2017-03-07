@@ -560,20 +560,20 @@ server <- function(input, output) {
         })
   
 output$leaf.let <- renderLeaflet({
-    leaflet(data = state) %>% addTiles() %>%
+    leaflet(data = state, options = leafletOptions(minZoom = 2.5)) %>% addTiles() %>%
       addPolygons(fillColor = heat.colors(20, alpha = NULL), stroke= FALSE,
         highlight = highlightOptions(
         weight = 5,
         color = "#666",
         dashArray = "",
         fillOpacity = 0.7,
-        bringToFront = TRUE)) %>% setView(lng=-105, lat = 52, zoom = 3)
+        bringToFront = TRUE)) %>% setView(lng=-108, lat = 48, zoom = 2.9)
   })
     
     
   observe({
     input$reset
-    leafletProxy("leaf.let") %>% setView(lng = -105, lat = 52, zoom = 3)
+    leafletProxy("leaf.let") %>% setView(lng = -108, lat = 48, zoom = 2.9)
   })
   
   
