@@ -276,22 +276,16 @@ output$leaf.let <- renderLeaflet({
     picture.base <- ("https://theunitedstates.io/images/congress/225x275/")
     picture.query <- (".jpg") 
     num <- nrow(bio.ids)
-    if (num == 1) {
     picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
-    tags$img(src=picture1)
-    } else if (num == 2) {
-      picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
-      picture2 <-paste0(picture.base, bio.ids[2,1], picture.query)
-      tagList(tags$img(src=picture1), 
-              tags$img(src=picture2))
-    } else {
-    picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
-    picture2 <-paste0(picture.base, bio.ids[2,1], picture.query)
-    picture3 <- paste0(picture.base, bio.ids[3,1], picture.query)
-    tagList(tags$img(src=picture1), 
-            tags$img(src=picture2), 
-            tags$img(src=picture3))
+    images <- tags$img(src=picture1)
+    if (num > 1) {
+      num <- 2:num
+      for (val in num) {
+          picture <-paste0(picture.base, bio.ids[val,1], picture.query)
+          images <- tagAppendChild(images, tags$img(src=picture))
+      }
     }
+    return(images)
   })
   
 
