@@ -209,7 +209,9 @@ server <- function(input, output) {
     show("senate.with.114")
   })
 
-    output$graph.button <- renderUI(actionButton('graph.button', "Return to graph", icon = icon("bar-chart", lib = "font-awesome")))
+  output$graph.button <- renderUI({
+    actionButton('graph.button', "Return to graph", icon = icon("bar-chart", lib = "font-awesome"))
+    })
 
   observeEvent(input$table.button, {
     show("graph.button")
