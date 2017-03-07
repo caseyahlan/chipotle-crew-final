@@ -268,7 +268,7 @@ output$leaf.let <- renderLeaflet({
     latitude <- click$lat
     response <- GET(paste0(sunlight.base, resource, latitude, resource2, longitude))
     body <- fromJSON(content(response, "text"))
-    bio.ids <- flatten(body$results) %>% select(bioguide_id)
+    bio.ids <- flatten(body$results) %>% select(bioguide_id, website)
     picture.base <- ("https://theunitedstates.io/images/congress/225x275/")
     picture.query <- (".jpg") 
     num <- nrow(bio.ids)
