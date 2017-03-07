@@ -23,7 +23,6 @@ propublica.base <- "https://api.propublica.org/congress/v1/"
 house.makeup <- read.csv("data/house.makeup", stringsAsFactors = FALSE)
 senate.makeup <- read.csv("data/senate.makeup", stringsAsFactors = FALSE)
 
-
 # 'GENDERS IN CONGRESS' SECTION
 # Function that finds the gender composition by examining votes
 GetGenderMakeup <- function(roll.id) {
@@ -72,10 +71,11 @@ server <- function(input, output) {
                         value  = Members,
                         `102`:`115`, convert = TRUE)
     h.makeup  <- data.frame(party, h.makeup)
+    View(h.makeup)
     plot <- ggplot(h.makeup, aes(x=Congress, y=Members, fill=party)) + 
       geom_area()+
       scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30")) +
-      scale_x_continuous(breaks = c(102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115))
+      scale_x_continuous(breaks = c(102:115))
     pplot <- ggplotly(plot)
     return(pplot)
   })
@@ -113,26 +113,17 @@ server <- function(input, output) {
   h.makeup  <- data.frame(party, h.makeup)
   plot <- ggplot(h.makeup, aes(x=Congress, y=Members, color=party)) + 
     geom_line()+
-    scale_color_manual(values = c("#002868", "#6D1FA7", "#BF0A30"))
+    scale_color_manual(values = c("#002868", "#6D1FA7", "#BF0A30")) +
+    scale_x_continuous(breaks = c(102:115))
   pplot <- ggplotly(plot)
   return(pplot)
   })
   
   output$house.pie <- renderPlot({
-    house.makeup$X102 <- round(((house.makeup$X102 / sum(house.makeup$X102))*100), digits = 2)
-    house.makeup$X103 <- round(((house.makeup$X103 / sum(house.makeup$X103))*100), digits = 2)
-    house.makeup$X104 <- round(((house.makeup$X104 / sum(house.makeup$X104))*100), digits = 2)
-    house.makeup$X105 <- round(((house.makeup$X105 / sum(house.makeup$X105))*100), digits = 2)
-    house.makeup$X106 <- round(((house.makeup$X106 / sum(house.makeup$X106))*100), digits = 2)
-    house.makeup$X107 <- round(((house.makeup$X107 / sum(house.makeup$X107))*100), digits = 2)
-    house.makeup$X108 <- round(((house.makeup$X108 / sum(house.makeup$X108))*100), digits = 2)
-    house.makeup$X109 <- round(((house.makeup$X109 / sum(house.makeup$X109))*100), digits = 2)
-    house.makeup$X110 <- round(((house.makeup$X110 / sum(house.makeup$X110))*100), digits = 2)
-    house.makeup$X111 <- round(((house.makeup$X111 / sum(house.makeup$X111))*100), digits = 2)
-    house.makeup$X112 <- round(((house.makeup$X112 / sum(house.makeup$X112))*100), digits = 2)
-    house.makeup$X113 <- round(((house.makeup$X113 / sum(house.makeup$X113))*100), digits = 2)
-    house.makeup$X114 <- round(((house.makeup$X114 / sum(house.makeup$X114))*100), digits = 2)
-    house.makeup$X115 <- round(((house.makeup$X115 / sum(house.makeup$X115))*100), digits = 2)
+    times <- 3:16
+    for (val in times) {
+      house.makeup[,val] <- round(((house.makeup[,val] / sum(house.makeup[,val]))*100), digits = 2)
+    }
     h.makeup <- house.makeup
     party <- c("D","I","R")
     h.makeup <- select(h.makeup, -X, -party)
@@ -183,7 +174,8 @@ server <- function(input, output) {
     s.makeup  <- data.frame(party, s.makeup)
     plot <- ggplot(s.makeup, aes(x=Congress, y=Members, fill=party)) + 
       geom_area()+
-      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"))
+      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30")) +
+      scale_x_continuous(breaks = c(80:115))
     pplot <- ggplotly(plot)
     return(pplot)
   })
@@ -199,48 +191,17 @@ server <- function(input, output) {
     s.makeup  <- data.frame(party, s.makeup)
     plot <- ggplot(s.makeup, aes(x=Congress, y=Members, color=party)) + 
       geom_line()+
-      scale_color_manual(values = c("#002868", "#6D1FA7", "#BF0A30"))
+      scale_color_manual(values = c("#002868", "#6D1FA7", "#BF0A30")) +
+      scale_x_continuous(breaks = c(80:115))
     pplot <- ggplotly(plot)
     return(pplot)
   })
   
   output$senate.pie <- renderPlot({
-    senate.makeup$X80 <- round(((senate.makeup$X80 / sum(senate.makeup$X80))*100), digits = 2)
-    senate.makeup$X81 <- round(((senate.makeup$X81 / sum(senate.makeup$X81))*100), digits = 2)
-    senate.makeup$X82 <- round(((senate.makeup$X82 / sum(senate.makeup$X82))*100), digits = 2)
-    senate.makeup$X83 <- round(((senate.makeup$X83 / sum(senate.makeup$X83))*100), digits = 2)
-    senate.makeup$X84 <- round(((senate.makeup$X84 / sum(senate.makeup$X84))*100), digits = 2)
-    senate.makeup$X85 <- round(((senate.makeup$X85 / sum(senate.makeup$X85))*100), digits = 2)
-    senate.makeup$X86 <- round(((senate.makeup$X86 / sum(senate.makeup$X86))*100), digits = 2)
-    senate.makeup$X87 <- round(((senate.makeup$X87 / sum(senate.makeup$X87))*100), digits = 2)
-    senate.makeup$X88 <- round(((senate.makeup$X88 / sum(senate.makeup$X88))*100), digits = 2)
-    senate.makeup$X89 <- round(((senate.makeup$X89 / sum(senate.makeup$X89))*100), digits = 2)
-    senate.makeup$X90 <- round(((senate.makeup$X90 / sum(senate.makeup$X90))*100), digits = 2)
-    senate.makeup$X91 <- round(((senate.makeup$X91 / sum(senate.makeup$X91))*100), digits = 2)
-    senate.makeup$X92 <- round(((senate.makeup$X92 / sum(senate.makeup$X92))*100), digits = 2)
-    senate.makeup$X93 <- round(((senate.makeup$X93 / sum(senate.makeup$X93))*100), digits = 2)
-    senate.makeup$X94 <- round(((senate.makeup$X94 / sum(senate.makeup$X94))*100), digits = 2)
-    senate.makeup$X95 <- round(((senate.makeup$X95 / sum(senate.makeup$X95))*100), digits = 2)
-    senate.makeup$X96 <- round(((senate.makeup$X96 / sum(senate.makeup$X96))*100), digits = 2)
-    senate.makeup$X97 <- round(((senate.makeup$X97 / sum(senate.makeup$X97))*100), digits = 2)
-    senate.makeup$X98 <- round(((senate.makeup$X98 / sum(senate.makeup$X98))*100), digits = 2)
-    senate.makeup$X99 <- round(((senate.makeup$X99 / sum(senate.makeup$X99))*100), digits = 2)
-    senate.makeup$X100 <- round(((senate.makeup$X100 / sum(senate.makeup$X100))*100), digits = 2)
-    senate.makeup$X101 <- round(((senate.makeup$X101 / sum(senate.makeup$X101))*100), digits = 2)
-    senate.makeup$X102 <- round(((senate.makeup$X102 / sum(senate.makeup$X102))*100), digits = 2)
-    senate.makeup$X103 <- round(((senate.makeup$X103 / sum(senate.makeup$X103))*100), digits = 2)
-    senate.makeup$X104 <- round(((senate.makeup$X104 / sum(senate.makeup$X104))*100), digits = 2)
-    senate.makeup$X105 <- round(((senate.makeup$X105 / sum(senate.makeup$X105))*100), digits = 2)
-    senate.makeup$X106 <- round(((senate.makeup$X106 / sum(senate.makeup$X106))*100), digits = 2)
-    senate.makeup$X107 <- round(((senate.makeup$X107 / sum(senate.makeup$X107))*100), digits = 2)
-    senate.makeup$X108 <- round(((senate.makeup$X108 / sum(senate.makeup$X108))*100), digits = 2)
-    senate.makeup$X109 <- round(((senate.makeup$X109 / sum(senate.makeup$X109))*100), digits = 2)
-    senate.makeup$X110 <- round(((senate.makeup$X110 / sum(senate.makeup$X110))*100), digits = 2)
-    senate.makeup$X111 <- round(((senate.makeup$X111 / sum(senate.makeup$X111))*100), digits = 2)
-    senate.makeup$X112 <- round(((senate.makeup$X112 / sum(senate.makeup$X112))*100), digits = 2)
-    senate.makeup$X113 <- round(((senate.makeup$X113 / sum(senate.makeup$X113))*100), digits = 2)
-    senate.makeup$X114 <- round(((senate.makeup$X114 / sum(senate.makeup$X114))*100), digits = 2)
-    senate.makeup$X115 <- round(((senate.makeup$X115 / sum(senate.makeup$X115))*100), digits = 2)
+    times <- 3:38
+    for (val in times) {
+      senate.makeup[,val] <- round(((senate.makeup[,val] / sum(senate.makeup[,val]))*100), digits = 2)
+    }
     s.makeup <- senate.makeup
     party <- c("D","I","R")
     s.makeup <- select(s.makeup, -X, -party)
@@ -324,19 +285,19 @@ server <- function(input, output) {
   
 output$leaf.let <- renderLeaflet({
     leaflet(data = state, options = leafletOptions(minZoom = 3)) %>% addTiles() %>%
-      addPolygons(fillColor = rainbow(50, alpha = NULL), stroke= FALSE,
+      addPolygons(fillColor = heat.colors(20, alpha = NULL), stroke= FALSE,
         highlight = highlightOptions(
         weight = 5,
         color = "#666",
         dashArray = "",
         fillOpacity = 0.7,
-        bringToFront = TRUE)) %>% setView(lng=-115, lat = 52, zoom = 3.4)
+        bringToFront = TRUE)) %>% setView(lng=-115, lat = 48, zoom = 3.7)
   })
     
     
   observe({
     input$reset
-    leafletProxy("leaf.let") %>% setView(lng = -115, lat = 52, zoom = 3.4)
+    leafletProxy("leaf.let") %>% setView(lng = -115, lat = 48, zoom = 3.7)
   })
   
   
@@ -358,22 +319,16 @@ output$leaf.let <- renderLeaflet({
     picture.base <- ("https://theunitedstates.io/images/congress/225x275/")
     picture.query <- (".jpg") 
     num <- nrow(bio.ids)
-    if (num == 1) {
     picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
-    tags$img(src=picture1)
-    } else if (num == 2) {
-      picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
-      picture2 <-paste0(picture.base, bio.ids[2,1], picture.query)
-      tagList(tags$img(src=picture1), 
-              tags$img(src=picture2))
-    } else {
-    picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
-    picture2 <-paste0(picture.base, bio.ids[2,1], picture.query)
-    picture3 <- paste0(picture.base, bio.ids[3,1], picture.query)
-    tagList(tags$img(src=picture1), 
-            tags$img(src=picture2), 
-            tags$img(src=picture3))
+    images <- tags$img(src=picture1)
+    if (num > 1) {
+      num <- 2:num
+      for (val in num) {
+          picture <-paste0(picture.base, bio.ids[val,1], picture.query)
+          images <- tagAppendChild(images, tags$img(src=picture))
+      }
     }
+    return(images)
   })
   
 
@@ -441,7 +396,7 @@ output$leaf.let <- renderLeaflet({
     ggtitle("House of Representatives % of Votes Missed")
   if (input$party == "all") {
     pp <- p + scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
-      theme(axis.text.x = element.blank())
+      theme(axis.text.x = element_blank())
   } else if (input$party == "Democrat") {
     pp <- p + scale_fill_manual(values = "#002868", labels = "Democrat")
   } else if (input$party == "Republican") {
