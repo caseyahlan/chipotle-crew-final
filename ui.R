@@ -7,6 +7,7 @@ library(plotly)
 library(shiny)
 library(devtools)
 library(leaflet)
+library(shinyjs)
 
 ui <- fluidPage(
   useShinyjs(),
@@ -28,12 +29,14 @@ ui <- fluidPage(
                            radioButtons('format', label = "Find representatives by...", choices = c("zipcode", "map"), selected = character(0)),
                            conditionalPanel(
                              condition = "input.format == 'map'", 
-                             actionButton('reset', "Reset View"), br(), br(), 
-                             leafletOutput('leaf.let', height = 650),
-                             uiOutput('explanation'),
+                             actionButton('reset', "Reset View", icon = icon("undo", lib = "font-awesome")), br(), br(), 
+                             fluidRow(
+                               column(6,
+                             leafletOutput('leaf.let')),
+                             column(6,
                              tableOutput('clickleg'),
-                             uiOutput('photosclick')
-                           ),
+                             uiOutput('photosclick'))
+                           )),
                            conditionalPanel(
                              condition = "input.format == 'zipcode'",
                              uiOutput('choice'),
@@ -82,7 +85,7 @@ ui <- fluidPage(
                             column(3,
                            selectInput('order', "Show Members:", choices = c("alphabetically", "decreasing", "increasing")))),
                           actionButton('table.button', "Show Table", icon = icon("table", lib = "font-awesome")),
-                          hidden(uiOutput('graph.button')),
+                          hidden(actionButton('graph.button', "Return to Graph", icon = icon("bar-chart", lib = "font-awesome"))),
                            conditionalPanel(
                               condition = "input.congress == '115th'", 
                               h3("Percent of Votes Missed"),

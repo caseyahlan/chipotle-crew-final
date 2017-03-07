@@ -9,6 +9,7 @@ library(sp)
 library(geojsonio)
 library(curlconverter)
 library(tidyr)
+library(shinyjs)
 source("apikey.R")
 
 state <- geojson_read("data/stateData.geojson", what = "sp")
@@ -120,9 +121,15 @@ legislators.by.gender.tall <- gather(legislators.by.gender, key = "Year", value 
 
 # Server function
 server <- function(input, output) {
+  
+
   output$hi <- eventReactive(input$welcome, {
       return("We think so too!")
     })
+  
+  observeEvent(input$table.button, {
+    show("graph.button")
+  })
   
   observeEvent(input$table.button, {
     hide("party")
@@ -208,11 +215,7 @@ server <- function(input, output) {
     show("senate.with.114")
   })
 
-    output$graph.button <- renderUI(actionButton('graph.button', "Return to graph", icon = icon("bar-chart", lib = "font-awesome")))
 
-  observeEvent(input$table.button, {
-    show("graph.button")
-  })  
     
   observeEvent(input$graph.button, {
     show("table.button")
