@@ -34,7 +34,7 @@ members.list <- request.body.list$results[[1]]$members
 names(members.list) <- NULL
 members.json <- toJSON(members.list)
 senate.114 <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
-  select(first_name, last_name, party, missed_votes_pct, votes_with_party_pct)
+  select(first_name, last_name, party, state, missed_votes_pct, votes_with_party_pct)
 senate.114 <- senate.114[!sapply(senate.114$votes_with_party_pct,is.null),]
 
 
@@ -48,7 +48,7 @@ members.list <- request.body.list$results[[1]]$members
 names(members.list) <- NULL
 members.json <- toJSON(members.list)
 house.114 <- flatten(fromJSON(members.json, flatten = TRUE)) %>%
-  select(first_name, last_name, party, missed_votes_pct, votes_with_party_pct)
+  select(first_name, last_name, party, state, missed_votes_pct, votes_with_party_pct)
 house.114 <- house.114[!sapply(house.114$votes_with_party_pct,is.null),]
 
 
@@ -63,7 +63,7 @@ members.list <- request.body.list$results[[1]]$members
 names(members.list) <- NULL
 members.json <- toJSON(members.list)
 senate.115 <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
-  select(first_name, last_name, party, missed_votes_pct, votes_with_party_pct)
+  select(first_name, last_name, party, state, missed_votes_pct, votes_with_party_pct)
 senate.115 <- senate.115[!sapply(senate.115$votes_with_party_pct,is.null),]
 
 
@@ -77,7 +77,7 @@ members.list <- request.body.list$results[[1]]$members
 names(members.list) <- NULL
 members.json <- toJSON(members.list)
 house.115 <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
-  select(first_name, last_name, party, missed_votes_pct, votes_with_party_pct)
+  select(first_name, last_name, party, state, missed_votes_pct, votes_with_party_pct)
 house.115 <- house.115[!sapply(house.115$votes_with_party_pct,is.null),]
 
 
@@ -143,7 +143,7 @@ server <- function(input, output) {
   })
 
   observeEvent(input$table.button, {
-    hideElement("table.button")
+    toggleElement("table.button")
   })
   
   observeEvent(input$graph.button, {
@@ -151,150 +151,150 @@ server <- function(input, output) {
   })
   
   observeEvent(input$graph.button, {
-    hideElement("graph.button")
+    toggleElement("graph.button")
   })
   
   observeEvent(input$table.button, {
-    hideElement("party")
+    toggleElement("party")
   })
   
   observeEvent(input$table.button, {
-    hideElement("order")
+    toggleElement("order")
   })
   
   observeEvent(input$graph.button, {
-    showElement("party")
+    toggleElement("party")
   })
   
   observeEvent(input$graph.button, {
-    showElement("order")
+    toggleElement("order")
   })
   
   observeEvent(input$table.button, {
-    hideElement("house.missed")
+    toggleElement("house.missed")
   })
   
   observeEvent(input$table.button, {
-    hideElement("senate.missed")
+    toggleElement("senate.missed")
   })
   
   observeEvent(input$table.button, {
-    hideElement("house.with")
+    toggleElement("house.with")
   })
   
   observeEvent(input$table.button, {
-    hideElement("senate.with")
+    toggleElement("senate.with")
   })
   
   observeEvent(input$table.button, {
-    hideElement("house.missed.114")
+    toggleElement("house.missed.114")
   })
   
   observeEvent(input$table.button, {
-    hideElement("senate.missed.114")
+    toggleElement("senate.missed.114")
   })
   
   observeEvent(input$table.button, {
-    hideElement("house.with.114")
+    toggleElement("house.with.114")
   })
   
   observeEvent(input$table.button, {
-    hideElement("senate.with.114")
+    toggleElement("senate.with.114")
   })
   
   
   observeEvent(input$graph.button, {
-    showElement("house.missed")
+    toggleElement("house.missed")
   })
   
   observeEvent(input$graph.button, {
-    showElement("senate.missed")
+    toggleElement("senate.missed")
   })
   
   observeEvent(input$graph.button, {
-    showElement("house.with")
+    toggleElement("house.with")
   })
   
   observeEvent(input$graph.button, {
-    showElement("senate.with")
+    toggleElement("senate.with")
   })
   
   observeEvent(input$graph.button, {
-    showElement("house.missed.114")
+    toggleElement("house.missed.114")
   })
   
   observeEvent(input$graph.button, {
-    showElement("senate.missed.114")
+    toggleElement("senate.missed.114")
   })
 
   observeEvent(input$graph.button, {
-    showElement("house.with.114")
+    toggleElement("house.with.114")
   })
   
   observeEvent(input$graph.button, {
-    showElement("senate.with.114")
+    toggleElement("senate.with.114")
   })
 
 
   
-  output$house.114 <- renderDataTable({
+  output$house.114 <- renderTable({
     house.1 <- house.114 %>% mutate(name = paste(first_name, last_name))
-    house <- house.1 %>% select(name, party, missed_votes_pct, votes_with_party_pct)
-    colnames(house) <- c("name", "party", "missed votes %", "votes with party %")
+    house <- house.1 %>% select(name, party, state, missed_votes_pct, votes_with_party_pct)
+    colnames(house) <- c("name", "party", "state", "missed votes %", "votes with party %")
     house
       })
   
-  output$senate.114 <- renderDataTable({
+  output$senate.114 <- renderTable({
     senate.1 <- senate.114 %>% mutate(name = paste(first_name, last_name))
-    senate <- senate.1 %>% select(name, party, missed_votes_pct, votes_with_party_pct)
-    colnames(senate) <- c("name", "party", "missed votes %", "votes with party %")
+    senate <- senate.1 %>% select(name, party, state, missed_votes_pct, votes_with_party_pct)
+    colnames(senate) <- c("name", "party", "state", "missed votes %", "votes with party %")
     senate
   })
   
-  output$house.115 <- renderDataTable({
+  output$house.115 <- renderTable({
     house.1 <- house.115 %>% mutate(name = paste(first_name, last_name))
-    house <- house.1 %>% select(name, party, missed_votes_pct, votes_with_party_pct)
-    colnames(house) <- c("name", "party", "missed votes %", "votes with party %")
+    house <- house.1 %>% select(name, party, state, missed_votes_pct, votes_with_party_pct)
+    colnames(house) <- c("name", "party", "state", "missed votes %", "votes with party %")
     house
   })
   
-  output$senate.115 <- renderDataTable({
+  output$senate.115 <- renderTable({
     senate.1 <- senate.115 %>% mutate(name = paste(first_name, last_name))
-    senate <- senate.1 %>% select(name, party, missed_votes_pct, votes_with_party_pct)
-    colnames(senate) <- c("name", "party", "missed votes %", "votes with party %")
+    senate <- senate.1 %>% select(name, party, state, missed_votes_pct, votes_with_party_pct)
+    colnames(senate) <- c("name", "party", "state", "missed votes %", "votes with party %")
     senate
   })
   
   observeEvent(input$table.button, {
-    showElement("house.114")
+    toggleElement("house.114")
   })
   
   observeEvent(input$table.button, {
-    showElement("senate.114")
+    toggleElement("senate.114")
   })
 
   observeEvent(input$table.button, {
-    showElement("house.115")
+    toggleElement("house.115")
   })
   
   observeEvent(input$table.button, {
-    showElement("senate.115")
+    toggleElement("senate.115")
   })
   
   observeEvent(input$graph.button, {
-    hideElement("house.114")
+    toggleElement("house.114")
   })
   
   observeEvent(input$graph.button, {
-    hideElement("senate.114")
+    toggleElement("senate.114")
   })
   
   observeEvent(input$graph.button, {
-    hideElement("house.115")
+    toggleElement("house.115")
   })
   
   observeEvent(input$graph.button, {
-    hideElement("senate.115")
+    toggleElement("senate.115")
   })
   
   
@@ -507,7 +507,7 @@ server <- function(input, output) {
     query <- paste0("?zip=", input$zip)
     response <- GET(paste0(sunlight.base, resource, query))
     body <- fromJSON(content(response, "text"))
-    legislators <- flatten(body$results) %>% mutate(name = paste(first_name, last_name)) %>% select(name, chamber, party, state, phone, website)
+    legislators <- flatten(body$results) %>% mutate(name = paste(first_name, last_name)) %>% select(name, chamber, party, state, phone)
     return(legislators)
   })
   
@@ -534,7 +534,7 @@ server <- function(input, output) {
     latitude <- click$lat
     response <- GET(paste0(sunlight.base, resource, latitude, resource2, longitude))
     body <- fromJSON(content(response, "text"))
-    legislators <- flatten(body$results) %>% mutate(name = paste(first_name, last_name)) %>% select(name, chamber, party, state, phone, website)
+    legislators <- flatten(body$results) %>% mutate(name = paste(first_name, last_name)) %>% select(name, chamber, party, state, phone)
     return(legislators)
   })
   
@@ -552,12 +552,7 @@ server <- function(input, output) {
       })
     
     
-  output$explanation <- renderUI({
-    if (is.null(input$leaflet_click)) 
-      return(em("Click on the map to view representatives"))
 
-    tags$em("Below are the representatives that represent this spot.") 
-        })
   
 output$leaf.let <- renderLeaflet({
     leaflet(data = state, options = leafletOptions(minZoom = 2.5)) %>% addTiles() %>%
@@ -567,18 +562,14 @@ output$leaf.let <- renderLeaflet({
         color = "#666",
         dashArray = "",
         fillOpacity = 0.7,
-        bringToFront = TRUE)) %>% setView(lng=-108, lat = 48, zoom = 2.9)
+        bringToFront = TRUE)) %>% setView(lng=-112, lat = 47, zoom = 3)
   })
     
     
   observe({
     input$reset
-    leafletProxy("leaf.let") %>% setView(lng = -108, lat = 48, zoom = 2.9)
+    leafletProxy("leaf.let") %>% setView(lng = -112, lat = 47, zoom = 3)
   })
-  
-  
-
-  
   
   
   output$photosclick <- renderUI({
@@ -596,12 +587,12 @@ output$leaf.let <- renderLeaflet({
     picture.query <- (".jpg") 
     num <- nrow(bio.ids)
     picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
-    images <- tags$img(src=picture1)
+    images <- tags$img(src=picture1, width = 200)
     if (num > 1) {
       num <- 2:num
       for (val in num) {
           picture <-paste0(picture.base, bio.ids[val,1], picture.query)
-          images <- tagAppendChild(images, tags$img(src=picture))
+          images <- tagAppendChild(images, tags$img(src=picture, width = 200))
       }
     }
     return(images)
@@ -675,6 +666,13 @@ output$leaf.let <- renderLeaflet({
   
   })
   
+  output$senate.ex <- renderText({
+    return("It appears that some Congresses had more than 100 members because all members that served during the Congress are shown, even though no more than 100 members were active at the same time.")
+  })
+  
+  observeEvent(input$senate.q, {
+    showElement("senate.ex", anim = TRUE, animType = "fade")
+  })
   
   
   output$senate.missed <- renderPlotly({
@@ -848,7 +846,7 @@ output$leaf.let <- renderLeaflet({
     } else if (input$party == "Independent") {
       senate.members.114 <- senate.114 %>% filter(party == "I")
     } else if (input$party == "Republican") {
-      senate.members.114 <- senate %>% filter(party == "R")
+      senate.members.114 <- senate.114 %>% filter(party == "R")
     }
     senate.members.114 <- senate.members.114 %>% mutate(name = paste(first_name, last_name))
     senate.members <- senate.members.114[!sapply(senate.members.114$missed_votes_pct,is.null),]

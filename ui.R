@@ -29,18 +29,23 @@ ui <- fluidPage(
                            radioButtons('format', label = "Find representatives by...", choices = c("zipcode", "map"), selected = character(0)),
                            conditionalPanel(
                              condition = "input.format == 'map'", 
-                             actionButton('reset', "Reset View", icon = icon("undo", lib = "font-awesome")), br(), br(), 
+                             actionButton('reset', "Reset View", icon = icon("undo", lib = "font-awesome")), br(), 
                              fluidRow(
                                column(6,
+                                      em("Click a point on the map to view its representatives"), br(), br(),
                                       leafletOutput('leaf.let')),
                                column(6,
                              tableOutput('clickleg'),
-                             uiOutput('photosclick')))
-                           ),
+                             uiOutput('photosclick'))              
+                             )),
 
                            conditionalPanel(
                              condition = "input.format == 'zipcode'",
                              uiOutput('choice'),
+                             em(strong("Note:"), "zipcodes have varying numbers of representatives because some 
+                                zipcodes span multiple congressional districts, meaning multiple members of the House are shown. 
+                                Finding your location on the map will
+                                show you who your representatives are."),
                              tableOutput('reps'),
                              uiOutput('photos'))
                   ),
@@ -74,6 +79,8 @@ ui <- fluidPage(
                            plotlyOutput("house.line"), br(),
                            plotOutput("house.pie"),
                            h3("Senate"),
+                           actionButton("senate.q", "What? I thought the senate had 100 members!"),
+                           hidden(textOutput("senate.ex")),
                            plotlyOutput("senate.area"), br(),
                            plotlyOutput("senate.line"), br(),
                            plotOutput("senate.pie")),
@@ -106,9 +113,9 @@ ui <- fluidPage(
                               plotlyOutput('senate.with'),
                               fluidRow(
                                 column(6,
-                              hidden(dataTableOutput('house.115'))),
+                              hidden(tableOutput('house.115'))),
                               column(6,
-                              hidden(dataTableOutput('senate.115'))))
+                              hidden(tableOutput('senate.115'))))
 
                              
                            ),
@@ -123,9 +130,9 @@ ui <- fluidPage(
                           plotlyOutput('senate.with.114'),
                           fluidRow(
                             column(6,
-                                   hidden(dataTableOutput('house.114'))),
+                                   hidden(tableOutput('house.114'))),
                             column(6,
-                          hidden(dataTableOutput('senate.114'))))
+                          hidden(tableOutput('senate.114'))))
 ))
 ),
 
