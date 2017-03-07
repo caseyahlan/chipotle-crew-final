@@ -9,9 +9,10 @@ library(devtools)
 library(leaflet)
 
 ui <- fluidPage(
-  titlePanel("Title"),
+  useShinyjs(),
+  titlePanel("Congress App"),
+  h3("Info 201 Final Project"),
   h3("By Kelsey Kua, Casey Lum, and Devin Reich"),
-  h5("This report is about blah blah blah"),
   img(src = "header.jpg", height = 255),
    hr(),
   
@@ -19,10 +20,10 @@ ui <- fluidPage(
       tabsetPanel(type="tabs",
                   tabPanel("Welcome", icon = icon("hand-spock-o", lib = "font-awesome"),
                            h1("Welcome"),
-                           h2("This app will allow you to explore congress data"),
+                           h3("This app will allow you to explore congress data"),
                            actionButton('welcome', "Awesome!"),
                            textOutput("hi")),
-                  tabPanel("Your Representatives", icon = icon("university", lib = "font-awesome"),
+                  tabPanel("Your Representatives", icon = icon("handshake-o", lib = "font-awesome"),
                            h2("Your Representatives"),
                            radioButtons('format', label = "Find representatives by...", choices = c("zipcode", "map"), selected = character(0)),
                            conditionalPanel(
@@ -40,9 +41,9 @@ ui <- fluidPage(
                              uiOutput('photos'))
                   ),
                   
-                  tabPanel("Compare Representatives", icon = icon("balance-scale", lib ="font-awesome")),
+                  tabPanel("Compare Two Reps", icon = icon("balance-scale", lib ="font-awesome")),
                   
-                  tabPanel("Voting Record"),
+                  tabPanel("Voting Record", icon = icon("history", lib = "font-awesome")),
                   
                   tabPanel("View a Vote", icon = icon("eye", lib = "font-awesome")),
                   
@@ -57,7 +58,7 @@ ui <- fluidPage(
                            br(), br(),
                            plotOutput("genderPie")),
                   
-                  tabPanel("Party Makeup", icon = icon("pie-chart", lib = "font-awesome"),
+                  tabPanel("Party Makeup", icon = icon("birthday-cake", lib = "font-awesome"),
                            h3("House"),
                            plotlyOutput("house.area"), br(),
                            plotlyOutput("house.line"), br(),
@@ -71,39 +72,52 @@ ui <- fluidPage(
       
                   tabPanel("Voting Reliability", icon = icon("check-square-o", lib = "font-awesome"),
                            h2("Voting Reliability: Missed Votes and Party Loyalty"), br(),
-                           radioButtons('party', "View by party:", 
-                                                    choices = c("all", "Democrat", "Republican", "Independent"), selected = "all"),
-                            radioButtons('congress', "Congress:",
-                                                    choices = c("114th", "115th")),
-                           selectInput('order', "Show Members:", choices = c("alphabetically", "decreasing", "increasing")),
+                          fluidRow(
+                            column(3,
+                                   radioButtons('congress', "Congress:",
+                                                choices = c("114th", "115th"))),
+                            column(3,
+                                   radioButtons('party', "Party:", 
+                                                    choices = c("all", "Democrat", "Republican", "Independent"), selected = "all")),
+                            column(3,
+                           selectInput('order', "Show Members:", choices = c("alphabetically", "decreasing", "increasing")))),
+                          actionButton('table.button', "Show Table", icon = icon("table", lib = "font-awesome")),
+                          hidden(uiOutput('graph.button')),
                            conditionalPanel(
                               condition = "input.congress == '115th'", 
                               h3("Percent of Votes Missed"),
-                              strong("Note:"), ("all percentages are inflated by 0.5% so that members with 0 missed
-                                             votes are still shown on the graph"),
+
                               plotlyOutput('house.missed'),
-                              strong("Note:"), ("all percentages are inflated by 0.2% so that members with 0 missed
-                                             votes are still shown on the graph"),
+
                               plotlyOutput('senate.missed'),
                               h3("Percent of Votes With Party"),
                               plotlyOutput('house.with'),
-                              plotlyOutput('senate.with')
+                              plotlyOutput('senate.with'),
+                              fluidRow(
+                                column(6,
+                              hidden(tableOutput('house.115'))),
+                              column(6,
+                              hidden(tableOutput('senate.115'))))
+
                              
                            ),
                            
                            conditionalPanel(
                              condition = "input.congress == '114th'",
                              h3("Percent of Votes Missed"),
-                             strong("Note:"), ("all percentages are inflated by 0.5% so that members with 0 missed
-                                             votes are still shown on the graph"),         
+       
                           plotlyOutput('house.missed.114'),
-                          strong("Note:"), ("all percentages are inflated by 0.2% so that members with 0 missed
-                                             votes are still shown on the graph"),
+
                           plotlyOutput('senate.missed.114'),
                           h3("Percent of Votes With Party"),
                           plotlyOutput('house.with.114'),
-                          plotlyOutput('senate.with.114')
-))
+                          plotlyOutput('senate.with.114')),
+                          fluidRow(
+                            column(6,
+                                   hidden(tableOutput('house.114'))),
+                            column(6,
+                          hidden(tableOutput('senate.114'))))
+)
 ),
 
   hr(),

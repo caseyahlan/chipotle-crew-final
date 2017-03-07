@@ -41,6 +41,64 @@ GetGenderMakeup <- function(roll.id) {
   return(voters.gender)
 }
 
+# Get senate 114 data
+cmd <- 'curl "https://api.propublica.org/congress/v1/114/senate/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
+parsed_cmd <- straighten(cmd)
+str(parsed_cmd)
+actual_function <- make_req(parsed_cmd)[[1]]
+request.body.list <- content(actual_function())
+members.list <- request.body.list$results[[1]]$members
+names(members.list) <- NULL
+members.json <- toJSON(members.list)
+senate.114 <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
+  select(first_name, last_name, party, missed_votes_pct, votes_with_party_pct)
+senate.114 <- senate.114[!sapply(senate.114$votes_with_party_pct,is.null),]
+
+
+# Get house 114 data
+cmd <- 'curl "https://api.propublica.org/congress/v1/114/house/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
+parsed_cmd <- straighten(cmd)
+str(parsed_cmd)
+actual_function <- make_req(parsed_cmd)[[1]]
+request.body.list <- content(actual_function())
+members.list <- request.body.list$results[[1]]$members
+names(members.list) <- NULL
+members.json <- toJSON(members.list)
+house.114 <- flatten(fromJSON(members.json, flatten = TRUE)) %>%
+  select(first_name, last_name, party, missed_votes_pct, votes_with_party_pct)
+house.114 <- house.114[!sapply(house.114$votes_with_party_pct,is.null),]
+
+
+
+# Get senate 115 data
+cmd <- 'curl "https://api.propublica.org/congress/v1/115/senate/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
+parsed_cmd <- straighten(cmd)
+str(parsed_cmd)
+actual_function <- make_req(parsed_cmd)[[1]]
+request.body.list <- content(actual_function())
+members.list <- request.body.list$results[[1]]$members
+names(members.list) <- NULL
+members.json <- toJSON(members.list)
+senate.115 <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
+  select(first_name, last_name, party, missed_votes_pct, votes_with_party_pct)
+senate.115 <- senate.115[!sapply(senate.115$votes_with_party_pct,is.null),]
+
+
+# Get house 115 data
+cmd <- 'curl "https://api.propublica.org/congress/v1/115/house/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
+parsed_cmd <- straighten(cmd)
+str(parsed_cmd)
+actual_function <- make_req(parsed_cmd)[[1]]
+request.body.list <- content(actual_function())
+members.list <- request.body.list$results[[1]]$members
+names(members.list) <- NULL
+members.json <- toJSON(members.list)
+house.115 <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
+  select(first_name, last_name, party, missed_votes_pct, votes_with_party_pct)
+house.115 <- house.115[!sapply(house.115$votes_with_party_pct,is.null),]
+
+
+
 
 # Creates a data frame of gender breakdown from 2009 to 2017
 resource <- "votes"
@@ -65,6 +123,165 @@ server <- function(input, output) {
   output$hi <- eventReactive(input$welcome, {
       return("We think so too!")
     })
+  
+  observeEvent(input$table.button, {
+    hide("party")
+  })
+  
+  observeEvent(input$table.button, {
+    hide("order")
+  })
+  
+  observeEvent(input$graph.button, {
+    show("party")
+  })
+  
+  observeEvent(input$graph.button, {
+    show("order")
+  })
+  
+  observeEvent(input$table.button, {
+    hide("house.missed")
+  })
+  
+  observeEvent(input$table.button, {
+    hide("senate.missed")
+  })
+  
+  observeEvent(input$table.button, {
+    hide("house.with")
+  })
+  
+  observeEvent(input$table.button, {
+    hide("senate.with")
+  })
+  
+  observeEvent(input$table.button, {
+    hide("house.missed.114")
+  })
+  
+  observeEvent(input$table.button, {
+    hide("senate.missed.114")
+  })
+  
+  observeEvent(input$table.button, {
+    hide("house.with.114")
+  })
+  
+  observeEvent(input$table.button, {
+    hide("senate.with.114")
+  })
+  
+  observeEvent(input$table.button, {
+    hide("table.button")
+  })
+  
+  observeEvent(input$graph.button, {
+    show("house.missed")
+  })
+  
+  observeEvent(input$graph.button, {
+    show("senate.missed")
+  })
+  
+  observeEvent(input$graph.button, {
+    show("house.with")
+  })
+  
+  observeEvent(input$graph.button, {
+    show("senate.with")
+  })
+  
+  observeEvent(input$graph.button, {
+    show("house.missed.114")
+  })
+  
+  observeEvent(input$graph.button, {
+    show("senate.missed.114")
+  })
+  
+  observeEvent(input$graph.button, {
+    show("house.with.114")
+  })
+  
+  observeEvent(input$graph.button, {
+    show("senate.with.114")
+  })
+
+    output$graph.button <- renderUI(actionButton('graph.button', "Return to graph", icon = icon("bar-chart", lib = "font-awesome")))
+
+  observeEvent(input$table.button, {
+    show("graph.button")
+  })  
+    
+  observeEvent(input$graph.button, {
+    show("table.button")
+  })
+  
+  observeEvent(input$graph.button, {
+    hide("graph.button")
+  })
+  
+  output$house.114 <- renderTable({
+    house.1 <- house.114 %>% mutate(name = paste(first_name, last_name))
+    house <- house.1 %>% select(name, party, missed_votes_pct, votes_with_party_pct)
+    colnames(house) <- c("name", "party", "missed votes %", "votes with party %")
+    return(house)
+  })
+  
+  output$senate.114 <- renderTable({
+    senate.1 <- senate.114 %>% mutate(name = paste(first_name, last_name))
+    senate <- senate.1 %>% select(name, party, missed_votes_pct, votes_with_party_pct)
+    colnames(senate) <- c("name", "party", "missed votes %", "votes with party %")
+    return(senate)
+  })
+  
+  output$house.115 <- renderTable({
+    house.1 <- house.115 %>% mutate(name = paste(first_name, last_name))
+    house <- house.1 %>% select(name, party, missed_votes_pct, votes_with_party_pct)
+    colnames(house) <- c("name", "party", "missed votes %", "votes with party %")
+    return(house)
+  })
+  
+  output$senate.115 <- renderTable({
+    senate.1 <- senate.115 %>% mutate(name = paste(first_name, last_name))
+    senate <- senate.1 %>% select(name, party, missed_votes_pct, votes_with_party_pct)
+    colnames(senate) <- c("name", "party", "missed votes %", "votes with party %")
+    return(senate)
+  })
+  
+  observeEvent(input$table.button, {
+    show("house.114")
+  })
+  
+  observeEvent(input$table.button, {
+    show("senate.114")
+  })
+
+  observeEvent(input$table.button, {
+    show("house.115")
+  })
+  
+  observeEvent(input$table.button, {
+    show("senate.115")
+  })
+  
+  observeEvent(input$graph.button, {
+    hide("house.114")
+  })
+  
+  observeEvent(input$graph.button, {
+    hide("senate.114")
+  })
+  
+  observeEvent(input$graph.button, {
+    hide("house.115")
+  })
+  
+  observeEvent(input$graph.button, {
+    hide("senate.115")
+  })
+  
   
   
   output$house.area <- renderPlotly({
@@ -365,24 +582,14 @@ output$leaf.let <- renderLeaflet({
   
 
   output$house.missed <- renderPlotly({
-    cmd <- 'curl "https://api.propublica.org/congress/v1/115/house/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
-    parsed_cmd <- straighten(cmd)
-    str(parsed_cmd)
-    actual_function <- make_req(parsed_cmd)[[1]]
-    request.body.list <- content(actual_function())
-    members.list <- request.body.list$results[[1]]$members
-    names(members.list) <- NULL
-    members.json <- toJSON(members.list)
-    house <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
-      select(first_name, last_name, party, missed_votes_pct)
     if (input$party == "all") {
-      house.members.115 <- house
+      house.members.115 <- house.115
     } else if (input$party == "Democrat") {
-      house.members.115 <- house %>% filter(party == "D")
+      house.members.115 <- house.115 %>% filter(party == "D")
     } else if (input$party == "Independent") {
-      house.members.115 <- house %>% filter(party == "I")
+      house.members.115 <- house.115 %>% filter(party == "I")
     } else if (input$party == "Republican") {
-      house.members.115 <- house %>% filter(party == "R")
+      house.members.115 <- house.115 %>% filter(party == "R")
     }
     house.members.115 <- house.members.115 %>% mutate(name = paste(first_name, last_name))
     house.members <- house.members.115[!sapply(house.members.115$missed_votes_pct,is.null),]
@@ -416,24 +623,14 @@ output$leaf.let <- renderLeaflet({
   
   
   output$senate.missed <- renderPlotly({
-    cmd <- 'curl "https://api.propublica.org/congress/v1/115/senate/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
-    parsed_cmd <- straighten(cmd)
-    str(parsed_cmd)
-    actual_function <- make_req(parsed_cmd)[[1]]
-    request.body.list <- content(actual_function())
-    members.list <- request.body.list$results[[1]]$members
-    names(members.list) <- NULL
-    members.json <- toJSON(members.list)
-    senate <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
-      select(first_name, last_name, party, missed_votes_pct)
     if (input$party == "all") {
-      senate.members.115 <- senate
+      senate.members.115 <- senate.115
     } else if (input$party == "Democrat") {
-      senate.members.115 <- senate %>% filter(party == "D")
+      senate.members.115 <- senate.115 %>% filter(party == "D")
     } else if (input$party == "Independent") {
-      senate.members.115 <- senate %>% filter(party == "I")
+      senate.members.115 <- senate.115 %>% filter(party == "I")
     } else if (input$party == "Republican") {
-      senate.members.115 <- senate %>% filter(party == "R")
+      senate.members.115 <- senate.115 %>% filter(party == "R")
     }
     senate.members.115 <- senate.members.115 %>% mutate(name = paste(first_name, last_name))
     senate.members <- senate.members.115[!sapply(senate.members.115$missed_votes_pct,is.null),]
@@ -465,24 +662,14 @@ output$leaf.let <- renderLeaflet({
   })
 
   output$house.with <- renderPlotly({
-    cmd <- 'curl "https://api.propublica.org/congress/v1/115/house/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
-    parsed_cmd <- straighten(cmd)
-    str(parsed_cmd)
-    actual_function <- make_req(parsed_cmd)[[1]]
-    request.body.list <- content(actual_function())
-    members.list <- request.body.list$results[[1]]$members
-    names(members.list) <- NULL
-    members.json <- toJSON(members.list)
-    house <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
-      select(first_name, last_name, party, votes_with_party_pct)
     if (input$party == "all") {
-      house.members.115 <- house
+      house.members.115 <- house.115
     } else if (input$party == "Democrat") {
-      house.members.115 <- house %>% filter(party == "D")
+      house.members.115 <- house.115 %>% filter(party == "D")
     } else if (input$party == "Independent") {
-      house.members.115 <- house %>% filter(party == "I")
+      house.members.115 <- house.115 %>% filter(party == "I")
     } else if (input$party == "Republican") {
-      house.members.115 <- house %>% filter(party == "R")
+      house.members.115 <- house.115 %>% filter(party == "R")
     }
     house.members.115 <- house.members.115 %>% mutate(name = paste(first_name, last_name))
     house.members <- house.members.115[!sapply(house.members.115$votes_with_party_pct,is.null),]
@@ -516,24 +703,14 @@ output$leaf.let <- renderLeaflet({
   
   
   output$senate.with <- renderPlotly({
-    cmd <- 'curl "https://api.propublica.org/congress/v1/115/senate/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
-    parsed_cmd <- straighten(cmd)
-    str(parsed_cmd)
-    actual_function <- make_req(parsed_cmd)[[1]]
-    request.body.list <- content(actual_function())
-    members.list <- request.body.list$results[[1]]$members
-    names(members.list) <- NULL
-    members.json <- toJSON(members.list)
-    senate <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
-      select(first_name, last_name, party, votes_with_party_pct)
     if (input$party == "all") {
-      senate.members.115 <- senate
+      senate.members.115 <- senate.115
     } else if (input$party == "Democrat") {
-      senate.members.115 <- senate %>% filter(party == "D")
+      senate.members.115 <- senate.115 %>% filter(party == "D")
     } else if (input$party == "Independent") {
-      senate.members.115 <- senate %>% filter(party == "I")
+      senate.members.115 <- senate.115 %>% filter(party == "I")
     } else if (input$party == "Republican") {
-      senate.members.115 <- senate %>% filter(party == "R")
+      senate.members.115 <- senate.115 %>% filter(party == "R")
     }
     senate.members.115 <- senate.members.115 %>% mutate(name = paste(first_name, last_name))
     senate.members <- senate.members.115[!sapply(senate.members.115$votes_with_party_pct,is.null),]
@@ -562,27 +739,17 @@ output$leaf.let <- renderLeaflet({
   })
   
   output$house.missed.114 <- renderPlotly({
-    cmd <- 'curl "https://api.propublica.org/congress/v1/114/house/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
-    parsed_cmd <- straighten(cmd)
-    str(parsed_cmd)
-    actual_function <- make_req(parsed_cmd)[[1]]
-    request.body.list <- content(actual_function())
-    members.list <- request.body.list$results[[1]]$members
-    names(members.list) <- NULL
-    members.json <- toJSON(members.list)
-    house <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
-      select(first_name, last_name, party, missed_votes_pct)
     if (input$party == "all") {
-      house.members.115 <- house
+      house.members.114 <- house.114
     } else if (input$party == "Democrat") {
-      house.members.115 <- house %>% filter(party == "D")
+      house.members.114 <- house.114 %>% filter(party == "D")
     } else if (input$party == "Independent") {
-      house.members.115 <- house %>% filter(party == "I")
+      house.members.114 <- house.114 %>% filter(party == "I")
     } else if (input$party == "Republican") {
-      house.members.115 <- house %>% filter(party == "R")
+      house.members.114 <- house.114 %>% filter(party == "R")
     }
-    house.members.115 <- house.members.115 %>% mutate(name = paste(first_name, last_name))
-    house.members <- house.members.115[!sapply(house.members.115$missed_votes_pct,is.null),]
+    house.members.114 <- house.members.114 %>% mutate(name = paste(first_name, last_name))
+    house.members <- house.members.114[!sapply(house.members.114$missed_votes_pct,is.null),]
     house.members$missed_votes_pct <- as.numeric(unlist(house.members$missed_votes_pct))
     house.members$name <- as.factor(unlist(house.members$name))
     house.members$last_name <- as.factor(unlist(house.members$last_name))
@@ -619,27 +786,17 @@ output$leaf.let <- renderLeaflet({
   
   
   output$senate.missed.114 <- renderPlotly({
-    cmd <- 'curl "https://api.propublica.org/congress/v1/114/senate/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
-    parsed_cmd <- straighten(cmd)
-    str(parsed_cmd)
-    actual_function <- make_req(parsed_cmd)[[1]]
-    request.body.list <- content(actual_function())
-    members.list <- request.body.list$results[[1]]$members
-    names(members.list) <- NULL
-    members.json <- toJSON(members.list)
-    senate <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
-      select(first_name, last_name, party, missed_votes_pct)
     if (input$party == "all") {
-      senate.members.115 <- senate
+      senate.members.114 <- senate.114
     } else if (input$party == "Democrat") {
-      senate.members.115 <- senate %>% filter(party == "D")
+      senate.members.114 <- senate.114 %>% filter(party == "D")
     } else if (input$party == "Independent") {
-      senate.members.115 <- senate %>% filter(party == "I")
+      senate.members.114 <- senate.114 %>% filter(party == "I")
     } else if (input$party == "Republican") {
-      senate.members.115 <- senate %>% filter(party == "R")
+      senate.members.114 <- senate %>% filter(party == "R")
     }
-    senate.members.115 <- senate.members.115 %>% mutate(name = paste(first_name, last_name))
-    senate.members <- senate.members.115[!sapply(senate.members.115$missed_votes_pct,is.null),]
+    senate.members.114 <- senate.members.114 %>% mutate(name = paste(first_name, last_name))
+    senate.members <- senate.members.114[!sapply(senate.members.114$missed_votes_pct,is.null),]
     senate.members$missed_votes_pct <- as.numeric(unlist(senate.members$missed_votes_pct))
     senate.members$name <- as.factor(unlist(senate.members$name))
     senate.members$last_name <- as.factor(unlist(senate.members$last_name))
@@ -676,27 +833,17 @@ output$leaf.let <- renderLeaflet({
   })
   
   output$house.with.114 <- renderPlotly({
-    cmd <- 'curl "https://api.propublica.org/congress/v1/114/house/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
-    parsed_cmd <- straighten(cmd)
-    str(parsed_cmd)
-    actual_function <- make_req(parsed_cmd)[[1]]
-    request.body.list <- content(actual_function())
-    members.list <- request.body.list$results[[1]]$members
-    names(members.list) <- NULL
-    members.json <- toJSON(members.list)
-    house <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
-      select(first_name, last_name, party, votes_with_party_pct)
     if (input$party == "all") {
-      house.members.115 <- house
+      house.members.114 <- house.114
     } else if (input$party == "Democrat") {
-      house.members.115 <- house %>% filter(party == "D")
+      house.members.114 <- house.114 %>% filter(party == "D")
     } else if (input$party == "Independent") {
-      house.members.115 <- house %>% filter(party == "I")
+      house.members.114 <- house.114 %>% filter(party == "I")
     } else if (input$party == "Republican") {
-      house.members.115 <- house %>% filter(party == "R")
+      house.members.114 <- house.114 %>% filter(party == "R")
     }
-    house.members.115 <- house.members.115 %>% mutate(name = paste(first_name, last_name))
-    house.members <- house.members.115[!sapply(house.members.115$votes_with_party_pct,is.null),]
+    house.members.114 <- house.members.114 %>% mutate(name = paste(first_name, last_name))
+    house.members <- house.members.114[!sapply(house.members.114$votes_with_party_pct,is.null),]
     house.members$percent <- as.numeric(unlist(house.members$votes_with_party_pct))
     house.members$name <- as.factor(unlist(house.members$name))
     house.members$last_name <- as.factor(unlist(house.members$last_name))
@@ -732,27 +879,17 @@ output$leaf.let <- renderLeaflet({
   
   
   output$senate.with.114 <- renderPlotly({
-    cmd <- 'curl "https://api.propublica.org/congress/v1/114/senate/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
-    parsed_cmd <- straighten(cmd)
-    str(parsed_cmd)
-    actual_function <- make_req(parsed_cmd)[[1]]
-    request.body.list <- content(actual_function())
-    members.list <- request.body.list$results[[1]]$members
-    names(members.list) <- NULL
-    members.json <- toJSON(members.list)
-    senate <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
-      select(first_name, last_name, party, votes_with_party_pct)
     if (input$party == "all") {
-      senate.members.115 <- senate
+      senate.members.114 <- senate.114
     } else if (input$party == "Democrat") {
-      senate.members.115 <- senate %>% filter(party == "D")
+      senate.members.114 <- senate.114 %>% filter(party == "D")
     } else if (input$party == "Independent") {
-      senate.members.115 <- senate %>% filter(party == "I")
+      senate.members.114 <- senate.114 %>% filter(party == "I")
     } else if (input$party == "Republican") {
-      senate.members.115 <- senate %>% filter(party == "R")
+      senate.members.114 <- senate.114 %>% filter(party == "R")
     }
-    senate.members.115 <- senate.members.115 %>% mutate(name = paste(first_name, last_name))
-    senate.members <- senate.members.115[!sapply(senate.members.115$votes_with_party_pct,is.null),]
+    senate.members.114 <- senate.members.114 %>% mutate(name = paste(first_name, last_name))
+    senate.members <- senate.members.114[!sapply(senate.members.114$votes_with_party_pct,is.null),]
     senate.members$percent <- as.numeric(unlist(senate.members$votes_with_party_pct))
     senate.members$name <- as.factor(unlist(senate.members$name))
     senate.members$last_name <- as.factor(unlist(senate.members$last_name))
