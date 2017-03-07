@@ -9,6 +9,7 @@ library(sp)
 library(geojsonio)
 library(curlconverter)
 library(tidyr)
+library(shinyjs)
 source("apikey.R")
 
 state <- geojson_read("data/stateData.geojson", what = "sp")
@@ -222,28 +223,28 @@ server <- function(input, output) {
     hide("graph.button")
   })
   
-  output$house.114 <- renderTable({
+  output$house.114 <- renderDataTable({
     house.1 <- house.114 %>% mutate(name = paste(first_name, last_name))
     house <- house.1 %>% select(name, party, missed_votes_pct, votes_with_party_pct)
     colnames(house) <- c("name", "party", "missed votes %", "votes with party %")
     return(house)
   })
   
-  output$senate.114 <- renderTable({
+  output$senate.114 <- renderDataTable({
     senate.1 <- senate.114 %>% mutate(name = paste(first_name, last_name))
     senate <- senate.1 %>% select(name, party, missed_votes_pct, votes_with_party_pct)
     colnames(senate) <- c("name", "party", "missed votes %", "votes with party %")
     return(senate)
   })
   
-  output$house.115 <- renderTable({
+  output$house.115 <- renderDataTable({
     house.1 <- house.115 %>% mutate(name = paste(first_name, last_name))
     house <- house.1 %>% select(name, party, missed_votes_pct, votes_with_party_pct)
     colnames(house) <- c("name", "party", "missed votes %", "votes with party %")
     return(house)
   })
   
-  output$senate.115 <- renderTable({
+  output$senate.115 <- renderDataTable({
     senate.1 <- senate.115 %>% mutate(name = paste(first_name, last_name))
     senate <- senate.1 %>% select(name, party, missed_votes_pct, votes_with_party_pct)
     colnames(senate) <- c("name", "party", "missed votes %", "votes with party %")
