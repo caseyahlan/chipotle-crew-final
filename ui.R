@@ -28,7 +28,7 @@ ui <- fluidPage(
                            radioButtons('format', label = "Find representatives by...", choices = c("zipcode", "map"), selected = character(0)),
                            conditionalPanel(
                              condition = "input.format == 'map'", 
-                             actionButton('reset', "Reset View"), br(), br(), 
+                             actionButton('reset', "Reset View", icon = icon("undo", lib = "font-awesome")), br(), br(), 
                              leafletOutput('leaf.let', height = 650),
                              uiOutput('explanation'),
                              tableOutput('clickleg'),
