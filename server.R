@@ -137,163 +137,162 @@ server <- function(input, output) {
     })
   
   observeEvent(input$table.button, {
-    hide("party")
-  })
-  
-  observeEvent(input$table.button, {
-    hide("order")
-  })
-  
-  observeEvent(input$graph.button, {
-    show("party")
-  })
-  
-  observeEvent(input$graph.button, {
-    show("order")
-  })
-  
-  observeEvent(input$table.button, {
-    hide("house.missed")
-  })
-  
-  observeEvent(input$table.button, {
-    hide("senate.missed")
-  })
-  
-  observeEvent(input$table.button, {
-    hide("house.with")
-  })
-  
-  observeEvent(input$table.button, {
-    hide("senate.with")
-  })
-  
-  observeEvent(input$table.button, {
-    hide("house.missed.114")
-  })
-  
-  observeEvent(input$table.button, {
-    hide("senate.missed.114")
-  })
-  
-  observeEvent(input$table.button, {
-    hide("house.with.114")
-  })
-  
-  observeEvent(input$table.button, {
-    hide("senate.with.114")
-  })
-  
-  observeEvent(input$table.button, {
-    hide("table.button")
-  })
-  
-  observeEvent(input$graph.button, {
-    show("house.missed")
-  })
-  
-  observeEvent(input$graph.button, {
-    show("senate.missed")
-  })
-  
-  observeEvent(input$graph.button, {
-    show("house.with")
-  })
-  
-  observeEvent(input$graph.button, {
-    show("senate.with")
-  })
-  
-  observeEvent(input$graph.button, {
-    show("house.missed.114")
-  })
-  
-  observeEvent(input$graph.button, {
-    show("senate.missed.114")
-  })
-  
-  observeEvent(input$graph.button, {
-    show("house.with.114")
-  })
-  
-  observeEvent(input$graph.button, {
-    show("senate.with.114")
-  })
-
-  output$graph.button <- renderUI({
-    actionButton('graph.button', "Return to graph", icon = icon("bar-chart", lib = "font-awesome"))
-    })
-
-  observeEvent(input$table.button, {
-    show("graph.button")
+    showElement("graph.button")
   })  
-    
-  observeEvent(input$graph.button, {
-    show("table.button")
+  
+  observeEvent(input$table.button, {
+    hideElement("table.button")
   })
   
   observeEvent(input$graph.button, {
-    hide("graph.button")
+    showElement("table.button")
   })
+  
+  observeEvent(input$graph.button, {
+    hideElement("graph.button")
+  })
+  
+  observeEvent(input$table.button, {
+    hideElement("party")
+  })
+  
+  observeEvent(input$table.button, {
+    hideElement("order")
+  })
+  
+  observeEvent(input$graph.button, {
+    showElement("party")
+  })
+  
+  observeEvent(input$graph.button, {
+    showElement("order")
+  })
+  
+  observeEvent(input$table.button, {
+    hideElement("house.missed")
+  })
+  
+  observeEvent(input$table.button, {
+    hideElement("senate.missed")
+  })
+  
+  observeEvent(input$table.button, {
+    hideElement("house.with")
+  })
+  
+  observeEvent(input$table.button, {
+    hideElement("senate.with")
+  })
+  
+  observeEvent(input$table.button, {
+    hideElement("house.missed.114")
+  })
+  
+  observeEvent(input$table.button, {
+    hideElement("senate.missed.114")
+  })
+  
+  observeEvent(input$table.button, {
+    hideElement("house.with.114")
+  })
+  
+  observeEvent(input$table.button, {
+    hideElement("senate.with.114")
+  })
+  
+  
+  observeEvent(input$graph.button, {
+    showElement("house.missed")
+  })
+  
+  observeEvent(input$graph.button, {
+    showElement("senate.missed")
+  })
+  
+  observeEvent(input$graph.button, {
+    showElement("house.with")
+  })
+  
+  observeEvent(input$graph.button, {
+    showElement("senate.with")
+  })
+  
+  observeEvent(input$graph.button, {
+    showElement("house.missed.114")
+  })
+  
+  observeEvent(input$graph.button, {
+    showElement("senate.missed.114")
+  })
+  
+  observeEvent(input$graph.button, {
+    showElement("house.with.114")
+  })
+  
+  observeEvent(input$graph.button, {
+    showElement("senate.with.114")
+  })
+
+
   
   output$house.114 <- renderDataTable({
     house.1 <- house.114 %>% mutate(name = paste(first_name, last_name))
     house <- house.1 %>% select(name, party, missed_votes_pct, votes_with_party_pct)
     colnames(house) <- c("name", "party", "missed votes %", "votes with party %")
-    return(house)
-  })
+    house
+      })
   
   output$senate.114 <- renderDataTable({
     senate.1 <- senate.114 %>% mutate(name = paste(first_name, last_name))
     senate <- senate.1 %>% select(name, party, missed_votes_pct, votes_with_party_pct)
     colnames(senate) <- c("name", "party", "missed votes %", "votes with party %")
-    return(senate)
+    senate
   })
   
   output$house.115 <- renderDataTable({
     house.1 <- house.115 %>% mutate(name = paste(first_name, last_name))
     house <- house.1 %>% select(name, party, missed_votes_pct, votes_with_party_pct)
     colnames(house) <- c("name", "party", "missed votes %", "votes with party %")
-    return(house)
+    house
   })
   
   output$senate.115 <- renderDataTable({
     senate.1 <- senate.115 %>% mutate(name = paste(first_name, last_name))
     senate <- senate.1 %>% select(name, party, missed_votes_pct, votes_with_party_pct)
     colnames(senate) <- c("name", "party", "missed votes %", "votes with party %")
-    return(senate)
+    senate
   })
   
   observeEvent(input$table.button, {
-    show("house.114")
+    showElement("house.114")
   })
   
   observeEvent(input$table.button, {
-    show("senate.114")
+    showElement("senate.114")
   })
 
   observeEvent(input$table.button, {
-    show("house.115")
+    showElement("house.115")
   })
   
   observeEvent(input$table.button, {
-    show("senate.115")
+    showElement("senate.115")
   })
   
   observeEvent(input$graph.button, {
-    hide("house.114")
+    hideElement("house.114")
   })
   
   observeEvent(input$graph.button, {
-    hide("senate.114")
+    hideElement("senate.114")
   })
   
   observeEvent(input$graph.button, {
-    hide("house.115")
+    hideElement("house.115")
   })
   
   observeEvent(input$graph.button, {
-    hide("senate.115")
+    hideElement("senate.115")
   })
   
   
@@ -559,20 +558,20 @@ server <- function(input, output) {
         })
   
 output$leaf.let <- renderLeaflet({
-    leaflet(data = state, options = leafletOptions(minZoom = 3)) %>% addTiles() %>%
+    leaflet(data = state) %>% addTiles() %>%
       addPolygons(fillColor = heat.colors(20, alpha = NULL), stroke= FALSE,
         highlight = highlightOptions(
         weight = 5,
         color = "#666",
         dashArray = "",
         fillOpacity = 0.7,
-        bringToFront = TRUE)) %>% setView(lng=-105, lat = 48, zoom = 3.7)
+        bringToFront = TRUE)) %>% setView(lng=-105, lat = 52, zoom = 3)
   })
     
     
   observe({
     input$reset
-    leafletProxy("leaf.let") %>% setView(lng = -105, lat = 48, zoom = 3.7)
+    leafletProxy("leaf.let") %>% setView(lng = -105, lat = 52, zoom = 3)
   })
   
   
