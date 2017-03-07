@@ -24,24 +24,6 @@ propublica.base <- "https://api.propublica.org/congress/v1/"
 house.makeup <- read.csv("data/house.makeup", stringsAsFactors = FALSE)
 senate.makeup <- read.csv("data/senate.makeup", stringsAsFactors = FALSE)
 
-# 'GENDERS IN CONGRESS' SECTION
-# Function that finds the gender composition by examining votes
-GetGenderMakeup <- function(roll.id) {
-  base <- ("https://congress.api.sunlightfoundation.com/")
-  votes.resource <- ("votes?roll_id=")
-  votes.filters <- ("&fields=voters")
-  votes.response <- GET(paste0(base, votes.resource, roll.id, votes.filters))
-  request.body.as.list <- content(votes.response)
-  voters.list <- request.body.as.list$results[[1]]$voters
-  names(voters.list) <- NULL
-  voters.json <- toJSON(voters.list)
-  voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
-  voters <- voters.as.data.frame %>% select(voter.party, voter.gender, vote)
-  voters$voter.gender <- as.factor(unlist(voters$voter.gender))
-  voters.gender <- tally(group_by(voters, voter.gender))
-  return(voters.gender)
-}
-
 # Get senate 114 data
 cmd <- 'curl "https://api.propublica.org/congress/v1/114/senate/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
 parsed_cmd <- straighten(cmd)
@@ -99,22 +81,51 @@ house.115 <- flatten(fromJSON(members.json, flatten = TRUE)) %>%
 house.115 <- house.115[!sapply(house.115$votes_with_party_pct,is.null),]
 
 
-
-
-# Creates a data frame of gender breakdown from 2009 to 2017
+# 'GENDERS IN CONGRESS' SECTION
+# Function that finds the gender composition by examining votes
+GetGenderMakeup <- function(roll.id) {
+  base <- ("https://congress.api.sunlightfoundation.com/")
+  votes.resource <- ("votes?roll_id=")
+  votes.filters <- ("&fields=voters")
+  votes.response <- GET(paste0(base, votes.resource, roll.id, votes.filters))
+  request.body.as.list <- content(votes.response)
+  voters.list <- request.body.as.list$results[[1]]$voters
+  names(voters.list) <- NULL
+  voters.json <- toJSON(voters.list)
+  voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
+  voters <- voters.as.data.frame %>% select(voter.party, voter.gender, vote)
+  voters$voter.gender <- as.factor(unlist(voters$voter.gender))
+  voters.gender <- tally(group_by(voters, voter.gender))
+  return(voters.gender)
+}
 resource <- "votes"
-legislators.by.gender <- data.frame(c("F", "M"))
 years <- c(2009 : 2017)
+
+# Creates a data frame of gender breakdown from 2009 to 2017 for the house
+legislators.by.gender.house <- data.frame(c("F", "M"))
 for (year in years) {
   query <- paste0("?chamber=", "house", "&per_page=", "all", "&year=", year)
   response <- GET(paste0(sunlight.base, resource, query))
   body <- fromJSON(content(response, "text"))
   body <- flatten(body$results)
-  legislators.by.gender <- cbind(legislators.by.gender, select(GetGenderMakeup(body[1, "roll_id"]), n))
+  legislators.by.gender.house <- cbind(legislators.by.gender.house, select(GetGenderMakeup(body[1, "roll_id"]), n))
 }
-colnames(legislators.by.gender) <- c("Gender", 2009:2017)
-legislators.by.gender.tall <- gather(legislators.by.gender, key = "Year", value = "Value",
+colnames(legislators.by.gender.house) <- c("Gender", 2009:2017)
+legislators.by.gender.house.tall <- gather(legislators.by.gender.house, key = "Year", value = "Value",
        `2009`:`2017`, convert = TRUE)
+
+# Creates a data frame of gender breakdown from 2009 to 2017 for the senate
+legislators.by.gender.senate <- data.frame(c("F", "M"))
+for (year in years) {
+  query <- paste0("?chamber=", "senate", "&per_page=", "all", "&year=", year)
+  response <- GET(paste0(sunlight.base, resource, query))
+  body <- fromJSON(content(response, "text"))
+  body <- flatten(body$results)
+  legislators.by.gender.senate <- cbind(legislators.by.gender.senate, select(GetGenderMakeup(body[1, "roll_id"]), n))
+}
+colnames(legislators.by.gender.senate) <- c("Gender", 2009:2017)
+legislators.by.gender.senate.tall <- gather(legislators.by.gender.senate, key = "Year", value = "Value",
+                                           `2009`:`2017`, convert = TRUE)
 
 
 
@@ -302,8 +313,8 @@ server <- function(input, output) {
     return(pplot)
   })
   
-  output$genderArea <- renderPlotly({
-    gender.area <- ggplot(data = legislators.by.gender.tall, mapping = aes(x = Year, y = Value, fill = Gender)) +
+  output$genderHouseArea <- renderPlotly({
+    gender.area <- ggplot(data = legislators.by.gender.house.tall, mapping = aes(x = Year, y = Value, fill = Gender)) +
       geom_area() +
       scale_fill_manual(values = c("#F06292", "#66BB6A")) +
       scale_x_continuous(breaks = c(2009, 2011, 2013, 2015, 2017), labels = c(111:115)) +
@@ -313,8 +324,19 @@ server <- function(input, output) {
     return(gender.area)
   })
   
-  output$genderLine <- renderPlotly({
-    gender.line <- ggplot(data = legislators.by.gender.tall, mapping = aes(x = Year, y = Value, color = Gender)) +
+  output$genderSenateArea <- renderPlotly({
+    gender.area <- ggplot(data = legislators.by.gender.senate.tall, mapping = aes(x = Year, y = Value, fill = Gender)) +
+      geom_area() +
+      scale_fill_manual(values = c("#F06292", "#66BB6A")) +
+      scale_x_continuous(breaks = c(2009, 2011, 2013, 2015, 2017), labels = c(111:115)) +
+      ggtitle("Gender Makeup in the Senate from 111th Congress to 115th Congress") +
+      labs(x = "Congress Number", y = "Number of Members")
+    gender.area <- ggplotly(gender.area)
+    return(gender.area)
+  })
+  
+  output$genderHouseLine <- renderPlotly({
+    gender.line <- ggplot(data = legislators.by.gender.house.tall, mapping = aes(x = Year, y = Value, color = Gender)) +
       geom_line() +
       scale_color_manual(values = c("#F06292", "#66BB6A")) +
       scale_x_continuous(breaks = c(2009, 2011, 2013, 2015, 2017), labels = c(111:115)) +
@@ -324,13 +346,42 @@ server <- function(input, output) {
     return(gender.line)
   })
   
-  output$genderPie <- renderPlot({
+  output$genderSenateLine <- renderPlotly({
+    gender.line <- ggplot(data = legislators.by.gender.senate.tall, mapping = aes(x = Year, y = Value, color = Gender)) +
+      geom_line() +
+      scale_color_manual(values = c("#F06292", "#66BB6A")) +
+      scale_x_continuous(breaks = c(2009, 2011, 2013, 2015, 2017), labels = c(111:115)) +
+      ggtitle("Gender Makeup in the Senate from 111th Congress to 115th Congress") +
+      labs(x = "Congress Number", y = "Number of Members")
+    gender.line <- ggplotly(gender.line)
+    return(gender.line)
+  })
+  
+  output$genderHousePie <- renderPlot({
     for (year in c(2:10)) {
-      legislators.by.gender[,year] <- round(((legislators.by.gender[,year] / sum(legislators.by.gender[,year])) * 100), digits = 2)
+      legislators.by.gender.house[,year] <- round(((legislators.by.gender.house[,year] / sum(legislators.by.gender.house[,year])) * 100), digits = 2)
     }
-    legislators.by.gender.tall <- gather(legislators.by.gender, key = "Year", value = "Value",
+    legislators.by.gender.house.tall <- gather(legislators.by.gender.house, key = "Year", value = "Value",
                                          `2009`:`2017`, convert = TRUE)
-    plot <- ggplot(data = legislators.by.gender.tall, mapping = aes(x = factor(1), y = Value, fill = Gender)) +
+    plot <- ggplot(data = legislators.by.gender.house.tall, mapping = aes(x = factor(1), y = Value, fill = Gender)) +
+      geom_bar(width = 1, stat = "identity") +
+      coord_polar(theta = "y") +
+      scale_fill_manual(values = c("#F06292", "#66BB6A")) +
+      facet_wrap(~Year) +
+      theme(axis.ticks = element_blank()) +
+      theme(axis.text = element_blank()) +
+      theme(axis.title = element_blank()) +
+      theme_void()
+    return(plot)
+  })
+  
+  output$genderSenatePie <- renderPlot({
+    for (year in c(2:10)) {
+      legislators.by.gender.senate[,year] <- round(((legislators.by.gender.senate[,year] / sum(legislators.by.gender.senate[,year])) * 100), digits = 2)
+    }
+    legislators.by.gender.senate.tall <- gather(legislators.by.gender.senate, key = "Year", value = "Value",
+                                               `2009`:`2017`, convert = TRUE)
+    plot <- ggplot(data = legislators.by.gender.senate.tall, mapping = aes(x = factor(1), y = Value, fill = Gender)) +
       geom_bar(width = 1, stat = "identity") +
       coord_polar(theta = "y") +
       scale_fill_manual(values = c("#F06292", "#66BB6A")) +
