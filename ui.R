@@ -49,9 +49,12 @@ ui <- fluidPage(
                   tabPanel("Gender Makeup",
                            h3("Gender Makeup"),
                            "This page shows how the gender makeup has changed from 2009 to 2017 for both the house and the senate.",
-                           br(),
-                           br(),
-                           plotlyOutput("genderPlot")),
+                           br(), br(),
+                           plotlyOutput("genderArea"),
+                           br(), br(),
+                           plotlyOutput("genderLine"),
+                           br(), br(),
+                           plotOutput("genderPie")),
                   
                   tabPanel("Party Makeup", 
                            h3("House"),
@@ -99,7 +102,7 @@ ui <- fluidPage(
                           h3("Percent of Votes With Party"),
                           plotlyOutput('house.with.114'),
                           plotlyOutput('senate.with.114')
-)
+))
 ),
 
   hr(),

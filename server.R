@@ -55,7 +55,7 @@ for (year in years) {
   legislators.by.gender <- cbind(legislators.by.gender, select(GetGenderMakeup(body[1, "roll_id"]), n))
 }
 colnames(legislators.by.gender) <- c("Gender", 2009:2017)
-legislators.by.gender <- gather(legislators.by.gender, key = "Year", value = "Value",
+legislators.by.gender.tall <- gather(legislators.by.gender, key = "Year", value = "Value",
        `2009`:`2017`, convert = TRUE)
 
 
@@ -80,12 +80,26 @@ server <- function(input, output) {
     return(pplot)
   })
   
-  output$genderPlot <- renderPlotly({
-    gender.plot <- ggplot(data = legislators.by.gender, mapping = aes(x = "Year", y = "Value", fill = "Gender")) +
+  output$genderArea <- renderPlotly({
+    gender.area <- ggplot(data = legislators.by.gender.tall, mapping = aes(x = Year, y = Value, fill = Gender)) +
       geom_area() +
-      scale_fill_manual(values = c("#7B241C", "#17A589"))
-    gender.plot <- ggplotly(gender.plot)
-    return(gender.plot)
+      scale_fill_manual(values = c("#F06292", "#66BB6A")) +
+      scale_x_continuous(breaks = c(2009, 2011, 2013, 2015, 2017), labels = c(111:115)) +
+      ggtitle("Gender Makeup in the House from 111th Congress to 115th Congress") +
+      labs(x = "Congress Number", y = "Number of Members")
+    gender.area <- ggplotly(gender.area)
+    return(gender.area)
+  })
+  
+  output$genderLine <- renderPlotly({
+    gender.line <- ggplot(data = legislators.by.gender.tall, mapping = aes(x = Year, y = Value, color = Gender)) +
+      geom_line() +
+      scale_color_manual(values = c("#F06292", "#66BB6A")) +
+      scale_x_continuous(breaks = c(2009, 2011, 2013, 2015, 2017), labels = c(111:115)) +
+      ggtitle("Gender Makeup in the House from 111th Congress to 115th Congress") +
+      labs(x = "Congress Number", y = "Number of Members")
+    gender.line <- ggplotly(gender.line)
+    return(gender.line)
   })
   
   output$house.line <- renderPlotly({
@@ -103,7 +117,6 @@ server <- function(input, output) {
   pplot <- ggplotly(plot)
   return(pplot)
   })
-  
   
   output$house.pie <- renderPlot({
     house.makeup$X102 <- round(((house.makeup$X102 / sum(house.makeup$X102))*100), digits = 2)
@@ -138,6 +151,24 @@ server <- function(input, output) {
       theme(axis.title = element_blank())+
       theme_void()
       
+    return(plot)
+  })
+  
+  output$genderPie <- renderPlot({
+    for (year in c(2:10)) {
+      legislators.by.gender[,year] <- round(((legislators.by.gender[,year] / sum(legislators.by.gender[,year])) * 100), digits = 2)
+    }
+    legislators.by.gender.tall <- gather(legislators.by.gender, key = "Year", value = "Value",
+                                         `2009`:`2017`, convert = TRUE)
+    plot <- ggplot(data = legislators.by.gender.tall, mapping = aes(x = factor(1), y = Value, fill = Gender)) +
+      geom_bar(width = 1, stat = "identity") +
+      coord_polar(theta = "y") +
+      scale_fill_manual(values = c("#F06292", "#66BB6A")) +
+      facet_wrap(~Year) +
+      theme(axis.ticks = element_blank()) +
+      theme(axis.text = element_blank()) +
+      theme(axis.title = element_blank()) +
+      theme_void()
     return(plot)
   })
   
