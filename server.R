@@ -133,7 +133,7 @@ server <- function(input, output) {
   
 
   output$hi <- eventReactive(input$welcome, {
-      return("We think so too!")
+      return("Click on one of the tabs above to get started :)")
     })
   
   observeEvent(input$table.button, {
@@ -373,12 +373,20 @@ server <- function(input, output) {
     return(pplot)
   })
   
+  output$genderHouseTable <- renderTable({
+    legislators.by.gender.house
+  })
+  
+  output$genderSenateTable <- renderTable({
+    legislators.by.gender.senate
+  })
+  
   output$genderHouseArea <- renderPlotly({
     gender.area <- ggplot(data = legislators.by.gender.house.tall, mapping = aes(x = Year, y = Value, fill = Gender)) +
       geom_area() +
       scale_fill_manual(values = c("#F06292", "#66BB6A")) +
       scale_x_continuous(breaks = c(2009, 2011, 2013, 2015, 2017), labels = c(111:115)) +
-      ggtitle("Gender Makeup in the House from 111th Congress to 115th Congress") +
+      ggtitle("Gender Makeup in the House of Representatives from 111th Congress to 115th Congress") +
       labs(x = "Congress Number", y = "Number of Members")
     gender.area <- ggplotly(gender.area)
     return(gender.area)
@@ -400,7 +408,7 @@ server <- function(input, output) {
       geom_line() +
       scale_color_manual(values = c("#F06292", "#66BB6A")) +
       scale_x_continuous(breaks = c(2009, 2011, 2013, 2015, 2017), labels = c(111:115)) +
-      ggtitle("Gender Makeup in the House from 111th Congress to 115th Congress") +
+      ggtitle("Gender Makeup in the House of Representatives from 111th Congress to 115th Congress") +
       labs(x = "Congress Number", y = "Number of Members")
     gender.line <- ggplotly(gender.line)
     return(gender.line)
@@ -427,7 +435,8 @@ server <- function(input, output) {
       geom_bar(width = 1, stat = "identity") +
       coord_polar(theta = "y") +
       scale_fill_manual(values = c("#F06292", "#66BB6A")) +
-      facet_wrap(~Year) +
+      ggtitle("Gender Makeup in the House of Representatives from 2009 to 2017") +
+      facet_wrap(~Year, nrow = 2) +
       theme(axis.ticks = element_blank()) +
       theme(axis.text = element_blank()) +
       theme(axis.title = element_blank()) +
@@ -445,7 +454,8 @@ server <- function(input, output) {
       geom_bar(width = 1, stat = "identity") +
       coord_polar(theta = "y") +
       scale_fill_manual(values = c("#F06292", "#66BB6A")) +
-      facet_wrap(~Year) +
+      ggtitle("Gender Makeup in the Senate from 2009 to 2017") +
+      facet_wrap(~Year, nrow = 2) +
       theme(axis.ticks = element_blank()) +
       theme(axis.text = element_blank()) +
       theme(axis.title = element_blank()) +
