@@ -78,7 +78,11 @@ ui <- fluidPage(
                            hidden(dataTableOutput('bills.search'))
                            ),
                   
-                  tabPanel("View a Vote", icon = icon("eye", lib = "font-awesome")),
+                  tabPanel("View a Vote", icon = icon("eye", lib = "font-awesome"),
+                           h3("See how Congress voted on a roll call vote"),
+                           h5("Choose a vote from the list below to view the breakdown of the vote"),
+                           selectInput("roll.id", label = "Roll.id", choices = c("h2-2017", "s65-2017")),
+                           actionButton("roll.id.button", "I want to enter my own roll.id")),
                   
                   
                   tabPanel("Gender Makeup", icon = icon("venus-mars", lib = "font-awesome"),
