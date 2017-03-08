@@ -52,7 +52,6 @@ house.114 <- flatten(fromJSON(members.json, flatten = TRUE)) %>%
 house.114 <- house.114[!sapply(house.114$votes_with_party_pct,is.null),]
 
 
-
 # Get senate 115 data
 cmd <- 'curl "https://api.propublica.org/congress/v1/115/senate/members.json" -H "X-API-Key: ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT"'
 parsed_cmd <- straighten(cmd)
@@ -79,7 +78,6 @@ members.json <- toJSON(members.list)
 house.115 <- flatten(fromJSON(members.json, flatten = TRUE)) %>% 
   select(first_name, last_name, party, state, missed_votes_pct, votes_with_party_pct)
 house.115 <- house.115[!sapply(house.115$votes_with_party_pct,is.null),]
-
 
 # 'GENDERS IN CONGRESS' SECTION
 # Function that finds the gender composition by examining votes
@@ -154,20 +152,20 @@ server <- function(input, output) {
     toggleElement("graph.button")
   })
   
-  observeEvent(input$table.button, {
-    toggleElement("party")
-  })
+#  observeEvent(input$table.button, {
+ #   toggleElement("state")
+#  })
   
   observeEvent(input$table.button, {
-    toggleElement("order")
+    hideElement("order")
   })
   
-  observeEvent(input$graph.button, {
-    toggleElement("party")
-  })
+# observeEvent(input$graph.button, {
+ #   toggleElement("state")
+#  })
   
   observeEvent(input$graph.button, {
-    toggleElement("order")
+    showElement("order")
   })
   
   observeEvent(input$table.button, {
@@ -238,31 +236,90 @@ server <- function(input, output) {
 
   
   output$house.114 <- renderTable({
-    house.1 <- house.114 %>% mutate(name = paste(first_name, last_name))
-    house <- house.1 %>% select(name, party, state, missed_votes_pct, votes_with_party_pct)
-    colnames(house) <- c("name", "party", "state", "missed votes %", "votes with party %")
-    house
+    house.2 <- house.114 %>% mutate(name = paste(first_name, last_name))
+    if (input$state == "all") {
+      house.1 <- house.2
+    } else {
+      house.1 <- house.2 %>% filter(state == input$state)
+    }
+    if (input$party == "all") {
+      house.table <- house.1
+    } else if (input$party == "Republican") {
+      house.table <- house.1 %>% filter(party == "R")
+    } else if (input$party == "Democrat") {
+      house.table <- house.1 %>% filter(party == "D")
+    } else if (input$party == "Independent") {
+      house.table <- house.1 %>% filter(party == "I")
+    }
+    house.table <- house.table %>% select(name, party, state, missed_votes_pct, votes_with_party_pct)
+    colnames(house.table) <- c("name", "party", "state", "missed votes %", "votes with party %")
+    house.table
       })
   
   output$senate.114 <- renderTable({
-    senate.1 <- senate.114 %>% mutate(name = paste(first_name, last_name))
-    senate <- senate.1 %>% select(name, party, state, missed_votes_pct, votes_with_party_pct)
-    colnames(senate) <- c("name", "party", "state", "missed votes %", "votes with party %")
-    senate
+    senate.2 <- senate.114 %>% mutate(name = paste(first_name, last_name))
+    if (input$state == "all") {
+      senate.1 <- senate.2
+    } else {
+      senate.1 <- senate.2 %>% filter(state == input$state)
+    }
+    if (input$party == "all") {
+      senate.table <- senate.1
+    }
+    else if (input$party == "Republican") {
+      senate.table <- senate.1 %>% filter(party == "R")
+    } else if (input$party == "Democrat") {
+      senate.table <- senate.1 %>% filter(party == "D")
+    } else if (input$party == "Independent") {
+      senate.table <- senate.1 %>% filter(party == "I")
+    }
+
+    senate.table <- senate.table %>% select(name, party, state, missed_votes_pct, votes_with_party_pct)
+    colnames(senate.table) <- c("name", "party", "state", "missed votes %", "votes with party %")
+    senate.table
   })
   
   output$house.115 <- renderTable({
-    house.1 <- house.115 %>% mutate(name = paste(first_name, last_name))
-    house <- house.1 %>% select(name, party, state, missed_votes_pct, votes_with_party_pct)
-    colnames(house) <- c("name", "party", "state", "missed votes %", "votes with party %")
-    house
+    house.2 <- house.115 %>% mutate(name = paste(first_name, last_name))
+    if (input$state == "all") {
+      house.1 <- house.2
+    } else {
+      house.1 <- house.2 %>% filter(state == input$state)
+    }
+    if (input$party == "all") {
+      house.table <- house.1
+    }    else if (input$party == "Republican") {
+      house.table <- house.1 %>% filter(party == "R")
+    } else if (input$party == "Democrat") {
+      house.table <- house.1 %>% filter(party == "D")
+    } else if (input$party == "Independent") {
+      house.table <- house.1 %>% filter(party == "I")
+    }
+    house.table <- house.table %>% select(name, party, state, missed_votes_pct, votes_with_party_pct)
+    colnames(house.table) <- c("name", "party", "state", "missed votes %", "votes with party %")
+    house.table
   })
   
   output$senate.115 <- renderTable({
-    senate.1 <- senate.115 %>% mutate(name = paste(first_name, last_name))
-    senate <- senate.1 %>% select(name, party, state, missed_votes_pct, votes_with_party_pct)
-    colnames(senate) <- c("name", "party", "state", "missed votes %", "votes with party %")
-    senate
+    senate.2 <- senate.115 %>% mutate(name = paste(first_name, last_name))
+    if (input$state == "all") {
+      senate.1 <- senate.2
+    } else {
+      senate.1 <- senate.2 %>% filter(state == input$state)
+    }
+    if (input$party == "all") {
+      senate.table <- senate.1
+    }
+    else if (input$party == "Republican") {
+      senate.table <- senate.1 %>% filter(party == "R")
+    } else if (input$party == "Democrat") {
+      senate.table <- senate.1 %>% filter(party == "D")
+    } else if (input$party == "Independent") {
+      senate.table <- senate.1 %>% filter(party == "I")
+    }
+    senate.table <- senate.table %>% select(name, party, state, missed_votes_pct, votes_with_party_pct)
+    colnames(senate.table) <- c("name", "party", "state", "missed votes %", "votes with party %")
+    senate.table
   })
   
   observeEvent(input$table.button, {
@@ -636,6 +693,11 @@ output$leaf.let <- renderLeaflet({
       house.members.115 <- house.115 %>% filter(party == "I")
     } else if (input$party == "Republican") {
       house.members.115 <- house.115 %>% filter(party == "R")
+    } 
+    if (input$state == "all") {
+      house.members.115 <- house.members.115
+    } else {
+      house.members.115 <- house.members.115 %>% filter(state == input$state)
     }
     house.members.115 <- house.members.115 %>% mutate(name = paste(first_name, last_name))
     house.members <- house.members.115[!sapply(house.members.115$missed_votes_pct,is.null),]
@@ -644,8 +706,15 @@ output$leaf.let <- renderLeaflet({
     house.members$last_name <- as.factor(unlist(house.members$last_name))
     house.members$party <- as.factor(unlist(house.members$party))
     house.members$percent <- (house.members$missed_votes_pct + 0.5)
-    house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
-  p <- ggplot(house.members, aes(x = name, y = percent, fill = party)) +
+    if (input$order == "alphabetically") {
+      house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
+    } else if (input$order == "increasing") {
+      house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent)])
+    } else if (input$order == "decreasing") {
+      house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent, 
+                                                                                        decreasing = TRUE)])
+    }  
+    p <- ggplot(house.members, aes(x = name, y = percent, fill = party)) +
     geom_bar(width = 1, stat = "identity") +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
     theme(axis.ticks.x = element_blank()) +
@@ -661,9 +730,11 @@ output$leaf.let <- renderLeaflet({
   } else if (input$party == "Independent") {
     pp <- p
   }
+    if (input$state != "all") {
+      pp <- pp + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+    }
     ppp <- ggplotly(pp)
-  return(ppp)
-  
+    return(ppp)
   })
   
   output$senate.ex <- renderText({
@@ -684,6 +755,11 @@ output$leaf.let <- renderLeaflet({
       senate.members.115 <- senate.115 %>% filter(party == "I")
     } else if (input$party == "Republican") {
       senate.members.115 <- senate.115 %>% filter(party == "R")
+    } 
+    if (input$state == "all") {
+      senate.members.115 <- senate.members.115
+    } else {
+      senate.members.115 <- senate.members.115 %>% filter(state == input$state)
     }
     senate.members.115 <- senate.members.115 %>% mutate(name = paste(first_name, last_name))
     senate.members <- senate.members.115[!sapply(senate.members.115$missed_votes_pct,is.null),]
@@ -692,8 +768,13 @@ output$leaf.let <- renderLeaflet({
     senate.members$last_name <- as.factor(unlist(senate.members$last_name))
     senate.members$party <- as.factor(unlist(senate.members$party))
     senate.members$percent <- (senate.members$missed_votes_pct + 0.2)
-    senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$last_name)])
-   
+    if (input$order == "alphabetically") {
+      senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$last_name)])
+    } else if (input$order == "increasing") {
+      senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent)])
+    } else if (input$order == "decreasing") {
+      senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent, decreasing = TRUE)])
+    }   
     p <- ggplot(senate.members, aes(x = name, y = percent, fill = party)) +
       geom_bar(width = 1, stat = "identity") +
       theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
@@ -723,6 +804,11 @@ output$leaf.let <- renderLeaflet({
       house.members.115 <- house.115 %>% filter(party == "I")
     } else if (input$party == "Republican") {
       house.members.115 <- house.115 %>% filter(party == "R")
+    } 
+    if (input$state == "all") {
+      house.members.115 <- house.members.115
+    } else {
+      house.members.115 <- house.members.115 %>% filter(state == input$state)
     }
     house.members.115 <- house.members.115 %>% mutate(name = paste(first_name, last_name))
     house.members <- house.members.115[!sapply(house.members.115$votes_with_party_pct,is.null),]
@@ -730,8 +816,14 @@ output$leaf.let <- renderLeaflet({
     house.members$name <- as.factor(unlist(house.members$name))
     house.members$last_name <- as.factor(unlist(house.members$last_name))
     house.members$party <- as.factor(unlist(house.members$party))
-    house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent, 
-                                                                                      decreasing = TRUE)])
+    if (input$order == "alphabetically") {
+      house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
+    } else if (input$order == "increasing") {
+      house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent)])
+    } else if (input$order == "decreasing") {
+      house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent, 
+                                                                                        decreasing = TRUE)])
+    }
     p <- ggplot(house.members, aes(x = name, y = percent, fill = party)) +
       geom_bar(width = 1, stat = "identity") +
       theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
@@ -747,6 +839,9 @@ output$leaf.let <- renderLeaflet({
       pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
     }else if (input$party == "Independent") {
       pp <- p
+    }
+    if (input$state != "all") {
+      pp <- pp + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
     }
     ppp <- ggplotly(pp)
     return(ppp)
@@ -764,6 +859,11 @@ output$leaf.let <- renderLeaflet({
       senate.members.115 <- senate.115 %>% filter(party == "I")
     } else if (input$party == "Republican") {
       senate.members.115 <- senate.115 %>% filter(party == "R")
+    } 
+    if (input$state == "all") {
+      senate.members.115 <- senate.members.115
+    } else {
+      senate.members.115 <- senate.members.115 %>% filter(state == input$state)
     }
     senate.members.115 <- senate.members.115 %>% mutate(name = paste(first_name, last_name))
     senate.members <- senate.members.115[!sapply(senate.members.115$votes_with_party_pct,is.null),]
@@ -771,7 +871,14 @@ output$leaf.let <- renderLeaflet({
     senate.members$name <- as.factor(unlist(senate.members$name))
     senate.members$last_name <- as.factor(unlist(senate.members$last_name))
     senate.members$party <- as.factor(unlist(senate.members$party))
-    senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent, decreasing = TRUE)])
+    if (input$order == "alphabetically") {
+      senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$last_name)])
+    } else if (input$order == "increasing") {
+      senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent)])
+    } else if (input$order == "decreasing") {
+      senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent, 
+                                                                                        decreasing = TRUE)])
+    }
     
     p <- ggplot(senate.members, aes(x = name, y = percent, fill = party)) +
       geom_bar(width = 1, stat = "identity") +
@@ -780,7 +887,8 @@ output$leaf.let <- renderLeaflet({
       scale_y_continuous(limits = c(0, 100))+
       ggtitle("Senate Votes With Party %")
     if (input$party == "all") {
-      pp <- p + scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))    } else if (input$party == "Democrat") {
+      pp <- p + scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))    
+      } else if (input$party == "Democrat") {
       pp <- p + scale_fill_manual(values = "#002868", labels = "Democrat")
     } else if (input$party == "Republican") {
       pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
@@ -790,6 +898,8 @@ output$leaf.let <- renderLeaflet({
     ppp <- ggplotly(pp)
     return(ppp)
   })
+  
+  
   
   output$house.missed.114 <- renderPlotly({
     if (input$party == "all") {
@@ -801,13 +911,18 @@ output$leaf.let <- renderLeaflet({
     } else if (input$party == "Republican") {
       house.members.114 <- house.114 %>% filter(party == "R")
     }
-    house.members.114 <- house.members.114 %>% mutate(name = paste(first_name, last_name))
-    house.members <- house.members.114[!sapply(house.members.114$missed_votes_pct,is.null),]
-    house.members$missed_votes_pct <- as.numeric(unlist(house.members$missed_votes_pct))
+   if (input$state == "all") {
+      house.memberz <- house.members.114
+    } else {
+      house.memberz <- house.members.114 %>% filter(state == input$state)
+    }
+    house.members <- house.memberz %>% mutate(name = paste(first_name, last_name))
+    house.members$percent <- as.numeric(unlist(house.members$missed_votes_pct))
     house.members$name <- as.factor(unlist(house.members$name))
     house.members$last_name <- as.factor(unlist(house.members$last_name))
     house.members$party <- as.factor(unlist(house.members$party))
-    house.members$percent <- (house.members$missed_votes_pct + 0.5)
+    house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
+    
     if (input$order == "alphabetically") {
       house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
     } else if (input$order == "increasing") {
@@ -818,10 +933,10 @@ output$leaf.let <- renderLeaflet({
     }
     p <- ggplot(house.members, aes(x = name, y = percent, fill = party)) +
       geom_bar(width = 1, stat = "identity") +
-      theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
       theme(axis.ticks.x = element_blank()) +
       scale_y_continuous(limits = c(0, 100))+
-      ggtitle("House of Representatives % of Votes Missed")
+      ggtitle("House of Representatives Votes With Party %")
     if (input$party == "all") {
       pp <- p + scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
         theme(axis.text.x = element_blank())
@@ -830,7 +945,10 @@ output$leaf.let <- renderLeaflet({
     } else if (input$party == "Republican") {
       pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
     } else if (input$party == "Independent") {
-      pp <- p
+      pp <- p + scale_fill_manual(values = "#6D1FA7", labels = "Independent")
+    }    
+    if (input$state != "all") {
+      pp <- pp + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
     }
     ppp <- ggplotly(pp)
     return(ppp)
@@ -847,6 +965,11 @@ output$leaf.let <- renderLeaflet({
       senate.members.114 <- senate.114 %>% filter(party == "I")
     } else if (input$party == "Republican") {
       senate.members.114 <- senate.114 %>% filter(party == "R")
+    }
+    if (input$state == "all") {
+      senate.members.114 <- senate.members.114
+    } else {
+      senate.members.114 <- senate.members.114 %>% filter(state == input$state)
     }
     senate.members.114 <- senate.members.114 %>% mutate(name = paste(first_name, last_name))
     senate.members <- senate.members.114[!sapply(senate.members.114$missed_votes_pct,is.null),]
@@ -877,9 +1000,7 @@ output$leaf.let <- renderLeaflet({
       pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
     } else if (input$party == "Independent") {
       pp <- p + scale_fill_manual(values = "#6D1FA7", labels = "Independent")
-    }   else if (input$party == "Independent") {
-      pp <- p
-    }
+    }  
     ppp <- ggplotly(pp)
     return(ppp)
     
@@ -895,24 +1016,31 @@ output$leaf.let <- renderLeaflet({
     } else if (input$party == "Republican") {
       house.members.114 <- house.114 %>% filter(party == "R")
     }
-    house.members.114 <- house.members.114 %>% mutate(name = paste(first_name, last_name))
-    house.members <- house.members.114[!sapply(house.members.114$votes_with_party_pct,is.null),]
+    if (input$state == "all") {
+      house.members.114 <- house.members.114
+    } else {
+      house.members.114 <- house.members.114 %>% filter(state == input$state)
+    }
+    house.members <- house.members.114 %>% mutate(name = paste(first_name, last_name))
     house.members$percent <- as.numeric(unlist(house.members$votes_with_party_pct))
     house.members$name <- as.factor(unlist(house.members$name))
     house.members$last_name <- as.factor(unlist(house.members$last_name))
     house.members$party <- as.factor(unlist(house.members$party))
-    if (input$order == "alphabetically") {
     house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
+    
+    if (input$order == "alphabetically") {
+      house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
     } else if (input$order == "increasing") {
-    house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent)])
+      house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent)])
     } else if (input$order == "decreasing") {
       house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent, 
                                                                                         decreasing = TRUE)])
     }
     p <- ggplot(house.members, aes(x = name, y = percent, fill = party)) +
       geom_bar(width = 1, stat = "identity") +
-      theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
       theme(axis.ticks.x = element_blank()) +
+      scale_y_continuous(limits = c(0, 100))+
       ggtitle("House of Representatives Votes With Party %")
     if (input$party == "all") {
       pp <- p + scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
@@ -922,11 +1050,13 @@ output$leaf.let <- renderLeaflet({
     } else if (input$party == "Republican") {
       pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
     } else if (input$party == "Independent") {
-      pp <- p
+      pp <- p + scale_fill_manual(values = "#6D1FA7", labels = "Independent")
+    }    
+    if (input$state != "all") {
+      pp <- pp + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
     }
     ppp <- ggplotly(pp)
     return(ppp)
-    
   })
   
   
@@ -941,8 +1071,12 @@ output$leaf.let <- renderLeaflet({
     } else if (input$party == "Republican") {
       senate.members.114 <- senate.114 %>% filter(party == "R")
     }
-    senate.members.114 <- senate.members.114 %>% mutate(name = paste(first_name, last_name))
-    senate.members <- senate.members.114[!sapply(senate.members.114$votes_with_party_pct,is.null),]
+    if (input$state == "all") {
+      senate.members.114 <- senate.members.114
+    } else {
+      senate.members.114 <- senate.members.114 %>% filter(state == input$state)
+    }
+    senate.members <- senate.members.114 %>% mutate(name = paste(first_name, last_name))
     senate.members$percent <- as.numeric(unlist(senate.members$votes_with_party_pct))
     senate.members$name <- as.factor(unlist(senate.members$name))
     senate.members$last_name <- as.factor(unlist(senate.members$last_name))

@@ -79,7 +79,7 @@ ui <- fluidPage(
                            plotlyOutput("house.line"), br(),
                            plotOutput("house.pie"),
                            h3("Senate"),
-                           actionButton("senate.q", "What? I thought the senate had 100 members!"),
+                           actionButton("senate.q", "What? I thought the senate has 100 members!"),
                            hidden(textOutput("senate.ex")),
                            plotlyOutput("senate.area"), br(),
                            plotlyOutput("senate.line"), br(),
@@ -91,42 +91,40 @@ ui <- fluidPage(
                            icon = icon("check-square-o", lib = "font-awesome"),
                            h2("Voting Reliability: Missed Votes and Party Loyalty"), br(),
                           fluidRow(
-                            column(3,
+                            column(2,
                                    radioButtons('congress', "Congress:",
                                                 choices = c("114th", "115th"))),
-                            column(3,
+                            column(2,
                                    radioButtons('party', "Party:", 
                                                     choices = c("all", "Democrat", "Republican", "Independent"), selected = "all")),
                             column(3,
                                     selectInput('order', "Show Members:", 
-                                                    choices = c("alphabetically", "decreasing", "increasing")))),
+                                                    choices = c("alphabetically", "decreasing", "increasing"))),
+                            column(3,
+                                   selectInput('state', "State", choices = c("all", "AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", 
+                                                                                    "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "RI", 
+                                                                                    "SC",  "SD", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV",  "WY"),
+                                                      selected = "all"))),
                           actionButton('table.button', "Show Table", icon = icon("table", lib = "font-awesome")),
                           hidden(actionButton('graph.button', "Return to Graph", icon = icon("bar-chart", lib = "font-awesome"))),
 
                            conditionalPanel(
                               condition = "input.congress == '115th'", 
-
-                              plotlyOutput('house.missed'),
-
-                              plotlyOutput('senate.missed'),
-                              plotlyOutput('house.with'),
-                              plotlyOutput('senate.with'),
+                              plotlyOutput('house.missed'), 
+                              plotlyOutput('senate.missed'), 
+                              plotlyOutput('house.with'), 
+                              plotlyOutput('senate.with'), 
                               fluidRow(
                                 column(6,
                               hidden(tableOutput('house.115'))),
                               column(6,
                               hidden(tableOutput('senate.115'))))
-
-                             
                            ),
-                           
                            conditionalPanel(
                              condition = "input.congress == '114th'",
-       
-                          plotlyOutput('house.missed.114'),
-
-                          plotlyOutput('senate.missed.114'),
-                          plotlyOutput('house.with.114'),
+                          plotlyOutput('house.missed.114'), hr(),
+                          plotlyOutput('senate.missed.114'), 
+                          plotlyOutput('house.with.114'), 
                           plotlyOutput('senate.with.114'),
                           fluidRow(
                             column(6,
