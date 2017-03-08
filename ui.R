@@ -69,11 +69,17 @@ ui <- fluidPage(
                              column(6, offset = 3,
                            iframe(width = "672", height = "378", url_link="https://www.youtube.com/embed/tyeJ55o3El0"),
                            ("via"), (em(tags$a(href = "http://www.schoolhouserock.tv/Bill.html", "Schoolhouse Rock!", target = "_blank"))))), hr(),
+                           "Click one of the buttons below to look for a bill.",
+                           br(), br(),
                            actionButton("choose.topic", "Choose Topic"),
                            actionButton("search.text", "Search Text of Bills"), br(), br(),
                            hidden(selectInput("topic", label = NULL, choices=c("education", "health", "guns", "veterans", "budget", 
                                                                      "law", "welfare", "taxes", "diplomacy", "defense", "immigration"))),
+<<<<<<< HEAD
                            hidden(textInput('search', "Search text of bills", value = "education")),
+=======
+                           hidden(textInput('search', "Search text of bills", placeholder = "e.g. immigration, Washington, taxes")),
+>>>>>>> dffa29f0143354c913dc53330d9672929973d6d2
                            hidden(dataTableOutput('bills.topic')),
                            hidden(dataTableOutput('bills.search'))
                            ),
