@@ -135,7 +135,7 @@ server <- function(input, output) {
   
 
   output$hi <- eventReactive(input$welcome, {
-      return("We think so too!")
+      return("Click on one of the tabs above to get started :)")
     })
   
   observeEvent(input$table.button, {

@@ -13,7 +13,7 @@ library(xtable)
 ui <- fluidPage(
   useShinyjs(),
   titlePanel("Congress App"),
-  h3("Info 201 Final Project"),
+  h3("INFO 201 Final Project"),
   h3("By Kelsey Kua, Casey Lum, and Devin Reich"),
   img(src = "header.jpg", height = 255),
    hr(),
@@ -22,13 +22,22 @@ ui <- fluidPage(
       tabsetPanel(type="tabs",
                   tabPanel("Welcome", icon = icon("hand-spock-o", lib = "font-awesome"),
                            h1("Welcome"),
-                           h3("This app will allow you to explore congress data"),
-                           actionButton('welcome', "Awesome!"),
+                           "This app will allow you to explore Congress data taken from the ",
+                           tags$a(href="https://sunlightlabs.github.io/congress/", "Sunlight Congress API", target = "_blank"),
+                           "and the ",
+                           tags$a(href="https://www.propublica.org/datastore/api/propublica-congress-api", "ProPublica Congress API", target = "_blank"),
+                           ". You can view information about the representatives for a selected area, see how a representative voted, and view gender and party makeup and overall voting reliability in Congress. 
+                           Have fun exploring our app!",
+                           br(), br(),
+                           actionButton('welcome', "Let's get started!"),
                            textOutput("hi")),
                   
                   tabPanel("Your Representatives", icon = icon("handshake-o", lib = "font-awesome"),
                            h2("Your Representatives"),
-                           radioButtons('format', label = "Find representatives by...", choices = c("zipcode", "map"), selected = character(0)),
+                           "Click on one of the radio buttons below to find representatives from a selected area. 
+                           You can find representatives by entering a zip code or clicking on a location on the map.",
+                           br(), br(),
+                           radioButtons('format', label = "Find representatives by...", choices = c("zip code", "map"), selected = character(0)),
                            conditionalPanel(
                              condition = "input.format == 'map'", 
                              actionButton('reset', "Reset View", icon = icon("undo", lib = "font-awesome")), br(), 
@@ -42,25 +51,23 @@ ui <- fluidPage(
                              )),
 
                            conditionalPanel(
-                             condition = "input.format == 'zipcode'",
+                             condition = "input.format == 'zip code'",
                              uiOutput('choice'),
-                             em(strong("Note:"), "zipcodes have varying numbers of representatives because some 
-                                zipcodes span multiple congressional districts, meaning multiple members of the House are shown. 
-                                Finding your location on the map will
-                                show you who your representatives are."),
+                             em(strong("Note:"), "Zip codes have varying numbers of representatives because some 
+                                zip codes span multiple congressional districts, meaning multiple members of the House are shown. 
+                                Finding your location on the map will show the representatives for that area."),
+                             br(), br(),
                              tableOutput('reps'),
                              uiOutput('photos'))
                   ),
-                  
-                  tabPanel("Compare Two Reps", icon = icon("balance-scale", lib ="font-awesome")),
-                  
-                  tabPanel("Voting Record", icon = icon("history", lib = "font-awesome")),
                   
                   tabPanel("View a Vote", icon = icon("eye", lib = "font-awesome")),
                   
                   tabPanel("Gender Makeup", icon = icon("venus-mars", lib = "font-awesome"),
                            h3("Gender Makeup"),
-                           "This page shows how the gender makeup has changed from 2009 to 2017 for both the house of representatives and the senate.",
+                           h5("This page shows how the gender makeup has changed from 2009 to 2017 for both the 
+                           House of Representatives and the Senate. Click on one of the radio buttons below to see
+                           information about the House or information about the Senate."),
                            br(), br(), br(),
                            fluidRow(
                              column(12, 
@@ -70,7 +77,6 @@ ui <- fluidPage(
                                                  )
                                     )
                            ),
-                           br(),
                            conditionalPanel(
                              condition = "input.chamber == 'House of Representatives'",
                              h4(em("Gender Makeup in the House of Representatives"), align = "center"),
@@ -80,7 +86,7 @@ ui <- fluidPage(
                              plotlyOutput("genderHouseArea"),
                              br(), br(),
                              plotlyOutput("genderHouseLine"),
-                             br(), br(),
+                             br(), br(), br(),
                              plotOutput("genderHousePie"),
                              align = "center"
                            ),
@@ -93,10 +99,13 @@ ui <- fluidPage(
                              plotlyOutput("genderSenateArea"),
                              br(), br(),
                              plotlyOutput("genderSenateLine"),
-                             br(), br(),
+                             br(), br(), br(),
                              plotOutput("genderSenatePie"),
                              align = "center"
-                           )
+                           ),
+                           br(), br(),
+                           h5("As seen in the data table and plots, the ratio of females to males has changed much from 2009 to 2017
+                           for both the House and the Senate.")
                   ),
                   
                   tabPanel("Party Makeup", icon = icon("birthday-cake", lib = "font-awesome"),
