@@ -12,6 +12,7 @@ library(tidyr)
 library(shinyjs)
 source("apikey.R")
 
+
 state <- geojson_read("data/stateData.geojson", what = "sp")
 class(state)
 
