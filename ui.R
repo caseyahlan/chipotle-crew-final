@@ -9,6 +9,7 @@ library(devtools)
 library(leaflet)
 library(shinyjs)
 library(xtable)
+library(shinyLP)
 
 ui <- fluidPage(
   useShinyjs(),
@@ -61,7 +62,24 @@ ui <- fluidPage(
                              uiOutput('photos'))
                   ),
                   
+
+                  tabPanel("Recent Bills", icon = icon("inbox", lib = "font-awesome"),
+                           h3("Recent Bills"),
+                           fluidRow(
+                             column(6, offset = 3,
+                           iframe(width = "672", height = "378", url_link="https://www.youtube.com/embed/tyeJ55o3El0"),
+                           ("via"), (em(tags$a(href = "http://www.schoolhouserock.tv/Bill.html", "Schoolhouse Rock!", target = "_blank"))))), hr(),
+                           actionButton("choose.topic", "Choose Topic"),
+                           actionButton("search.text", "Search Text of Bills"),
+                           hidden(selectInput("topic", label = NULL, choices=c("education", "health", "guns", "veterans", "budget", 
+                                                                     "law", "welfare", "taxes", "diplomacy", "defense", "immigration"))),
+                           hidden(textInput('search', "Search text of bills")),
+                           hidden(dataTableOutput('bills.topic')),
+                           hidden(dataTableOutput('bills.search'))
+                           ),
+                  
                   tabPanel("View a Vote", icon = icon("eye", lib = "font-awesome")),
+                  
                   
                   tabPanel("Gender Makeup", icon = icon("venus-mars", lib = "font-awesome"),
                            h3("Gender Makeup"),
@@ -105,7 +123,7 @@ ui <- fluidPage(
                            ),
                            br(), br(),
                            "As seen in the data table and plots, the ratio of females to males has experienced little change from 2009 to 2017
-                           for both the House and the Senate. Even though the public is becoming more aware of the gender diversity (or lack of) 
+                           for both the House and the Senate. Even though the public is becoming more aware of the gender diversity (or lack thereof) 
                            in predominantly male fields (e.g. STEM fields, politics, military), this data shows that there has been 
                            negligible change in the number of women in both the House and the Senate. What would this mean in terms of how 
                            effective the push for more diversity is in these predominantly male fields? As ",
