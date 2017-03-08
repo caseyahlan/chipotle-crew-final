@@ -83,9 +83,15 @@ ui <- fluidPage(
                   
                   tabPanel("View a Vote", icon = icon("eye", lib = "font-awesome"),
                            h3("See how Congress voted on a roll call vote"),
-                           h5("Choose a vote from the list below to view the breakdown of the vote"),
-                           selectInput("roll.id", label = "Roll.id", choices = c("h2-2017", "s65-2017")),
-                           actionButton("roll.id.button", "I want to enter my own roll.id")),
+                           h5("You can view the vote breakdown of any vote that took place during or after 2009."),
+                           selectInput("roll.id", label = "Vote", 
+                                       choices = c("h2-2017", 
+                                                   "s65-2017")),
+                           actionButton("roll.id.button", "I want to enter my own roll.id", icon = icon("i-cursor", lib = "font-awesome")),
+                           hidden(textInput('own.roll.id', "Enter roll.id")),
+                           hidden(actionButton("return.options", "Return to options", icon = icon("mouse-pointer", lib = "font-awesome"))),
+                           hidden(tableOutput('vote.choose')),
+                           hidden(tableOutput('vote.own'))),
                   
                   
                   tabPanel("Gender Makeup", icon = icon("venus-mars", lib = "font-awesome"),
