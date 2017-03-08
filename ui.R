@@ -66,9 +66,9 @@ ui <- fluidPage(
                   
                   tabPanel("Gender Makeup", icon = icon("venus-mars", lib = "font-awesome"),
                            h3("Gender Makeup"),
-                           h5("This page shows how the gender makeup has changed from 2009 to 2017 for both the 
+                           "This page shows how the gender makeup has changed from 2009 to 2017 for both the 
                            House of Representatives and the Senate. Click on one of the radio buttons below to see
-                           information about the House or information about the Senate."),
+                           gender information about the House or the Senate.",
                            br(), br(), br(),
                            fluidRow(
                              column(12, 
@@ -105,8 +105,18 @@ ui <- fluidPage(
                              align = "center"
                            ),
                            br(), br(),
-                           h5("As seen in the data table and plots, the ratio of females to males has changed much from 2009 to 2017
-                           for both the House and the Senate.")
+                           "As seen in the data table and plots, the ratio of females to males has experienced little change from 2009 to 2017
+                           for both the House and the Senate. Even though the public is becoming more aware of the gender diversity (or lack of) 
+                           in predominantly male fields (e.g. STEM fields, politics, military), this data shows that there has been 
+                           negligible change in the number of women in both the House and the Senate. What would this mean in terms of how 
+                           effective the push for more diversity is in these predominantly male fields? As ",
+                           tags$a(href="https://www.gillibrand.senate.gov/", "Senator Kirsten Gillibrand", target = "_blank"),
+                           " points out, ",
+                           tags$a(href="http://www.dailykos.com/story/2012/09/27/1137167/-Women-Are-The-Key-To-Holding-Onto-The-Senate",
+                                  "women make up 51% of the United States population but only 17% of Congress.", target = "_blank"),
+                           br(), br(),
+                           "To learn more about women's involvement in politics, visit the ",
+                           tags$a(href="http://www.cawp.rutgers.edu/facts", "Center for American Women and Politics website.", target = "_blank")
                   ),
                   
                   tabPanel("Party Makeup", icon = icon("birthday-cake", lib = "font-awesome"),
@@ -115,7 +125,7 @@ ui <- fluidPage(
                            plotlyOutput("house.line"), br(),
                            plotOutput("house.pie"),
                            h3("Senate"),
-                           actionButton("senate.q", "What? I thought the senate had 100 members!"),
+                           actionButton("senate.q", "What? I thought the senate has 100 members!"),
                            hidden(textOutput("senate.ex")),
                            plotlyOutput("senate.area"), br(),
                            plotlyOutput("senate.line"), br(),
@@ -125,42 +135,40 @@ ui <- fluidPage(
                            icon = icon("check-square-o", lib = "font-awesome"),
                            h2("Voting Reliability: Missed Votes and Party Loyalty"), br(),
                           fluidRow(
-                            column(3,
+                            column(2,
                                    radioButtons('congress', "Congress:",
                                                 choices = c("114th", "115th"))),
-                            column(3,
+                            column(2,
                                    radioButtons('party', "Party:", 
                                                     choices = c("all", "Democrat", "Republican", "Independent"), selected = "all")),
                             column(3,
                                     selectInput('order', "Show Members:", 
-                                                    choices = c("alphabetically", "decreasing", "increasing")))),
+                                                    choices = c("alphabetically", "decreasing", "increasing"))),
+                            column(3,
+                                   selectInput('state', "State", choices = c("all", "AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", 
+                                                                                    "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "RI", 
+                                                                                    "SC",  "SD", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV",  "WY"),
+                                                      selected = "all"))),
                           actionButton('table.button', "Show Table", icon = icon("table", lib = "font-awesome")),
                           hidden(actionButton('graph.button', "Return to Graph", icon = icon("bar-chart", lib = "font-awesome"))),
 
                            conditionalPanel(
                               condition = "input.congress == '115th'", 
-
-                              plotlyOutput('house.missed'),
-
-                              plotlyOutput('senate.missed'),
-                              plotlyOutput('house.with'),
-                              plotlyOutput('senate.with'),
+                              plotlyOutput('house.missed'), 
+                              plotlyOutput('senate.missed'), 
+                              plotlyOutput('house.with'), 
+                              plotlyOutput('senate.with'), 
                               fluidRow(
                                 column(6,
                               hidden(tableOutput('house.115'))),
                               column(6,
                               hidden(tableOutput('senate.115'))))
-
-                             
                            ),
-                           
                            conditionalPanel(
                              condition = "input.congress == '114th'",
-       
-                          plotlyOutput('house.missed.114'),
-
-                          plotlyOutput('senate.missed.114'),
-                          plotlyOutput('house.with.114'),
+                          plotlyOutput('house.missed.114'), hr(),
+                          plotlyOutput('senate.missed.114'), 
+                          plotlyOutput('house.with.114'), 
                           plotlyOutput('senate.with.114'),
                           fluidRow(
                             column(6,
