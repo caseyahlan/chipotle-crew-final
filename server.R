@@ -315,8 +315,8 @@ server <- function(input, output) {
             colnames(bills)[colnames(bills) == "introduced_on"] <- "date introduced"
             colnames(bills)[colnames(bills) == "official_title"] <- "full title of bill"
             return(bills)
-            autoWidth: FALSE
-          })
+          }
+          )
           
           output$bills.search <- renderDataTable({
             bills.resource <- ("bills/search?query=")
@@ -330,10 +330,95 @@ server <- function(input, output) {
             colnames(bills)[colnames(bills) == "introduced_on"] <- "date introduced"
             colnames(bills)[colnames(bills) == "official_title"] <- "full title of bill"
             return(bills)
-            autoWidth: FALSE
           })
 
+  
+  #############################
+  ## BILLS
+  #############################
+          observeEvent(input$roll.id.button, {
+            showElement("own.roll.id")
+          })
           
+          observeEvent(input$roll.id.button, {
+            showElement("return.options")
+          })
+          
+          observeEvent(input$roll.id.button, {
+            hideElement("roll.id.button")
+          })
+          
+          observeEvent(input$roll.id.button, {
+            hideElement("vote.choose")
+          })
+          
+          
+          observeEvent(input$roll.id.button, {
+            hideElement("roll.id")
+          })
+          
+          observeEvent(input$roll.id.button, {
+            showElement("vote.own")
+          })
+          
+          observeEvent(input$return.options, {
+            showElement("roll.id.button")
+          })
+          
+          observeEvent(input$return.options, {
+            hideElement("vote.own")
+          })
+          
+          observeEvent(input$return.options, {
+            showElement("roll.id")
+          })
+          
+          observeEvent(input$return.options, {
+            showElement("vote.choose")
+          })
+          
+          observeEvent(input$return.options, {
+            hideElement("return.options")
+          })
+          
+          observeEvent(input$return.options, {
+            hideElement("own.roll.id")
+          })
+          
+        
+          output$vote.choose <- renderTable({
+            votes.resource <- ("votes?roll_id=")
+            votes.filters <- ("&fields=voters")
+            votes.response <- GET(paste0(sunlight.base, votes.resource, input$roll.id, votes.filters))
+            request.body.as.list <- content(votes.response)
+            voters.list <- request.body.as.list$results[[1]]$voters
+            names(voters.list) <- NULL
+            voters.json <- toJSON(voters.list)
+            voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
+            voters <- select(voters.as.data.frame, voter.first_name, voter.last_name, voter.party, voter.state, vote)
+            colnames(voters)[colnames(voters) == "voter.party"] <- "party"
+            colnames(voters)[colnames(voters) == "voter.first_name"] <- "first name"
+            colnames(voters)[colnames(voters) == "voter.last_name"] <- "last name"
+            colnames(voters)[colnames(voters) == "voter.state"] <- "state"
+            return(voters)
+          })
+          
+          output$vote.own <- renderTable({
+            votes.resource <- ("votes?roll_id=")
+            votes.filters <- ("&fields=voters")
+            votes.response <- GET(paste0(sunlight.base, votes.resource, input$own.roll.id, votes.filters))
+            request.body.as.list <- content(votes.response)
+            voters.list <- request.body.as.list$results[[1]]$voters
+            names(voters.list) <- NULL
+            voters.json <- toJSON(voters.list)
+            voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
+            voters <- select(voters.as.data.frame, voter.first_name, voter.last_name, voter.party, voter.state, vote)
+            colnames(voters)[colnames(voters) == "voter.party"] <- "party"
+            colnames(voters)[colnames(voters) == "voter.first_name"] <- "first name"
+            colnames(voters)[colnames(voters) == "voter.last_name"] <- "last name"
+            colnames(voters)[colnames(voters) == "voter.state"] <- "state"
+            return(voters)
+          })
           
   #############################
   ## GENDER MAKEUP
