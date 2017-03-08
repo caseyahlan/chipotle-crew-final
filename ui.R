@@ -69,17 +69,15 @@ ui <- fluidPage(
                              column(6, offset = 3,
                            iframe(width = "672", height = "378", url_link="https://www.youtube.com/embed/tyeJ55o3El0"),
                            ("via"), (em(tags$a(href = "http://www.schoolhouserock.tv/Bill.html", "Schoolhouse Rock!", target = "_blank"))))), hr(),
-                           "Click one of the buttons below to look for a bill.",
+                           "Click one of the buttons below to look for recent bills.",
                            br(), br(),
                            actionButton("choose.topic", "Choose Topic"),
                            actionButton("search.text", "Search Text of Bills"), br(), br(),
                            hidden(selectInput("topic", label = NULL, choices=c("education", "health", "guns", "veterans", "budget", 
                                                                      "law", "welfare", "taxes", "diplomacy", "defense", "immigration"))),
-<<<<<<< HEAD
-                           hidden(textInput('search', "Search text of bills", value = "education")),
-=======
+
+
                            hidden(textInput('search', "Search text of bills", placeholder = "e.g. immigration, Washington, taxes")),
->>>>>>> dffa29f0143354c913dc53330d9672929973d6d2
                            hidden(dataTableOutput('bills.topic')),
                            hidden(dataTableOutput('bills.search'))
                            ),
@@ -87,13 +85,13 @@ ui <- fluidPage(
                   tabPanel("View a Vote", icon = icon("eye", lib = "font-awesome"),
                            h3("See how Congress voted on a roll call vote"),
                            h5("You can view the vote breakdown of any vote that took place during or after 2009."),
-                           selectInput("roll.id", label = "Vote", 
-                                       choices = c("h2-2017", 
-                                                   "s65-2017")),
+                           selectInput("roll.id.choose", label = "Vote", 
+                                       choices = c("h6-2017", 
+                                                   "s5-2010"), selected = character(0)),
                            actionButton("roll.id.button", "I want to enter my own roll.id", icon = icon("i-cursor", lib = "font-awesome")),
                            hidden(textInput('own.roll.id', "Enter roll.id")),
                            hidden(actionButton("return.options", "Return to options", icon = icon("mouse-pointer", lib = "font-awesome"))),
-                           hidden(tableOutput('vote.choose')),
+                           tableOutput('vote.choose'),
                            hidden(tableOutput('vote.own'))),
                   
                   

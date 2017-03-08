@@ -10,6 +10,7 @@ library(geojsonio)
 library(curlconverter)
 library(tidyr)
 library(shinyjs)
+library(devtools)
 source("apikey.R")
 
 
@@ -132,9 +133,6 @@ legislators.by.gender.senate.tall <- gather(legislators.by.gender.senate, key = 
 # Server function
 server <- function(input, output) {
 
-  output$hi <- eventReactive(input$welcome, {
-      return("Click on one of the tabs above to get started :)")
-    })
   
 
   
@@ -336,60 +334,72 @@ server <- function(input, output) {
   #############################
   ## BILLS
   #############################
+          
+          # Hide "enter own roll id" button when it is pushed
           observeEvent(input$roll.id.button, {
             showElement("own.roll.id")
           })
-          
+        
+          # Show "return" button when "enter own" button is pushed
           observeEvent(input$roll.id.button, {
             showElement("return.options")
           })
           
+          # Hide "enter own roll id" button when it is pushed
           observeEvent(input$roll.id.button, {
             hideElement("roll.id.button")
           })
           
+          # Hide data frame "vote.choose" when "enter own" button is pushed
           observeEvent(input$roll.id.button, {
             hideElement("vote.choose")
           })
           
-          
+          # Hide roll.id selectInput when "enter own" button is pushed
           observeEvent(input$roll.id.button, {
-            hideElement("roll.id")
+            hideElement("roll.id.choose")
           })
           
+          # Show "vote.own" data frame when "enter own" button is pushed
           observeEvent(input$roll.id.button, {
             showElement("vote.own")
-          })
+         })
           
+          # Show "enter own" button when "return" button is pushed
           observeEvent(input$return.options, {
             showElement("roll.id.button")
           })
           
+          # Hide "vote.own" data frame with "return" button is pushed
           observeEvent(input$return.options, {
             hideElement("vote.own")
           })
           
+          # Show roll.id selectInput when "return" button is pushed
           observeEvent(input$return.options, {
-            showElement("roll.id")
+            showElement("roll.id.choose")
           })
           
+          # Show "vote.choose" data frame when "return button is pushed
           observeEvent(input$return.options, {
             showElement("vote.choose")
           })
           
+          # Hide "return" button when it is pushed
           observeEvent(input$return.options, {
             hideElement("return.options")
           })
           
+          # Hide "own.roll.id" textInput when "return" button is pushed
           observeEvent(input$return.options, {
             hideElement("own.roll.id")
           })
           
         
-          output$vote.choose <- renderTable({
+          vote.choose <- reactive({
             votes.resource <- ("votes?roll_id=")
             votes.filters <- ("&fields=voters")
-            votes.response <- GET(paste0(sunlight.base, votes.resource, input$roll.id, votes.filters))
+            votes.response <- GET(paste0(sunlight.base, votes.resource, input$roll.id.choose, votes.filters))
             request.body.as.list <- content(votes.response)
             voters.list <- request.body.as.list$results[[1]]$voters
             names(voters.list) <- NULL
@@ -403,22 +413,33 @@ server <- function(input, output) {
             return(voters)
           })
           
-          output$vote.own <- renderTable({
-            votes.resource <- ("votes?roll_id=")
-            votes.filters <- ("&fields=voters")
-            votes.response <- GET(paste0(sunlight.base, votes.resource, input$own.roll.id, votes.filters))
-            request.body.as.list <- content(votes.response)
-            voters.list <- request.body.as.list$results[[1]]$voters
-            names(voters.list) <- NULL
-            voters.json <- toJSON(voters.list)
-            voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
-            voters <- select(voters.as.data.frame, voter.first_name, voter.last_name, voter.party, voter.state, vote)
-            colnames(voters)[colnames(voters) == "voter.party"] <- "party"
-            colnames(voters)[colnames(voters) == "voter.first_name"] <- "first name"
-            colnames(voters)[colnames(voters) == "voter.last_name"] <- "last name"
-            colnames(voters)[colnames(voters) == "voter.state"] <- "state"
-            return(voters)
+          output$vote.choose <- renderTable({
+            return(vote.choose())
           })
+          
+          vote.own <- reactive({
+            votes.resource.1 <- ("votes?roll_id=")
+            votes.filters.1 <- ("&fields=voters")
+            roll.id.1 <- input$own.roll.id
+            votes.response.1 <- GET(paste0(sunlight.base, votes.resource.1, roll.id.1, votes.filters.1))
+            request.body.as.list.1 <- content(votes.response.1)
+            voters.list.1 <- request.body.as.list.1$results[[1]]$voters
+            names(voters.list.1) <- NULL
+            voters.json.1 <- toJSON(voters.list.1)
+            voters.as.data.frame.1 <- flatten(fromJSON(voters.json.1, flatten=TRUE))
+            voters.1 <- select(voters.as.data.frame.1, voter.first_name, voter.last_name, voter.party, voter.state, vote)
+            colnames(voters.1)[colnames(voters.1) == "voter.party"] <- "party"
+            colnames(voters.1)[colnames(voters.1) == "voter.first_name"] <- "first name"
+            colnames(voters.1)[colnames(voters.1) == "voter.last_name"] <- "last name"
+            colnames(voters.1)[colnames(voters.1) == "voter.state"] <- "state"
+            return(voters.1)
+          })
+          
+          output$vote.own <- renderTable({
+            return(vote.own())
+          })
+          
+          
           
   #############################
   ## GENDER MAKEUP
