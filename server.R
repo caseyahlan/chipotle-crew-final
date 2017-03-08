@@ -132,7 +132,6 @@ legislators.by.gender.senate.tall <- gather(legislators.by.gender.senate, key = 
 
 # Server function
 server <- function(input, output) {
-  
 
   output$hi <- eventReactive(input$welcome, {
       return("Click on one of the tabs above to get started :)")

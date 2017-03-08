@@ -9,6 +9,7 @@ library(devtools)
 library(leaflet)
 library(shinyjs)
 library(xtable)
+library(shinyLP)
 
 ui <- fluidPage(
   useShinyjs(),
