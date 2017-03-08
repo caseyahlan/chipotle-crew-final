@@ -65,9 +65,9 @@ ui <- fluidPage(
                   
                   tabPanel("Gender Makeup", icon = icon("venus-mars", lib = "font-awesome"),
                            h3("Gender Makeup"),
-                           h5("This page shows how the gender makeup has changed from 2009 to 2017 for both the 
+                           "This page shows how the gender makeup has changed from 2009 to 2017 for both the 
                            House of Representatives and the Senate. Click on one of the radio buttons below to see
-                           information about the House or information about the Senate."),
+                           gender information about the House or the Senate.",
                            br(), br(), br(),
                            fluidRow(
                              column(12, 
@@ -104,8 +104,18 @@ ui <- fluidPage(
                              align = "center"
                            ),
                            br(), br(),
-                           h5("As seen in the data table and plots, the ratio of females to males has changed much from 2009 to 2017
-                           for both the House and the Senate.")
+                           "As seen in the data table and plots, the ratio of females to males has experienced little change from 2009 to 2017
+                           for both the House and the Senate. Even though the public is becoming more aware of the gender diversity (or lack of) 
+                           in predominantly male fields (e.g. STEM fields, politics, military), this data shows that there has been 
+                           negligible change in the number of women in both the House and the Senate. What would this mean in terms of how 
+                           effective the push for more diversity is in these predominantly male fields? As ",
+                           tags$a(href="https://www.gillibrand.senate.gov/", "Senator Kirsten Gillibrand", target = "_blank"),
+                           " points out, ",
+                           tags$a(href="http://www.dailykos.com/story/2012/09/27/1137167/-Women-Are-The-Key-To-Holding-Onto-The-Senate",
+                                  "women make up 51% of the United States population but only 17% of Congress.", target = "_blank"),
+                           br(), br(),
+                           "To learn more about women's involvement in politics, visit the ",
+                           tags$a(href="http://www.cawp.rutgers.edu/facts", "Center for American Women and Politics website.", target = "_blank")
                   ),
                   
                   tabPanel("Party Makeup", icon = icon("birthday-cake", lib = "font-awesome"),
