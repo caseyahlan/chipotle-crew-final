@@ -379,7 +379,7 @@ server <- function(input, output) {
       coord_polar(theta = "y") +
       scale_fill_manual(values = c("#F06292", "#66BB6A")) +
       ggtitle("Gender Makeup in the House of Representatives from 2009 to 2017") +
-      facet_wrap(~Year) +
+      facet_wrap(~Year, nrow = 2) +
       theme(axis.ticks = element_blank()) +
       theme(axis.text = element_blank()) +
       theme(axis.title = element_blank()) +
@@ -398,7 +398,7 @@ server <- function(input, output) {
       coord_polar(theta = "y") +
       scale_fill_manual(values = c("#F06292", "#66BB6A")) +
       ggtitle("Gender Makeup in the Senate from 2009 to 2017") +
-      facet_wrap(~Year) +
+      facet_wrap(~Year, nrow = 2) +
       theme(axis.ticks = element_blank()) +
       theme(axis.text = element_blank()) +
       theme(axis.title = element_blank()) +
