@@ -136,9 +136,6 @@ server <- function(input, output) {
       return("Click on one of the tabs above to get started :)")
     })
   
-  observeEvent(input$table.button, {
-    showElement("graph.button")
-  })
 
   
   #############################
