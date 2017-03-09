@@ -27,7 +27,8 @@ house.makeup <- read.csv("data/house.makeup", stringsAsFactors = FALSE)
 senate.makeup <- read.csv("data/senate.makeup", stringsAsFactors = FALSE)
 
 # Get senate 114 data
-request <- GET("https://api.propublica.org/congress/v1/114/senate/members.json", add_headers("X-API-Key" = "ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT") )
+request <- GET("https://api.propublica.org/congress/v1/114/senate/members.json", 
+               add_headers("X-API-Key" = "ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT") )
 request.body.list <- content(request)
 members.list <- request.body.list$results[[1]]$members
 names(members.list) <- NULL
@@ -38,7 +39,8 @@ senate.114 <- senate.114[!sapply(senate.114$votes_with_party_pct,is.null),]
 
 
 # Get house 114 data
-request <- GET("https://api.propublica.org/congress/v1/114/house/members.json", add_headers("X-API-Key" = "ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT") )
+request <- GET("https://api.propublica.org/congress/v1/114/house/members.json", 
+               add_headers("X-API-Key" = "ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT") )
 request.body.list <- content(request)
 members.list <- request.body.list$results[[1]]$members
 names(members.list) <- NULL
@@ -49,7 +51,8 @@ house.114 <- house.114[!sapply(house.114$votes_with_party_pct,is.null),]
 
 
 # Get senate 115 data
-request <- GET("https://api.propublica.org/congress/v1/115/senate/members.json", add_headers("X-API-Key" = "ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT") )
+request <- GET("https://api.propublica.org/congress/v1/115/senate/members.json", 
+               add_headers("X-API-Key" = "ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT") )
 request.body.list <- content(request)
 members.list <- request.body.list$results[[1]]$members
 names(members.list) <- NULL
@@ -60,7 +63,8 @@ senate.115 <- senate.115[!sapply(senate.115$votes_with_party_pct,is.null),]
 
 
 # Get house 115 data
-request <- GET("https://api.propublica.org/congress/v1/115/house/members.json", add_headers("X-API-Key" = "ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT") )
+request <- GET("https://api.propublica.org/congress/v1/115/house/members.json", 
+               add_headers("X-API-Key" = "ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT") )
 request.body.list <- content(request)
 members.list <- request.body.list$results[[1]]$members
 names(members.list) <- NULL
@@ -81,7 +85,8 @@ GetGenderMakeup <- function(roll.id) {
   names(voters.list) <- NULL
   voters.json <- toJSON(voters.list)
   voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
-  voters <- voters.as.data.frame %>% select(voter.party, voter.gender, vote)
+  voters <- voters.as.data.frame %>% 
+    select(voter.party, voter.gender, vote)
   voters$voter.gender <- as.factor(unlist(voters$voter.gender))
   voters.gender <- tally(group_by(voters, voter.gender))
   return(voters.gender)
@@ -96,10 +101,12 @@ for (year in years) {
   response <- GET(paste0(sunlight.base, resource, query))
   body <- fromJSON(content(response, "text"))
   body <- flatten(body$results)
-  legislators.by.gender.house <- cbind(legislators.by.gender.house, select(GetGenderMakeup(body[1, "roll_id"]), n))
+  legislators.by.gender.house <- cbind(legislators.by.gender.house, 
+                                       select(GetGenderMakeup(body[1, "roll_id"]), n))
 }
 colnames(legislators.by.gender.house) <- c("Gender", 2009:2017)
-legislators.by.gender.house.tall <- gather(legislators.by.gender.house, key = "Year", value = "Value",
+legislators.by.gender.house.tall <- gather(legislators.by.gender.house, 
+                                           key = "Year", value = "Value",
                                            `2009`:`2017`, convert = TRUE)
 
 # Creates a data frame of gender breakdown from 2009 to 2017 for the senate
@@ -109,10 +116,12 @@ for (year in years) {
   response <- GET(paste0(sunlight.base, resource, query))
   body <- fromJSON(content(response, "text"))
   body <- flatten(body$results)
-  legislators.by.gender.senate <- cbind(legislators.by.gender.senate, select(GetGenderMakeup(body[1, "roll_id"]), n))
+  legislators.by.gender.senate <- cbind(legislators.by.gender.senate, 
+                                        select(GetGenderMakeup(body[1, "roll_id"]), n))
 }
 colnames(legislators.by.gender.senate) <- c("Gender", 2009:2017)
-legislators.by.gender.senate.tall <- gather(legislators.by.gender.senate, key = "Year", value = "Value",
+legislators.by.gender.senate.tall <- gather(legislators.by.gender.senate, 
+                                            key = "Year", value = "Value",
                                             `2009`:`2017`, convert = TRUE)
 
 
@@ -146,7 +155,9 @@ server <- function(input, output) {
     query <- paste0("?zip=", input$zip)
     response <- GET(paste0(sunlight.base, resource, query))
     body <- fromJSON(content(response, "text"))
-    legislators <- flatten(body$results) %>% mutate(name = paste(first_name, last_name)) %>% select(name, chamber, party, state, phone)
+    legislators <- flatten(body$results) %>% 
+      mutate(name = paste(first_name, last_name)) %>% 
+      select(name, chamber, party, state, phone)
     return(legislators)
   })
   
@@ -164,7 +175,9 @@ server <- function(input, output) {
     latitude <- click$lat
     response <- GET(paste0(sunlight.base, resource, latitude, resource2, longitude))
     body <- fromJSON(content(response, "text"))
-    legislators <- flatten(body$results) %>% mutate(name = paste(first_name, last_name)) %>% select(name, chamber, party, state, phone)
+    legislators <- flatten(body$results) %>% 
+      mutate(name = paste(first_name, last_name)) %>% 
+      select(name, chamber, party, state, phone)
     return(legislators)
   })
   
@@ -185,19 +198,22 @@ server <- function(input, output) {
   
   output$leaf.let <- renderLeaflet({
     leaflet(data = state, options = leafletOptions(minZoom = 2.5)) %>% addTiles() %>%
-      addPolygons(fillColor = heat.colors(20, alpha = NULL), stroke= FALSE,
+      addPolygons(fillColor = heat.colors(20, alpha = NULL), 
+                  stroke= FALSE,
                   highlight = highlightOptions(
                     weight = 5,
                     color = "#666",
                     dashArray = "",
                     fillOpacity = 0.7,
-                    bringToFront = TRUE)) %>% setView(lng=-112, lat = 47, zoom = 3)
+                    bringToFront = TRUE)) %>% 
+      setView(lng=-112, lat = 47, zoom = 3)
   })
   
   
   observe({
     input$reset
-    leafletProxy("leaf.let") %>% setView(lng = -112, lat = 47, zoom = 3)
+    leafletProxy("leaf.let") %>% 
+      setView(lng = -112, lat = 47, zoom = 3)
   })
   
   
@@ -211,7 +227,8 @@ server <- function(input, output) {
     latitude <- click$lat
     response <- GET(paste0(sunlight.base, resource, latitude, resource2, longitude))
     body <- fromJSON(content(response, "text"))
-    bio.ids <- flatten(body$results) %>% select(bioguide_id)
+    bio.ids <- flatten(body$results) %>% 
+      select(bioguide_id)
     picture.base <- ("https://theunitedstates.io/images/congress/225x275/")
     picture.query <- (".jpg") 
     num <- nrow(bio.ids)
@@ -234,7 +251,8 @@ server <- function(input, output) {
     query <- paste0("?zip=", input$zip)
     response <- GET(paste0(sunlight.base, resource, query))
     body <- fromJSON(content(response, "text"))
-    bio.ids <- flatten(body$results) %>% select(bioguide_id)
+    bio.ids <- flatten(body$results) %>% 
+      select(bioguide_id)
     picture.base <- ("https://theunitedstates.io/images/congress/225x275/")
     picture.query <- (".jpg")
     num.reps <- nrow(bio.ids)
@@ -305,9 +323,7 @@ server <- function(input, output) {
     bills.body <- fromJSON(content(bills.response, "text"))
     bills <- flatten(bills.body$results)
     bills <- select(bills, bill_id, introduced_on, official_title)
-    colnames(bills)[colnames(bills) == "bill_id"] <- "bill"
-    colnames(bills)[colnames(bills) == "introduced_on"] <- "date introduced"
-    colnames(bills)[colnames(bills) == "official_title"] <- "full title of bill"
+    colnames(bills) <- c("bill", "date introduced", "full title of bill")
     return(bills)
   }
   )
@@ -320,9 +336,7 @@ server <- function(input, output) {
     bills.body <- fromJSON(content(bills.response, "text"))
     bills <- flatten(bills.body$results)
     bills <- select(bills, bill_id, introduced_on, official_title)
-    colnames(bills)[colnames(bills) == "bill_id"] <- "bill"
-    colnames(bills)[colnames(bills) == "introduced_on"] <- "date introduced"
-    colnames(bills)[colnames(bills) == "official_title"] <- "full title of bill"
+    colnames(bills) <- c("bill", "date introduced", "full title of bill")
     return(bills)
   })
   
@@ -383,11 +397,11 @@ server <- function(input, output) {
     names(voters.list) <- NULL
     voters.json <- toJSON(voters.list)
     voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
-    voters.a <- voters.as.data.frame %>% mutate(name = paste(voter.first_name, voter.last_name))
-    voters <- voters.a %>% select(name, voter.party, voter.state, vote)
-    colnames(voters)[colnames(voters) == "voter.party"] <- "party"
-    colnames(voters)[colnames(voters) == "voter.name"] <- "name"
-    colnames(voters)[colnames(voters) == "voter.state"] <- "state"
+    voters.a <- voters.as.data.frame %>% 
+      mutate(name = paste(voter.first_name, voter.last_name))
+    voters <- voters.a %>% 
+      select(name, voter.party, voter.state, vote)
+    colnames(voters) <- c("name", "party", "state", "vote")
     return(voters)
   })
   
@@ -400,11 +414,11 @@ server <- function(input, output) {
     names(voters.list.1) <- NULL
     voters.json.1 <- toJSON(voters.list.1)
     voters.as.data.frame.1 <- flatten(fromJSON(voters.json.1, flatten=TRUE))
-    voters.1 <- voters.as.data.frame.1 %>% mutate(name = paste(voter.first_name, voter.last_name))
-    voters.1 <- voters.1 %>% select(name, voter.party, voter.state, vote)
-    colnames(voters.1)[colnames(voters.1) == "voter.party"] <- "party"
-    colnames(voters.1)[colnames(voters.1) == "voter.name"] <- "name"
-    colnames(voters.1)[colnames(voters.1) == "voter.state"] <- "state"
+    voters.1 <- voters.as.data.frame.1 %>% 
+      mutate(name = paste(voter.first_name, voter.last_name))
+    voters.1 <- voters.1 %>% 
+      select(name, voter.party, voter.state, vote)
+    colnames(voters) <- c("name", "party", "state", "vote")
     return(voters.1)
   })
   
@@ -528,7 +542,7 @@ server <- function(input, output) {
                         `102`:`115`, convert = TRUE)
     h.makeup  <- data.frame(party, h.makeup)
     plot <- ggplot(h.makeup, aes(x=Congress, y=Members, fill=party)) + 
-      geom_area()+
+      geom_area() +
       scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30")) +
       scale_x_continuous(breaks = c(102:115))
     pplot <- ggplotly(plot)
@@ -545,7 +559,7 @@ server <- function(input, output) {
                         `102`:`115`, convert = TRUE)
     h.makeup  <- data.frame(party, h.makeup)
     plot <- ggplot(h.makeup, aes(x=Congress, y=Members, color=party)) + 
-      geom_line()+
+      geom_line() +
       scale_color_manual(values = c("#002868", "#6D1FA7", "#BF0A30")) +
       scale_x_continuous(breaks = c(102:115))
     pplot <- ggplotly(plot)
@@ -567,14 +581,13 @@ server <- function(input, output) {
     h.makeup  <- data.frame(party, h.makeup)
     plot <- ggplot(h.makeup, aes(x=factor(1), y=Members, fill=party)) + 
       geom_bar(width = 1, stat="identity") +
-      coord_polar(theta="y")+
-      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"))+
-      facet_wrap(~Congress, nrow = 2)+
-      theme(axis.ticks = element_blank())+
-      theme(axis.text = element_blank())+
-      theme(axis.title = element_blank())+
+      coord_polar(theta="y") +
+      scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30")) +
+      facet_wrap(~Congress, nrow = 2) +
+      theme(axis.ticks = element_blank()) +
+      theme(axis.text = element_blank()) +
+      theme(axis.title = element_blank()) +
       theme_void()
-    
     return(plot)
   })
   
@@ -588,7 +601,7 @@ server <- function(input, output) {
                         `80`:`115`, convert = TRUE)
     s.makeup  <- data.frame(party, s.makeup)
     plot <- ggplot(s.makeup, aes(x=Congress, y=Members, fill=party)) + 
-      geom_area()+
+      geom_area() +
       scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30")) +
       scale_x_continuous(breaks = c(80:115))
     pplot <- ggplotly(plot)
@@ -605,7 +618,7 @@ server <- function(input, output) {
                         `80`:`115`, convert = TRUE)
     s.makeup  <- data.frame(party, s.makeup)
     plot <- ggplot(s.makeup, aes(x=Congress, y=Members, color=party)) + 
-      geom_line()+
+      geom_line() +
       scale_color_manual(values = c("#002868", "#6D1FA7", "#BF0A30")) +
       scale_x_continuous(breaks = c(80:115))
     pplot <- ggplotly(plot)
@@ -627,12 +640,12 @@ server <- function(input, output) {
     s.makeup  <- data.frame(party, s.makeup)
     plot <- ggplot(s.makeup, aes(x=factor(1), y=Members, fill=party)) + 
       geom_bar(width = 1, stat = "identity") +
-      coord_polar(theta="y")+
+      coord_polar(theta="y") +
       scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30")) +
-      facet_wrap(~Congress, nrow = 3)+
-      theme(axis.ticks = element_blank())+
-      theme(axis.text = element_blank())+
-      theme(axis.title = element_blank())+
+      facet_wrap(~Congress, nrow = 3) +
+      theme(axis.ticks = element_blank()) +
+      theme(axis.text = element_blank()) +
+      theme(axis.title = element_blank()) +
       theme_void()
     return(plot)
   })
@@ -737,11 +750,13 @@ server <- function(input, output) {
   
   
   output$house.114 <- renderTable({
-    house.2 <- house.114 %>% mutate(name = paste(first_name, last_name))
+    house.2 <- house.114 %>% 
+      mutate(name = paste(first_name, last_name))
     if (input$state == "all") {
       house.1 <- house.2
     } else {
-      house.1 <- house.2 %>% filter(state == input$state)
+      house.1 <- house.2 %>% 
+        filter(state == input$state)
     }
     if (input$party == "all") {
       house.table <- house.1
@@ -753,18 +768,22 @@ server <- function(input, output) {
       house.table <- house.1 %>% filter(party == "I")
     }
     house.table$last_name <- as.factor(unlist(house.table$last_name))
-    house.table <- house.table %>% arrange(last_name)
-    house.table <- house.table %>% select(name, party, state, missed_votes_pct, votes_with_party_pct)
+    house.table <- house.table %>% 
+      arrange(last_name)
+    house.table <- house.table %>% 
+      select(name, party, state, missed_votes_pct, votes_with_party_pct)
     colnames(house.table) <- c("name", "party", "state", "missed votes %", "votes with party %")
     house.table
   })
   
   output$senate.114 <- renderTable({
-    senate.2 <- senate.114 %>% mutate(name = paste(first_name, last_name))
+    senate.2 <- senate.114 %>% 
+      mutate(name = paste(first_name, last_name))
     if (input$state == "all") {
       senate.1 <- senate.2
     } else {
-      senate.1 <- senate.2 %>% filter(state == input$state)
+      senate.1 <- senate.2 %>% 
+        filter(state == input$state)
     }
     if (input$party == "all") {
       senate.table <- senate.1
@@ -777,18 +796,22 @@ server <- function(input, output) {
       senate.table <- senate.1 %>% filter(party == "I")
     }
     senate.table$last_name <- as.factor(unlist(senate.table$last_name))
-    senate.table <- senate.table %>% arrange(last_name)
-    senate.table <- senate.table %>% select(name, party, state, missed_votes_pct, votes_with_party_pct)
+    senate.table <- senate.table %>% 
+      arrange(last_name)
+    senate.table <- senate.table %>% 
+      select(name, party, state, missed_votes_pct, votes_with_party_pct)
     colnames(senate.table) <- c("name", "party", "state", "missed votes %", "votes with party %")
     senate.table
   })
   
   output$house.115 <- renderTable({
-    house.2 <- house.115 %>% mutate(name = paste(first_name, last_name))
+    house.2 <- house.115 %>% 
+      mutate(name = paste(first_name, last_name))
     if (input$state == "all") {
       house.1 <- house.2
     } else {
-      house.1 <- house.2 %>% filter(state == input$state)
+      house.1 <- house.2 %>% 
+        filter(state == input$state)
     }
     if (input$party == "all") {
       house.table <- house.1
@@ -800,18 +823,22 @@ server <- function(input, output) {
       house.table <- house.1 %>% filter(party == "I")
     }
     house.table$last_name <- as.factor(unlist(house.table$last_name))
-    house.table <- house.table %>% arrange(last_name)
-    house.table <- house.table %>% select(name, party, state, missed_votes_pct, votes_with_party_pct)
+    house.table <- house.table %>% 
+      arrange(last_name)
+    house.table <- house.table %>% 
+      select(name, party, state, missed_votes_pct, votes_with_party_pct)
     colnames(house.table) <- c("name", "party", "state", "missed votes %", "votes with party %")
     house.table
   })
   
   output$senate.115 <- renderTable({
-    senate.2 <- senate.115 %>% mutate(name = paste(first_name, last_name))
+    senate.2 <- senate.115 %>% 
+      mutate(name = paste(first_name, last_name))
     if (input$state == "all") {
       senate.1 <- senate.2
     } else {
-      senate.1 <- senate.2 %>% filter(state == input$state)
+      senate.1 <- senate.2 %>% 
+        filter(state == input$state)
     }
     if (input$party == "all") {
       senate.table <- senate.1
@@ -824,8 +851,10 @@ server <- function(input, output) {
       senate.table <- senate.1 %>% filter(party == "I")
     }
     senate.table$last_name <- as.factor(unlist(senate.table$last_name))
-    senate.table <- senate.table %>% arrange(last_name)
-    senate.table <- senate.table %>% select(name, party, state, missed_votes_pct, votes_with_party_pct)
+    senate.table <- senate.table %>% 
+      arrange(last_name)
+    senate.table <- senate.table %>% 
+      select(name, party, state, missed_votes_pct, votes_with_party_pct)
     colnames(senate.table) <- c("name", "party", "state", "missed votes %", "votes with party %")
     senate.table
   })
@@ -877,7 +906,8 @@ server <- function(input, output) {
     } else {
       house.members.115 <- house.members.115 %>% filter(state == input$state)
     }
-    house.members.115 <- house.members.115 %>% mutate(name = paste(first_name, last_name))
+    house.members.115 <- house.members.115 %>% 
+      mutate(name = paste(first_name, last_name))
     house.members <- house.members.115[!sapply(house.members.115$missed_votes_pct,is.null),]
     house.members$missed_votes_pct <- as.numeric(unlist(house.members$missed_votes_pct))
     house.members$name <- as.factor(unlist(house.members$name))
@@ -894,9 +924,9 @@ server <- function(input, output) {
     }  
     p <- ggplot(house.members, aes(x = name, y = percent, fill = party)) +
       geom_bar(width = 1, stat = "identity") +
-      theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5)) +
       theme(axis.ticks.x = element_blank()) +
-      scale_y_continuous(limits = c(0, 100))+
+      scale_y_continuous(limits = c(0, 100)) +
       ggtitle("House of Representatives % of Votes Missed")
     if (input$party == "all") {
       pp <- p + scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
@@ -906,7 +936,7 @@ server <- function(input, output) {
     } else if (input$party == "Republican") {
       pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
     } else if (input$party == "Independent") {
-      pp <- p
+      pp <- p + scale_fill_manual(values = "#6D1FA7", labels = "Independent")
     }
     if (input$state != "all") {
       pp <- pp + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
@@ -930,9 +960,11 @@ server <- function(input, output) {
     if (input$state == "all") {
       senate.members.115 <- senate.members.115
     } else {
-      senate.members.115 <- senate.members.115 %>% filter(state == input$state)
+      senate.members.115 <- senate.members.115 %>% 
+        filter(state == input$state)
     }
-    senate.members.115 <- senate.members.115 %>% mutate(name = paste(first_name, last_name))
+    senate.members.115 <- senate.members.115 %>% 
+      mutate(name = paste(first_name, last_name))
     senate.members <- senate.members.115[!sapply(senate.members.115$missed_votes_pct,is.null),]
     senate.members$missed_votes_pct <- as.numeric(unlist(senate.members$missed_votes_pct))
     senate.members$name <- as.factor(unlist(senate.members$name))
@@ -948,9 +980,9 @@ server <- function(input, output) {
     }   
     p <- ggplot(senate.members, aes(x = name, y = percent, fill = party)) +
       geom_bar(width = 1, stat = "identity") +
-      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
       theme(axis.ticks.x = element_blank()) +
-      scale_y_continuous(limits = c(0, 100))+
+      scale_y_continuous(limits = c(0, 100)) +
       ggtitle("Senate % of Votes Missed")
     if (input$party == "all") {
       pp <- p + scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))
@@ -979,9 +1011,11 @@ server <- function(input, output) {
     if (input$state == "all") {
       house.members.115 <- house.members.115
     } else {
-      house.members.115 <- house.members.115 %>% filter(state == input$state)
+      house.members.115 <- house.members.115 %>% 
+        filter(state == input$state)
     }
-    house.members.115 <- house.members.115 %>% mutate(name = paste(first_name, last_name))
+    house.members.115 <- house.members.115 %>% 
+      mutate(name = paste(first_name, last_name))
     house.members <- house.members.115[!sapply(house.members.115$votes_with_party_pct,is.null),]
     house.members$percent <- as.numeric(unlist(house.members$votes_with_party_pct))
     house.members$name <- as.factor(unlist(house.members$name))
@@ -997,9 +1031,9 @@ server <- function(input, output) {
     }
     p <- ggplot(house.members, aes(x = name, y = percent, fill = party)) +
       geom_bar(width = 1, stat = "identity") +
-      theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5)) +
       theme(axis.ticks.x = element_blank()) +
-      scale_y_continuous(limits = c(0, 100))+
+      scale_y_continuous(limits = c(0, 100)) +
       ggtitle("House of Representatives Votes With Party %")
     if (input$party == "all") {
       pp <- p + scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
@@ -1008,8 +1042,8 @@ server <- function(input, output) {
       pp <- p + scale_fill_manual(values = "#002868", labels = "Democrat")
     } else if (input$party == "Republican") {
       pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
-    }else if (input$party == "Independent") {
-      pp <- p
+    } else if (input$party == "Independent") {
+      pp <- p + scale_fill_manual(values = "#6D1FA7", labels = "Independent")
     }
     if (input$state != "all") {
       pp <- pp + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
@@ -1034,9 +1068,11 @@ server <- function(input, output) {
     if (input$state == "all") {
       senate.members.115 <- senate.members.115
     } else {
-      senate.members.115 <- senate.members.115 %>% filter(state == input$state)
+      senate.members.115 <- senate.members.115 %>% 
+        filter(state == input$state)
     }
-    senate.members.115 <- senate.members.115 %>% mutate(name = paste(first_name, last_name))
+    senate.members.115 <- senate.members.115 %>% 
+      mutate(name = paste(first_name, last_name))
     senate.members <- senate.members.115[!sapply(senate.members.115$votes_with_party_pct,is.null),]
     senate.members$percent <- as.numeric(unlist(senate.members$votes_with_party_pct))
     senate.members$name <- as.factor(unlist(senate.members$name))
@@ -1053,9 +1089,9 @@ server <- function(input, output) {
     
     p <- ggplot(senate.members, aes(x = name, y = percent, fill = party)) +
       geom_bar(width = 1, stat = "identity") +
-      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
       theme(axis.ticks.x = element_blank()) +
-      scale_y_continuous(limits = c(0, 100))+
+      scale_y_continuous(limits = c(0, 100)) +
       ggtitle("Senate Votes With Party %")
     if (input$party == "all") {
       pp <- p + scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))    
@@ -1085,9 +1121,11 @@ server <- function(input, output) {
     if (input$state == "all") {
       house.memberz <- house.members.114
     } else {
-      house.memberz <- house.members.114 %>% filter(state == input$state)
+      house.memberz <- house.members.114 %>% 
+        filter(state == input$state)
     }
-    house.members <- house.memberz %>% mutate(name = paste(first_name, last_name))
+    house.members <- house.memberz %>% 
+      mutate(name = paste(first_name, last_name))
     house.members$percent <- as.numeric(unlist(house.members$missed_votes_pct))
     house.members$name <- as.factor(unlist(house.members$name))
     house.members$last_name <- as.factor(unlist(house.members$last_name))
@@ -1104,9 +1142,9 @@ server <- function(input, output) {
     }
     p <- ggplot(house.members, aes(x = name, y = percent, fill = party)) +
       geom_bar(width = 1, stat = "identity") +
-      theme(axis.text.x = element_text(size = 5, angle = 90, hjust = 1, vjust = 0.5))+
+      theme(axis.text.x = element_text(size = 5, angle = 90, hjust = 1, vjust = 0.5)) +
       theme(axis.ticks.x = element_blank()) +
-      scale_y_continuous(limits = c(0, 100))+
+      scale_y_continuous(limits = c(0, 100)) +
       ggtitle("House of Representatives Votes With Party %")
     if (input$party == "all") {
       pp <- p + scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
@@ -1140,9 +1178,11 @@ server <- function(input, output) {
     if (input$state == "all") {
       senate.members.114 <- senate.members.114
     } else {
-      senate.members.114 <- senate.members.114 %>% filter(state == input$state)
+      senate.members.114 <- senate.members.114 %>% 
+        filter(state == input$state)
     }
-    senate.members.114 <- senate.members.114 %>% mutate(name = paste(first_name, last_name))
+    senate.members.114 <- senate.members.114 %>% 
+      mutate(name = paste(first_name, last_name))
     senate.members <- senate.members.114[!sapply(senate.members.114$missed_votes_pct,is.null),]
     senate.members$missed_votes_pct <- as.numeric(unlist(senate.members$missed_votes_pct))
     senate.members$name <- as.factor(unlist(senate.members$name))
@@ -1159,9 +1199,9 @@ server <- function(input, output) {
     }    
     p <- ggplot(senate.members, aes(x = name, y = percent, fill = party)) +
       geom_bar(width = 1, stat = "identity") +
-      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
       theme(axis.ticks.x = element_blank()) +
-      scale_y_continuous(limits = c(0, 100))+
+      scale_y_continuous(limits = c(0, 100)) +
       ggtitle("Senate % of Votes Missed")
     if (input$party == "all") {
       pp <- p + scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))
@@ -1190,9 +1230,11 @@ server <- function(input, output) {
     if (input$state == "all") {
       house.members.114 <- house.members.114
     } else {
-      house.members.114 <- house.members.114 %>% filter(state == input$state)
+      house.members.114 <- house.members.114 %>% 
+        filter(state == input$state)
     }
-    house.members <- house.members.114 %>% mutate(name = paste(first_name, last_name))
+    house.members <- house.members.114 %>% 
+      mutate(name = paste(first_name, last_name))
     house.members$percent <- as.numeric(unlist(house.members$votes_with_party_pct))
     house.members$name <- as.factor(unlist(house.members$name))
     house.members$last_name <- as.vector(unlist(house.members$last_name))
@@ -1209,9 +1251,9 @@ server <- function(input, output) {
     }
     p <- ggplot(house.members, aes(x = name, y = percent, fill = party)) +
       geom_bar(width = 1, stat = "identity") +
-      theme(axis.text.x = element_text(size = 5, angle = 90, hjust = 1, vjust = 0.5))+
+      theme(axis.text.x = element_text(size = 5, angle = 90, hjust = 1, vjust = 0.5)) +
       theme(axis.ticks.x = element_blank()) +
-      scale_y_continuous(limits = c(0, 100))+
+      scale_y_continuous(limits = c(0, 100)) +
       ggtitle("House of Representatives Votes With Party %")
     if (input$party == "all") {
       pp <- p + scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
@@ -1245,9 +1287,11 @@ server <- function(input, output) {
     if (input$state == "all") {
       senate.members.114 <- senate.members.114
     } else {
-      senate.members.114 <- senate.members.114 %>% filter(state == input$state)
+      senate.members.114 <- senate.members.114 %>% 
+        filter(state == input$state)
     }
-    senate.members <- senate.members.114 %>% mutate(name = paste(first_name, last_name))
+    senate.members <- senate.members.114 %>% 
+      mutate(name = paste(first_name, last_name))
     senate.members$percent <- as.numeric(unlist(senate.members$votes_with_party_pct))
     senate.members$name <- as.factor(unlist(senate.members$name))
     senate.members$last_name <- as.factor(unlist(senate.members$last_name))
@@ -1264,9 +1308,9 @@ server <- function(input, output) {
     }
     p <- ggplot(senate.members, aes(x = name, y = percent, fill = party)) +
       geom_bar(width = 1, stat = "identity") +
-      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
       theme(axis.ticks.x = element_blank()) +
-      scale_y_continuous(limits = c(0, 100))+
+      scale_y_continuous(limits = c(0, 100)) +
       ggtitle("Senate Votes With Party %")
     if (input$party == "all") {
       pp <- p + scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))
