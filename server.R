@@ -1368,7 +1368,7 @@ server <- function(input, output) {
     } else if (input$party == "Republican") {
       pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
     } else if (input$party == "Independent") {
-      pp <- p
+      pp <- p + scale_fill_manual(values = "#6D1FA7", labels = "Independent")
     }    
     if (input$state != "all") {
       pp <- pp + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
