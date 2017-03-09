@@ -100,7 +100,7 @@ for (year in years) {
 }
 colnames(legislators.by.gender.house) <- c("Gender", 2009:2017)
 legislators.by.gender.house.tall <- gather(legislators.by.gender.house, key = "Year", value = "Value",
-       `2009`:`2017`, convert = TRUE)
+                                           `2009`:`2017`, convert = TRUE)
 
 # Creates a data frame of gender breakdown from 2009 to 2017 for the senate
 legislators.by.gender.senate <- data.frame(c("F", "M"))
@@ -113,399 +113,399 @@ for (year in years) {
 }
 colnames(legislators.by.gender.senate) <- c("Gender", 2009:2017)
 legislators.by.gender.senate.tall <- gather(legislators.by.gender.senate, key = "Year", value = "Value",
-                                           `2009`:`2017`, convert = TRUE)
+                                            `2009`:`2017`, convert = TRUE)
 
 
 
 
 # Server function
 server <- function(input, output) {
-
   
-
+  
+  
   
   #############################
   ## WELCOME
   #############################
-
-      output$hi <- eventReactive(input$welcome, {
-          return("Click on one of the tabs above to get started :)")
-        })
-    
+  
+  output$hi <- eventReactive(input$welcome, {
+    return("Click on one of the tabs above to get started :)")
+  })
+  
   
   
   #############################
   ## FIND REPRESENTATIVES
   #############################
-      output$choice <- renderUI({
-        textInput('zip', "Zip code", value = "90210")
-      })
-    
-      legislators <- reactive({
-        resource <- "legislators/locate"
-        query <- paste0("?zip=", input$zip)
-        response <- GET(paste0(sunlight.base, resource, query))
-        body <- fromJSON(content(response, "text"))
-        legislators <- flatten(body$results) %>% mutate(name = paste(first_name, last_name)) %>% select(name, chamber, party, state, phone)
-        return(legislators)
-      })
-      
-      output$reps <- renderTable({
-        return(legislators())
-      })
-      
-      legislators.click <- reactive({
-        click <- input$leaf.let_shape_click
-        if (is.null(click))
-          return()
-        resource <- ("legislators/locate?latitude=")
-        resource2 <- ("&longitude=")
-        longitude <- click$lng
-        latitude <- click$lat
-        response <- GET(paste0(sunlight.base, resource, latitude, resource2, longitude))
-        body <- fromJSON(content(response, "text"))
-        legislators <- flatten(body$results) %>% mutate(name = paste(first_name, last_name)) %>% select(name, chamber, party, state, phone)
-        return(legislators)
-      })
-      
-
+  output$choice <- renderUI({
+    textInput('zip', "Zip code", value = "90210")
+  })
+  
+  legislators <- reactive({
+    resource <- "legislators/locate"
+    query <- paste0("?zip=", input$zip)
+    response <- GET(paste0(sunlight.base, resource, query))
+    body <- fromJSON(content(response, "text"))
+    legislators <- flatten(body$results) %>% mutate(name = paste(first_name, last_name)) %>% select(name, chamber, party, state, phone)
+    return(legislators)
+  })
+  
+  output$reps <- renderTable({
+    return(legislators())
+  })
+  
+  legislators.click <- reactive({
+    click <- input$leaf.let_shape_click
+    if (is.null(click))
+      return()
+    resource <- ("legislators/locate?latitude=")
+    resource2 <- ("&longitude=")
+    longitude <- click$lng
+    latitude <- click$lat
+    response <- GET(paste0(sunlight.base, resource, latitude, resource2, longitude))
+    body <- fromJSON(content(response, "text"))
+    legislators <- flatten(body$results) %>% mutate(name = paste(first_name, last_name)) %>% select(name, chamber, party, state, phone)
+    return(legislators)
+  })
   
   
-        output$clickleg <- renderTable({
-           return(legislators.click()) 
-        })
-      
-        output$info <- renderPrint({
-          if (is.null(input$leaflet_click))
-            return()
-          return(input$leaflet_click)
-            })
-    
-
   
-        output$leaf.let <- renderLeaflet({
-            leaflet(data = state, options = leafletOptions(minZoom = 2.5)) %>% addTiles() %>%
-              addPolygons(fillColor = heat.colors(20, alpha = NULL), stroke= FALSE,
-                highlight = highlightOptions(
-                weight = 5,
-                color = "#666",
-                dashArray = "",
-                fillOpacity = 0.7,
-                bringToFront = TRUE)) %>% setView(lng=-112, lat = 47, zoom = 3)
-          })
-            
-            
-          observe({
-            input$reset
-            leafletProxy("leaf.let") %>% setView(lng = -112, lat = 47, zoom = 3)
-          })
-          
-          
-          output$photosclick <- renderUI({
-            click <- input$leaf.let_shape_click
-            if (is.null(click))
-              return()
-            resource <- ("legislators/locate?latitude=")
-            resource2 <- ("&longitude=")
-            longitude <- click$lng
-            latitude <- click$lat
-            response <- GET(paste0(sunlight.base, resource, latitude, resource2, longitude))
-            body <- fromJSON(content(response, "text"))
-            bio.ids <- flatten(body$results) %>% select(bioguide_id)
-            picture.base <- ("https://theunitedstates.io/images/congress/225x275/")
-            picture.query <- (".jpg") 
-            num <- nrow(bio.ids)
-            picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
-            images <- tags$img(src=picture1, width = 200)
-            if (num > 1) {
-              num <- 2:num
-              for (val in num) {
-                  picture <-paste0(picture.base, bio.ids[val,1], picture.query)
-                  images <- tagAppendChild(images, tags$img(src=picture, width = 200))
-              }
-            }
-            return(images)
-          })
-          
-        
-          
-          output$photos <- renderUI({
-            resource <- ("legislators/locate")
-            query <- paste0("?zip=", input$zip)
-            response <- GET(paste0(sunlight.base, resource, query))
-            body <- fromJSON(content(response, "text"))
-            bio.ids <- flatten(body$results) %>% select(bioguide_id)
-            picture.base <- ("https://theunitedstates.io/images/congress/225x275/")
-            picture.query <- (".jpg")
-            num.reps <- nrow(bio.ids)
-            size <- 200
-            if (num.reps > 6) {
-              size <- 200 - (4*num.reps)
-            }
-            picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
-            images <- tags$img(src=picture1, width = size)
-            if (num.reps > 1) {
-              num.reps <- 2:num.reps
-              for (val in num.reps) {
-                picture <-paste0(picture.base, bio.ids[val,1], picture.query)
-                images <- tagAppendChild(images, tags$img(src=picture, width = size))
-              }
-           }
-            return(images)
-          })
+  
+  output$clickleg <- renderTable({
+    return(legislators.click()) 
+  })
+  
+  output$info <- renderPrint({
+    if (is.null(input$leaflet_click))
+      return()
+    return(input$leaflet_click)
+  })
+  
+  
+  
+  output$leaf.let <- renderLeaflet({
+    leaflet(data = state, options = leafletOptions(minZoom = 2.5)) %>% addTiles() %>%
+      addPolygons(fillColor = heat.colors(20, alpha = NULL), stroke= FALSE,
+                  highlight = highlightOptions(
+                    weight = 5,
+                    color = "#666",
+                    dashArray = "",
+                    fillOpacity = 0.7,
+                    bringToFront = TRUE)) %>% setView(lng=-112, lat = 47, zoom = 3)
+  })
+  
+  
+  observe({
+    input$reset
+    leafletProxy("leaf.let") %>% setView(lng = -112, lat = 47, zoom = 3)
+  })
+  
+  
+  output$photosclick <- renderUI({
+    click <- input$leaf.let_shape_click
+    if (is.null(click))
+      return()
+    resource <- ("legislators/locate?latitude=")
+    resource2 <- ("&longitude=")
+    longitude <- click$lng
+    latitude <- click$lat
+    response <- GET(paste0(sunlight.base, resource, latitude, resource2, longitude))
+    body <- fromJSON(content(response, "text"))
+    bio.ids <- flatten(body$results) %>% select(bioguide_id)
+    picture.base <- ("https://theunitedstates.io/images/congress/225x275/")
+    picture.query <- (".jpg") 
+    num <- nrow(bio.ids)
+    picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
+    images <- tags$img(src=picture1, width = 200)
+    if (num > 1) {
+      num <- 2:num
+      for (val in num) {
+        picture <-paste0(picture.base, bio.ids[val,1], picture.query)
+        images <- tagAppendChild(images, tags$img(src=picture, width = 200))
+      }
+    }
+    return(images)
+  })
+  
+  
+  
+  output$photos <- renderUI({
+    resource <- ("legislators/locate")
+    query <- paste0("?zip=", input$zip)
+    response <- GET(paste0(sunlight.base, resource, query))
+    body <- fromJSON(content(response, "text"))
+    bio.ids <- flatten(body$results) %>% select(bioguide_id)
+    picture.base <- ("https://theunitedstates.io/images/congress/225x275/")
+    picture.query <- (".jpg")
+    num.reps <- nrow(bio.ids)
+    size <- 200
+    if (num.reps > 6) {
+      size <- 200 - (4*num.reps)
+    }
+    picture1 <-paste0(picture.base, bio.ids[1,1], picture.query)
+    images <- tags$img(src=picture1, width = size)
+    if (num.reps > 1) {
+      num.reps <- 2:num.reps
+      for (val in num.reps) {
+        picture <-paste0(picture.base, bio.ids[val,1], picture.query)
+        images <- tagAppendChild(images, tags$img(src=picture, width = size))
+      }
+    }
+    return(images)
+  })
   
   #############################
   ## RECENT BILLS
   #############################
-          
-          observeEvent(input$choose.topic, {
-            showElement("topic")
-          })
-          
-          observeEvent(input$search.text, {
-            showElement("search")
-          })
-          
-          observeEvent(input$search.text, {
-            showElement("go.table")
-          })
-          
-          observeEvent(input$choose.topic, {
-            hideElement("go.table")
-          })
-          
-          observeEvent(input$search.text, {
-            hideElement("topic")
-          })
-          
-          observeEvent(input$choose.topic, {
-            hideElement("search")
-          })
-          
-          observeEvent(input$choose.topic,{
-            showElement("bills.topic")
-          })
-          
-          observeEvent(input$go.table,{
-            showElement("bills.search")
-          })
-          
-          observeEvent(input$search.text, {
-            hideElement("bills.topic")
-          })
-          
-          observeEvent(input$choose.topic, {
-            hideElement("bills.search")
-          })
-          
-          output$bills.topic <- renderDataTable({
-            bills.resource <- ("bills/search?query=")
-            filters <- ("&congress=115&order=last_action_at")
-            bills.response <- GET(paste0(sunlight.base, bills.resource, input$topic, filters))
-            bills.body <- fromJSON(content(bills.response, "text"))
-            bills <- flatten(bills.body$results)
-            bills <- select(bills, bill_id, introduced_on, official_title)
-            colnames(bills)[colnames(bills) == "bill_id"] <- "bill"
-            colnames(bills)[colnames(bills) == "introduced_on"] <- "date introduced"
-            colnames(bills)[colnames(bills) == "official_title"] <- "full title of bill"
-            return(bills)
-          }
-          )
-          
-          output$bills.search <- renderDataTable({
-            bills.resource <- ("bills/search?query=")
-            filters <- ("&congress=115&order=last_action_at")
-            search <- paste0('"', input$search, '"')
-            bills.response <- GET(paste0(sunlight.base, bills.resource, search, filters))
-            bills.body <- fromJSON(content(bills.response, "text"))
-            bills <- flatten(bills.body$results)
-            bills <- select(bills, bill_id, introduced_on, official_title)
-            colnames(bills)[colnames(bills) == "bill_id"] <- "bill"
-            colnames(bills)[colnames(bills) == "introduced_on"] <- "date introduced"
-            colnames(bills)[colnames(bills) == "official_title"] <- "full title of bill"
-            return(bills)
-          })
-
+  
+  observeEvent(input$choose.topic, {
+    showElement("topic")
+  })
+  
+  observeEvent(input$search.text, {
+    showElement("search")
+  })
+  
+  observeEvent(input$search.text, {
+    showElement("go.table")
+  })
+  
+  observeEvent(input$choose.topic, {
+    hideElement("go.table")
+  })
+  
+  observeEvent(input$search.text, {
+    hideElement("topic")
+  })
+  
+  observeEvent(input$choose.topic, {
+    hideElement("search")
+  })
+  
+  observeEvent(input$choose.topic,{
+    showElement("bills.topic")
+  })
+  
+  observeEvent(input$go.table,{
+    showElement("bills.search")
+  })
+  
+  observeEvent(input$search.text, {
+    hideElement("bills.topic")
+  })
+  
+  observeEvent(input$choose.topic, {
+    hideElement("bills.search")
+  })
+  
+  output$bills.topic <- renderDataTable({
+    bills.resource <- ("bills/search?query=")
+    filters <- ("&congress=115&order=last_action_at")
+    bills.response <- GET(paste0(sunlight.base, bills.resource, input$topic, filters))
+    bills.body <- fromJSON(content(bills.response, "text"))
+    bills <- flatten(bills.body$results)
+    bills <- select(bills, bill_id, introduced_on, official_title)
+    colnames(bills)[colnames(bills) == "bill_id"] <- "bill"
+    colnames(bills)[colnames(bills) == "introduced_on"] <- "date introduced"
+    colnames(bills)[colnames(bills) == "official_title"] <- "full title of bill"
+    return(bills)
+  }
+  )
+  
+  output$bills.search <- renderDataTable({
+    bills.resource <- ("bills/search?query=")
+    filters <- ("&congress=115&order=last_action_at")
+    search <- paste0('"', input$search, '"')
+    bills.response <- GET(paste0(sunlight.base, bills.resource, search, filters))
+    bills.body <- fromJSON(content(bills.response, "text"))
+    bills <- flatten(bills.body$results)
+    bills <- select(bills, bill_id, introduced_on, official_title)
+    colnames(bills)[colnames(bills) == "bill_id"] <- "bill"
+    colnames(bills)[colnames(bills) == "introduced_on"] <- "date introduced"
+    colnames(bills)[colnames(bills) == "official_title"] <- "full title of bill"
+    return(bills)
+  })
+  
   
   #############################
   ## VOTE
   #############################
-
-
-          
-          observeEvent(input$select.id.button, {
-            showElement("roll.id.choose")
-          })
-          
-          observeEvent(input$type.roll.id.button, {
-            showElement("own.roll.id")
-          })
-          
-          observeEvent(input$type.roll.id.button, {
-            hideElement("roll.id.choose")
-          })
-          
-          observeEvent(input$type.roll.id.button, {
-            showElement("go.vote")
-          })
-          
-          observeEvent(input$select.id.button, {
-            hideElement("go.vote")
-          })
-          
-          observeEvent(input$select.id.button, {
-            hideElement("own.roll.id")
-          })
-          
-          observeEvent(input$select.id.button,{
-            showElement("vote.choose")
-          })
-          
-          observeEvent(input$go.vote,{
-            showElement("vote.own")
-          })
-          
-          observeEvent(input$type.roll.id.button, {
-            hideElement("vote.choose")
-          })
-          
-          observeEvent(input$select.id.button, {
-            hideElement("vote.own")
-          })
-          
-        
-          output$vote.choose <- renderTable({
-            votes.resource <- ("votes?roll_id=")
-            votes.filters <- ("&fields=voters")
-            votes.response <- GET(paste0(sunlight.base, votes.resource, input$roll.id.choose, votes.filters))
-            request.body.as.list <- content(votes.response)
-            voters.list <- request.body.as.list$results[[1]]$voters
-            names(voters.list) <- NULL
-            voters.json <- toJSON(voters.list)
-            voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
-            voters.a <- voters.as.data.frame %>% mutate(name = paste(voter.first_name, voter.last_name))
-            voters <- voters.a %>% select(name, voter.party, voter.state, vote)
-            colnames(voters)[colnames(voters) == "voter.party"] <- "party"
-            colnames(voters)[colnames(voters) == "voter.name"] <- "name"
-            colnames(voters)[colnames(voters) == "voter.state"] <- "state"
-            return(voters)
-          })
-
-          output$vote.own <- renderTable({
-            votes.resource.1 <- ("votes?roll_id=")
-            votes.filters.1 <- ("&fields=voters")
-            votes.response.1 <- GET(paste0(sunlight.base, votes.resource.1, input$own.roll.id, votes.filters.1))
-            request.body.as.list.1 <- content(votes.response.1)
-            voters.list.1 <- request.body.as.list.1$results[[1]]$voters
-            names(voters.list.1) <- NULL
-            voters.json.1 <- toJSON(voters.list.1)
-            voters.as.data.frame.1 <- flatten(fromJSON(voters.json.1, flatten=TRUE))
-            voters.1 <- voters.as.data.frame.1 %>% mutate(name = paste(voter.first_name, voter.last_name))
-            voters.1 <- voters.1 %>% select(name, voter.party, voter.state, vote)
-            colnames(voters.1)[colnames(voters.1) == "voter.party"] <- "party"
-            colnames(voters.1)[colnames(voters.1) == "voter.name"] <- "name"
-            colnames(voters.1)[colnames(voters.1) == "voter.state"] <- "state"
-            return(voters.1)
-          })
-          
-
-          
-          
-          
+  
+  
+  
+  observeEvent(input$select.id.button, {
+    showElement("roll.id.choose")
+  })
+  
+  observeEvent(input$type.roll.id.button, {
+    showElement("own.roll.id")
+  })
+  
+  observeEvent(input$type.roll.id.button, {
+    hideElement("roll.id.choose")
+  })
+  
+  observeEvent(input$type.roll.id.button, {
+    showElement("go.vote")
+  })
+  
+  observeEvent(input$select.id.button, {
+    hideElement("go.vote")
+  })
+  
+  observeEvent(input$select.id.button, {
+    hideElement("own.roll.id")
+  })
+  
+  observeEvent(input$select.id.button,{
+    showElement("vote.choose")
+  })
+  
+  observeEvent(input$go.vote,{
+    showElement("vote.own")
+  })
+  
+  observeEvent(input$type.roll.id.button, {
+    hideElement("vote.choose")
+  })
+  
+  observeEvent(input$select.id.button, {
+    hideElement("vote.own")
+  })
+  
+  
+  output$vote.choose <- renderTable({
+    votes.resource <- ("votes?roll_id=")
+    votes.filters <- ("&fields=voters")
+    votes.response <- GET(paste0(sunlight.base, votes.resource, input$roll.id.choose, votes.filters))
+    request.body.as.list <- content(votes.response)
+    voters.list <- request.body.as.list$results[[1]]$voters
+    names(voters.list) <- NULL
+    voters.json <- toJSON(voters.list)
+    voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
+    voters.a <- voters.as.data.frame %>% mutate(name = paste(voter.first_name, voter.last_name))
+    voters <- voters.a %>% select(name, voter.party, voter.state, vote)
+    colnames(voters)[colnames(voters) == "voter.party"] <- "party"
+    colnames(voters)[colnames(voters) == "voter.name"] <- "name"
+    colnames(voters)[colnames(voters) == "voter.state"] <- "state"
+    return(voters)
+  })
+  
+  output$vote.own <- renderTable({
+    votes.resource.1 <- ("votes?roll_id=")
+    votes.filters.1 <- ("&fields=voters")
+    votes.response.1 <- GET(paste0(sunlight.base, votes.resource.1, input$own.roll.id, votes.filters.1))
+    request.body.as.list.1 <- content(votes.response.1)
+    voters.list.1 <- request.body.as.list.1$results[[1]]$voters
+    names(voters.list.1) <- NULL
+    voters.json.1 <- toJSON(voters.list.1)
+    voters.as.data.frame.1 <- flatten(fromJSON(voters.json.1, flatten=TRUE))
+    voters.1 <- voters.as.data.frame.1 %>% mutate(name = paste(voter.first_name, voter.last_name))
+    voters.1 <- voters.1 %>% select(name, voter.party, voter.state, vote)
+    colnames(voters.1)[colnames(voters.1) == "voter.party"] <- "party"
+    colnames(voters.1)[colnames(voters.1) == "voter.name"] <- "name"
+    colnames(voters.1)[colnames(voters.1) == "voter.state"] <- "state"
+    return(voters.1)
+  })
+  
+  
+  
+  
+  
   #############################
   ## GENDER MAKEUP
   #############################    
-          
-        output$genderHouseTable <- renderTable({
-          legislators.by.gender.house
-        })
-        
-        output$genderSenateTable <- renderTable({
-          legislators.by.gender.senate
-        })
-        
-        output$genderHouseArea <- renderPlotly({
-          gender.area <- ggplot(data = legislators.by.gender.house.tall, mapping = aes(x = Year, y = Value, fill = Gender)) +
-            geom_area() +
-            scale_fill_manual(values = c("#F06292", "#66BB6A")) +
-            scale_x_continuous(breaks = c(2009, 2011, 2013, 2015, 2017), labels = c(111:115)) +
-            ggtitle("Gender Makeup in the House of Representatives from 111th Congress to 115th Congress") +
-            labs(x = "Congress Number", y = "Number of Members")
-          gender.area <- ggplotly(gender.area)
-          return(gender.area)
-        })
-        
-        output$genderSenateArea <- renderPlotly({
-          gender.area <- ggplot(data = legislators.by.gender.senate.tall, mapping = aes(x = Year, y = Value, fill = Gender)) +
-            geom_area() +
-            scale_fill_manual(values = c("#F06292", "#66BB6A")) +
-            scale_x_continuous(breaks = c(2009, 2011, 2013, 2015, 2017), labels = c(111:115)) +
-            ggtitle("Gender Makeup in the Senate from 111th Congress to 115th Congress") +
-            labs(x = "Congress Number", y = "Number of Members")
-          gender.area <- ggplotly(gender.area)
-          return(gender.area)
-        })
-        
-        output$genderHouseLine <- renderPlotly({
-          gender.line <- ggplot(data = legislators.by.gender.house.tall, mapping = aes(x = Year, y = Value, color = Gender)) +
-            geom_line() +
-            scale_color_manual(values = c("#F06292", "#66BB6A")) +
-            scale_x_continuous(breaks = c(2009, 2011, 2013, 2015, 2017), labels = c(111:115)) +
-            ggtitle("Gender Makeup in the House of Representatives from 111th Congress to 115th Congress") +
-            labs(x = "Congress Number", y = "Number of Members")
-          gender.line <- ggplotly(gender.line)
-          return(gender.line)
-        })
-        
-        output$genderSenateLine <- renderPlotly({
-          gender.line <- ggplot(data = legislators.by.gender.senate.tall, mapping = aes(x = Year, y = Value, color = Gender)) +
-            geom_line() +
-            scale_color_manual(values = c("#F06292", "#66BB6A")) +
-            scale_x_continuous(breaks = c(2009, 2011, 2013, 2015, 2017), labels = c(111:115)) +
-            ggtitle("Gender Makeup in the Senate from 111th Congress to 115th Congress") +
-            labs(x = "Congress Number", y = "Number of Members")
-          gender.line <- ggplotly(gender.line)
-          return(gender.line)
-        })
-        
-        output$genderHousePie <- renderPlot({
-          for (year in c(2:10)) {
-            legislators.by.gender.house[,year] <- round(((legislators.by.gender.house[,year] / sum(legislators.by.gender.house[,year])) * 100), digits = 2)
-          }
-          legislators.by.gender.house.tall <- gather(legislators.by.gender.house, key = "Year", value = "Value",
+  
+  output$genderHouseTable <- renderTable({
+    legislators.by.gender.house
+  })
+  
+  output$genderSenateTable <- renderTable({
+    legislators.by.gender.senate
+  })
+  
+  output$genderHouseArea <- renderPlotly({
+    gender.area <- ggplot(data = legislators.by.gender.house.tall, mapping = aes(x = Year, y = Value, fill = Gender)) +
+      geom_area() +
+      scale_fill_manual(values = c("#F06292", "#66BB6A")) +
+      scale_x_continuous(breaks = c(2009, 2011, 2013, 2015, 2017), labels = c(111:115)) +
+      ggtitle("Gender Makeup in the House of Representatives from 111th Congress to 115th Congress") +
+      labs(x = "Congress Number", y = "Number of Members")
+    gender.area <- ggplotly(gender.area)
+    return(gender.area)
+  })
+  
+  output$genderSenateArea <- renderPlotly({
+    gender.area <- ggplot(data = legislators.by.gender.senate.tall, mapping = aes(x = Year, y = Value, fill = Gender)) +
+      geom_area() +
+      scale_fill_manual(values = c("#F06292", "#66BB6A")) +
+      scale_x_continuous(breaks = c(2009, 2011, 2013, 2015, 2017), labels = c(111:115)) +
+      ggtitle("Gender Makeup in the Senate from 111th Congress to 115th Congress") +
+      labs(x = "Congress Number", y = "Number of Members")
+    gender.area <- ggplotly(gender.area)
+    return(gender.area)
+  })
+  
+  output$genderHouseLine <- renderPlotly({
+    gender.line <- ggplot(data = legislators.by.gender.house.tall, mapping = aes(x = Year, y = Value, color = Gender)) +
+      geom_line() +
+      scale_color_manual(values = c("#F06292", "#66BB6A")) +
+      scale_x_continuous(breaks = c(2009, 2011, 2013, 2015, 2017), labels = c(111:115)) +
+      ggtitle("Gender Makeup in the House of Representatives from 111th Congress to 115th Congress") +
+      labs(x = "Congress Number", y = "Number of Members")
+    gender.line <- ggplotly(gender.line)
+    return(gender.line)
+  })
+  
+  output$genderSenateLine <- renderPlotly({
+    gender.line <- ggplot(data = legislators.by.gender.senate.tall, mapping = aes(x = Year, y = Value, color = Gender)) +
+      geom_line() +
+      scale_color_manual(values = c("#F06292", "#66BB6A")) +
+      scale_x_continuous(breaks = c(2009, 2011, 2013, 2015, 2017), labels = c(111:115)) +
+      ggtitle("Gender Makeup in the Senate from 111th Congress to 115th Congress") +
+      labs(x = "Congress Number", y = "Number of Members")
+    gender.line <- ggplotly(gender.line)
+    return(gender.line)
+  })
+  
+  output$genderHousePie <- renderPlot({
+    for (year in c(2:10)) {
+      legislators.by.gender.house[,year] <- round(((legislators.by.gender.house[,year] / sum(legislators.by.gender.house[,year])) * 100), digits = 2)
+    }
+    legislators.by.gender.house.tall <- gather(legislators.by.gender.house, key = "Year", value = "Value",
                                                `2009`:`2017`, convert = TRUE)
-          plot <- ggplot(data = legislators.by.gender.house.tall, mapping = aes(x = factor(1), y = Value, fill = Gender)) +
-            geom_bar(width = 1, stat = "identity") +
-            coord_polar(theta = "y") +
-            scale_fill_manual(values = c("#F06292", "#66BB6A")) +
-            ggtitle("Gender Makeup in the House of Representatives from 2009 to 2017") +
-            facet_wrap(~Year, nrow = 2) +
-            theme(axis.ticks = element_blank()) +
-            theme(axis.text = element_blank()) +
-            theme(axis.title = element_blank()) +
-            theme_void()
-          return(plot)
-        })
-        
-        output$genderSenatePie <- renderPlot({
-          for (year in c(2:10)) {
-            legislators.by.gender.senate[,year] <- round(((legislators.by.gender.senate[,year] / sum(legislators.by.gender.senate[,year])) * 100), digits = 2)
-          }
-          legislators.by.gender.senate.tall <- gather(legislators.by.gender.senate, key = "Year", value = "Value",
-                                                     `2009`:`2017`, convert = TRUE)
-          plot <- ggplot(data = legislators.by.gender.senate.tall, mapping = aes(x = factor(1), y = Value, fill = Gender)) +
-            geom_bar(width = 1, stat = "identity") +
-            coord_polar(theta = "y") +
-            scale_fill_manual(values = c("#F06292", "#66BB6A")) +
-            ggtitle("Gender Makeup in the Senate from 2009 to 2017") +
-            facet_wrap(~Year, nrow = 2) +
-            theme(axis.ticks = element_blank()) +
-            theme(axis.text = element_blank()) +
-            theme(axis.title = element_blank()) +
-            theme_void()
-          return(plot)
-        })
-        
+    plot <- ggplot(data = legislators.by.gender.house.tall, mapping = aes(x = factor(1), y = Value, fill = Gender)) +
+      geom_bar(width = 1, stat = "identity") +
+      coord_polar(theta = "y") +
+      scale_fill_manual(values = c("#F06292", "#66BB6A")) +
+      ggtitle("Gender Makeup in the House of Representatives from 2009 to 2017") +
+      facet_wrap(~Year, nrow = 2) +
+      theme(axis.ticks = element_blank()) +
+      theme(axis.text = element_blank()) +
+      theme(axis.title = element_blank()) +
+      theme_void()
+    return(plot)
+  })
+  
+  output$genderSenatePie <- renderPlot({
+    for (year in c(2:10)) {
+      legislators.by.gender.senate[,year] <- round(((legislators.by.gender.senate[,year] / sum(legislators.by.gender.senate[,year])) * 100), digits = 2)
+    }
+    legislators.by.gender.senate.tall <- gather(legislators.by.gender.senate, key = "Year", value = "Value",
+                                                `2009`:`2017`, convert = TRUE)
+    plot <- ggplot(data = legislators.by.gender.senate.tall, mapping = aes(x = factor(1), y = Value, fill = Gender)) +
+      geom_bar(width = 1, stat = "identity") +
+      coord_polar(theta = "y") +
+      scale_fill_manual(values = c("#F06292", "#66BB6A")) +
+      ggtitle("Gender Makeup in the Senate from 2009 to 2017") +
+      facet_wrap(~Year, nrow = 2) +
+      theme(axis.ticks = element_blank()) +
+      theme(axis.text = element_blank()) +
+      theme(axis.title = element_blank()) +
+      theme_void()
+    return(plot)
+  })
+  
   #############################
   ## PARTY MAKEUP
   #############################  
@@ -637,14 +637,14 @@ server <- function(input, output) {
             return(plot)
           })
           
-  
 
+  
 
   
   #############################
   ## VOTER RELIABILITY  
   #############################
-            observeEvent(input$table.button, {
+          observeEvent(input$table.button, {
             showElement("graph.button")
           })
         
