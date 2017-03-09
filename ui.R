@@ -13,16 +13,22 @@ library(shinyLP)
 
 ui <- fluidPage(
   useShinyjs(),
+  # Titles the report
   titlePanel("Congress App"),
   h3("INFO 201 Final Project"),
   h3("By Kelsey Kua, Casey Lum, and Devin Reich"),
+  # Puts three patriotric images as the header
   img(src = "header.jpg", height = 255),
    hr(),
   
-
+      # Creates navigation tabs
       tabsetPanel(type="tabs",
+                  # Creates a welcome tab
                   tabPanel("Welcome", icon = icon("hand-spock-o", lib = "font-awesome"),
+                           # Creates a header title
                            h1("Welcome"),
+                           
+                           # Creates a description
                            "This app will allow you to explore Congress data taken from the ",
                            tags$a(href="https://sunlightlabs.github.io/congress/", "Sunlight Congress API", target = "_blank"),
                            "and the ",
@@ -30,16 +36,26 @@ ui <- fluidPage(
                            ". You can view information about the representatives for a selected area, see how a representative voted, and view gender and party makeup and overall voting reliability in Congress. 
                            Have fun exploring our app!",
                            br(), br(),
+                           
+                           # Creates a cute button that doesn't do much but is still fun
                            actionButton('welcome', "Let's get started!"),
                            textOutput("hi")
                            ),
                   
+                  # Creates a tab called "Your Representatives"
                   tabPanel("Your Representatives", icon = icon("handshake-o", lib = "font-awesome"),
+                           # Creates a header title
                            h2("Your Representatives"),
+                           
+                           # Creates a description
                            h5("Click on one of the radio buttons below to find representatives of a selected area. 
                               You can find representatives by entering a zip code or by clicking on a location on the map."),
                            br(), br(),
+                           
+                           # Creates radio buttons to find representatives by zip code or by clicking on a map
                            radioButtons('format', label = "Find representatives by...", choices = c("zip code", "map"), selected = character(0)),
+                           
+                           # Creates a conditional panel for when the user selects the "map" radio button
                            conditionalPanel(
                              condition = "input.format == 'map'", 
                              actionButton('reset', "Reset View", icon = icon("undo", lib = "font-awesome")), br(), 
@@ -48,11 +64,12 @@ ui <- fluidPage(
                                       em("Click a point on the map to view its representatives"), br(), br(),
                                       leafletOutput('leaf.let')),
                                column(6,
-                             tableOutput('clickleg'),
-                             uiOutput('photosclick'))              
+                                      tableOutput('clickleg'),
+                                      uiOutput('photosclick'))              
                              )
                            ),
 
+                           # Creates a conditional panel for when the user selects the "zip code" radio button
                            conditionalPanel(
                              condition = "input.format == 'zip code'",
                              uiOutput('choice'),
@@ -66,8 +83,12 @@ ui <- fluidPage(
                            ),
                   
 
+                  # Creates a tab called "Recent Bills"
                   tabPanel("Recent Bills", icon = icon("inbox", lib = "font-awesome"),
+                           # Creates a header title
                            h3("Recent Bills"),
+                           
+                           # Displays the "I'm Just A Bill" video
                            fluidRow(
                              column(6, offset = 3,
                                     iframe(width = "672", height = "378",
@@ -78,58 +99,87 @@ ui <- fluidPage(
                            hr(),
                            h5("Click one of the buttons below to look for recent bills."),
                            br(), br(),
+                           
+                           # Creates two action buttons where the user can choose a topic from a dropdown menu or input a search
                            actionButton("choose.topic", "Choose Topic"),
                            actionButton("search.text", "Search Text of Bills"), br(), br(),
+                           
+                           # Creates dropdown menu choices
                            hidden(selectInput("topic", label = NULL, 
                                               choices=c("budget", "defense", "diplomacy", "education", "guns",
                                                         "health", "immigration", "law", "taxes", "veterans", "welfare"))),
+                           
+                           # Creates the search input box
                            fluidRow(
                              column(3,
                                     hidden(textInput('search', label = NULL, placeholder = "e.g. immigration, Washington, taxes"))),
                              column(3,
                                     hidden(actionButton('go.table', "search bills", icon = icon("search", lib = "font-awesome"))))),
+                           
+                           # Outputs tables based on what the user enters
                            hidden(dataTableOutput('bills.topic')),
                            hidden(dataTableOutput('bills.search'))
                            ),
                   
+                  # Creates a tab called "View a Vote"
                   tabPanel("View a Vote", icon = icon("eye", lib = "font-awesome"),
+                           # Creates a header title
                            h3("See how Congress voted on a roll call vote"),
+                           
+                           # Creates a description
                            h5("You can view the vote breakdown of any vote that took place during or after 2009. Choose a vote from the
                               dropdown menu below or enter your own roll id."),
                            br(),
+                           
+                           # Creates action buttons that let the user either select a bill from a dropdown menu or enter a roll id
                            actionButton("select.id.button", "Select from options", icon = icon("mouse-pointer", lib = "font-awesome")),
-                           actionButton("type.roll.id.button", "enter my own roll.id", icon = icon("i-cursor", lib = "font-awesome")), br(), br(), 
+                           actionButton("type.roll.id.button", "Enter my own roll.id", icon = icon("i-cursor", lib = "font-awesome")), br(), br(), 
+                           
+                           # Makes dropdown menu options
                            hidden(selectInput("roll.id.choose", label = "Vote", 
                                        choices = c("h6-2017", 
                                                    "s5-2010"))),
+                           
+                           # Creates an input textbox and an enter button
                            fluidRow(
                              column(3, hidden(textInput('own.roll.id', label = NULL, placeholder = "enter roll.id"))),
                              column(3, hidden(actionButton('go.vote', "look up vote", icon = icon("search", lib = "font-awesome"))))
                            ),
+                           
+                           # Outputs tables based on what the user enters
                            hidden(tableOutput('vote.choose')),
                            hidden(tableOutput('vote.own'))
                            ),
                   
                   
+                  # Creates a tab called "Gender Makeup"
                   tabPanel("Gender Makeup", icon = icon("venus-mars", lib = "font-awesome"),
+                           # Creates a header title
                            h3("Gender Makeup"),
+                           
+                           # Creates a description
                            h5("This page shows how the gender makeup has changed from 2009 to 2017 in both the 
                               House of Representatives and the Senate. Click one of the radio buttons below to see 
                               gender information about the House or the Senate."),
                            br(), br(),
+                           
+                           # Creates radio buttons to view plots for the House and Senate
                            fluidRow(
-                             column(12, 
-                                    radioButtons('chamber',
-                                                 label = "Chamber",
-                                                 choices = c("House of Representatives", "Senate")
-                                                 )
+                             column(12, radioButtons('chamber', label = "Chamber",
+                                                     choices = c("House of Representatives", "Senate")
+                                                     )
                                     )
                            ),
                            
+                           # Creates a conditional panel for when the "House of Representatives" button is selected
                            conditionalPanel(
                              condition = "input.chamber == 'House of Representatives'",
+                             
+                             # Creates a header
                              h4(em("Gender Makeup in the House of Representatives"), align = "center"),
                              br(), br(),
+                             
+                             # Outputs tables showing information about the House
                              tableOutput("genderHouseTable"),
                              br(), br(),
                              plotlyOutput("genderHouseArea"),
@@ -140,10 +190,15 @@ ui <- fluidPage(
                              align = "center"
                            ),
                            
+                           # Creates a conditional panel for when the "Senate" button is selected
                            conditionalPanel(
                              condition = "input.chamber == 'Senate'",
+                             
+                             # Creates a header
                              h4(em("Gender Makeup in the Senate"), align = "center"),
                              br(), br(),
+                             
+                             # Outputs tables showing information about the Senate
                              tableOutput("genderSenateTable"),
                              br(), br(),
                              plotlyOutput("genderSenateArea"),
@@ -168,24 +223,40 @@ ui <- fluidPage(
                            tags$a(href="http://www.cawp.rutgers.edu/facts", "Center for American Women and Politics website.", target = "_blank")
                            ),
                   
+                  # Creates a tab called "Party Makeup"
                   tabPanel("Party Makeup", icon = icon("birthday-cake", lib = "font-awesome"),
+                           # Creates a title
                            h3("House of Representatives"),
+                           
+                           # Outputs plots of House data
                            plotlyOutput("house.area"), br(),
                            plotlyOutput("house.line"), br(),
                            plotOutput("house.pie"), br(),
+                           
+                           # Creates a title
                            h3("Senate"),
+                           
+                           # Creates a button that explains why the plots may show more than 100 senators
                            actionButton("senate.q", "What?? Why doesn't the senate have 100 members??"),
                            hidden(textOutput("senate.ex")),
+                           
+                           # Outputs plots of Senate data
                            plotlyOutput("senate.area"), br(),
                            plotlyOutput("senate.line"), br(),
                            plotOutput("senate.pie"),
+                           
+                           # Creates a description
                            h5("It appears that in both the House and the Senate, the majority party fluctuates between Democrat
                               and Republican. This can be most clearly seen in the line graphs for the House and the Senate, although 
                               the majority party in the Senate seems to change more often than the House.")
                            ),
                   
+                  # Creates a tab called "Voting Reliability"
                   tabPanel("Voting Reliability", icon = icon("check-square-o", lib = "font-awesome"),
+                           # Creates a header title
                            h2("Voting Reliability: Missed Votes and Party Loyalty"), 
+                           
+                           # Creates a description
                            h5("This section of the report shows the percentage of missed votes of individual representatives from both 
                               the House and the Senate as well as how these representatives vote compared to the rest of their party. 
                               You can filter by the 114th or 115th Congress, political party (Democrat, Republican, Independent, or all), 
@@ -193,16 +264,25 @@ ui <- fluidPage(
                               scroll over a bar to view whose data is represented by that bar. You can also choose to see tables of the 
                               data shown in the plots by clicking on the 'Show Table' button."),
                            br(),
+                           
+                           # Creates a set of filters like radio buttons and dropdown menus
                            fluidRow(
+                             # Creates radio buttons to select the 114th or 115th Congress
                               column(2,
                                   radioButtons('congress', "Congress:", 
                                                choices = c("114th", "115th"))),
+                              
+                              # Creates radio buttons to select the party
                               column(2,
                                   radioButtons('party', "Party:", 
                                                choices = c("all", "Democrat", "Republican", "Independent"), selected = "all")),
+                              
+                              # Creates a dropdown menu that arranges the data in the plots
                               column(3,
                                   selectInput('order', "Show Members By:", 
                                               choices = c("alphabetically", "increasing", "decreasing"))),
+                              
+                              # Creates a dropdown menu of state selections
                               column(3,
                                   selectInput('state', "State",
                                               choices = c("all", "AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", 
@@ -211,22 +291,31 @@ ui <- fluidPage(
                                               selected = "all")
                               )
                           ),
+                          
+                          # Creates a button that changes the view from plots to table and vice versa
                           actionButton('table.button', "Show Table", icon = icon("table", lib = "font-awesome")),
                           hidden(actionButton('graph.button', "Return to Graph", icon = icon("bar-chart", lib = "font-awesome"))),
+                          
+                          # Creates a conditional panel for when the 115th Congress radio button is selected
                           conditionalPanel(
                             condition = "input.congress == '115th'", 
+                            
+                            # Creates plots showing information about the 115th Congress
                             plotlyOutput('house.missed'), br(), br(),
                             plotlyOutput('senate.missed'), br(), br(),
                             plotlyOutput('house.with'), br(), br(),
-                            plotlyOutput('senate.with'), 
+                            plotlyOutput('senate.with'),
                             fluidRow(
                               column(6, hidden(tableOutput('house.115'))),
                               column(6, hidden(tableOutput('senate.115')))
                             )
                           ),
                           
+                          # Creates a conditional panel for when the 114th Congress radio button is selected
                           conditionalPanel(
                             condition = "input.congress == '114th'",
+                            
+                            # Creates plots showing information about the 114th Congress
                             plotlyOutput('house.missed.114'), br(), br(),
                             plotlyOutput('senate.missed.114'), br(), br(),
                             plotlyOutput('house.with.114'), br(), br(),
@@ -240,13 +329,16 @@ ui <- fluidPage(
                   ),
 
       hr(),
-      ("Image credits for header photos (L to R):"), 
+  
+      # Creates a footer that provides hyperlinks to the images from the header
+      "Image credits for header photos (L to R):",
       tags$a(href="http://feelgrafix.com/group/american-flag.html", "feelgrafix", target = "_blank"), 
       ("|"),
       tags$a(href="https://en.wikipedia.org/wiki/United_States_Congress", "Wikipedia", target = "_blank"), 
       ("|"),
       tags$a(href="https://www.brookings.edu/multi-chapter-report/vital-statistics-on-congress/", "Brookings", target = "_blank"), br(),
 
+      # Sets the theme of the app
       theme = "creative.css"
   
 )
