@@ -510,6 +510,14 @@ server <- function(input, output) {
   ## PARTY MAKEUP
   #############################  
   
+          output$senate.ex <- renderText({
+            return("It appears that some Congresses had more than 100 members because all members that served during the Congress are shown, even though no more than 100 members were active at the same time.")
+          })
+          
+          observeEvent(input$senate.q, {
+            showElement("senate.ex", anim = TRUE, animType = "fade")
+          })
+          
           output$house.area <- renderPlotly({
             h.makeup <- house.makeup
             party <- c("D","I","R")
@@ -877,28 +885,29 @@ server <- function(input, output) {
             house.members$party <- as.factor(unlist(house.members$party))
             house.members$percent <- (house.members$missed_votes_pct + 0.5)
             if (input$order == "alphabetically") {
-              house.members.a <- house.members %>% arrange(last_name)
+              house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
             } else if (input$order == "increasing") {
-              house.members.a <- factor(house.members$name, levels = house.members$name[order(house.members$percent)])
+              house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent)])
             } else if (input$order == "decreasing") {
-              house.members.a <- factor(house.members$name, levels = house.members$name[order(house.members$percent, decreasing = TRUE)])
+              house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent, 
+                                                                                                decreasing = TRUE)])
+            }  
+            p <- ggplot(house.members, aes(x = name, y = percent, fill = party)) +
+              geom_bar(width = 1, stat = "identity") +
+              theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
+              theme(axis.ticks.x = element_blank()) +
+              scale_y_continuous(limits = c(0, 100))+
+              ggtitle("House of Representatives % of Votes Missed")
+            if (input$party == "all") {
+              pp <- p + scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
+                theme(axis.text.x = element_blank())
+            } else if (input$party == "Democrat") {
+              pp <- p + scale_fill_manual(values = "#002868", labels = "Democrat")
+            } else if (input$party == "Republican") {
+              pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
+            } else if (input$party == "Independent") {
+              pp <- p
             }
-            p <- ggplot(house.members.a, aes(x = name, y = percent, fill = party)) +
-            geom_bar(width = 1, stat = "identity") +
-            theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
-            theme(axis.ticks.x = element_blank()) +
-            scale_y_continuous(limits = c(0, 100))+
-            ggtitle("House of Representatives % of Votes Missed")
-          if (input$party == "all") {
-            pp <- p + scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
-              theme(axis.text.x = element_blank())
-          } else if (input$party == "Democrat") {
-            pp <- p + scale_fill_manual(values = "#002868", labels = "Democrat")
-          } else if (input$party == "Republican") {
-            pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
-          } else if (input$party == "Independent") {
-            pp <- p
-          }
             if (input$state != "all") {
               pp <- pp + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
             }
@@ -906,13 +915,6 @@ server <- function(input, output) {
             return(ppp)
           })
           
-          output$senate.ex <- renderText({
-            return("It appears that some Congresses had more than 100 members because all members that served during the Congress are shown, even though no more than 100 members were active at the same time.")
-          })
-          
-          observeEvent(input$senate.q, {
-            showElement("senate.ex", anim = TRUE, animType = "fade")
-          })
           
           
           output$senate.missed <- renderPlotly({
@@ -937,15 +939,14 @@ server <- function(input, output) {
             senate.members$last_name <- as.factor(unlist(senate.members$last_name))
             senate.members$party <- as.factor(unlist(senate.members$party))
             senate.members$percent <- (senate.members$missed_votes_pct + 0.2)
-            
             if (input$order == "alphabetically") {
-              senate.members.a <- senate.members %>% arrange(last_name)
+              senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$last_name)])
             } else if (input$order == "increasing") {
-              senate.members.a <- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent)])
+              senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent)])
             } else if (input$order == "decreasing") {
-              senate.members.a <- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent, decreasing = TRUE)])
-            }
-            p <- ggplot(senate.members.a, aes(x = name, y = percent, fill = party)) +
+              senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent, decreasing = TRUE)])
+            }   
+            p <- ggplot(senate.members, aes(x = name, y = percent, fill = party)) +
               geom_bar(width = 1, stat = "identity") +
               theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
               theme(axis.ticks.x = element_blank()) +
@@ -964,7 +965,7 @@ server <- function(input, output) {
             return(ppp)
             
           })
-        
+          
           output$house.with <- renderPlotly({
             if (input$party == "all") {
               house.members.115 <- house.115
@@ -987,13 +988,14 @@ server <- function(input, output) {
             house.members$last_name <- as.factor(unlist(house.members$last_name))
             house.members$party <- as.factor(unlist(house.members$party))
             if (input$order == "alphabetically") {
-              house.members.a <- house.members %>% arrange(last_name)
+              house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
             } else if (input$order == "increasing") {
-              house.members.a <- factor(house.members$name, levels = house.members$name[order(house.members$percent)])
+              house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent)])
             } else if (input$order == "decreasing") {
-              house.members.a <- factor(house.members$name, levels = house.members$name[order(house.members$percent, decreasing = TRUE)])
+              house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent, 
+                                                                                                decreasing = TRUE)])
             }
-            p <- ggplot(house.members.a, aes(x = name, y = percent, fill = party)) +
+            p <- ggplot(house.members, aes(x = name, y = percent, fill = party)) +
               geom_bar(width = 1, stat = "identity") +
               theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5))+
               theme(axis.ticks.x = element_blank()) +
@@ -1040,15 +1042,16 @@ server <- function(input, output) {
             senate.members$name <- as.factor(unlist(senate.members$name))
             senate.members$last_name <- as.factor(unlist(senate.members$last_name))
             senate.members$party <- as.factor(unlist(senate.members$party))
-            
             if (input$order == "alphabetically") {
-              senate.members.a <- senate.members %>% arrange(last_name)
+              senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$last_name)])
             } else if (input$order == "increasing") {
-              senate.members.a <- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent)])
+              senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent)])
             } else if (input$order == "decreasing") {
-              senate.members.a <- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent, decreasing = TRUE)])
+              senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent, 
+                                                                                                   decreasing = TRUE)])
             }
-            p <- ggplot(senate.members.a, aes(x = name, y = percent, fill = party)) +
+            
+            p <- ggplot(senate.members, aes(x = name, y = percent, fill = party)) +
               geom_bar(width = 1, stat = "identity") +
               theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
               theme(axis.ticks.x = element_blank()) +
@@ -1056,7 +1059,7 @@ server <- function(input, output) {
               ggtitle("Senate Votes With Party %")
             if (input$party == "all") {
               pp <- p + scale_fill_manual(values = c("#002868", "#6D1FA7", "#BF0A30"), labels = c("Democrat", "Independent", "Republican"))    
-              } else if (input$party == "Democrat") {
+            } else if (input$party == "Democrat") {
               pp <- p + scale_fill_manual(values = "#002868", labels = "Democrat")
             } else if (input$party == "Republican") {
               pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
@@ -1079,7 +1082,7 @@ server <- function(input, output) {
             } else if (input$party == "Republican") {
               house.members.114 <- house.114 %>% filter(party == "R")
             }
-           if (input$state == "all") {
+            if (input$state == "all") {
               house.memberz <- house.members.114
             } else {
               house.memberz <- house.members.114 %>% filter(state == input$state)
@@ -1092,15 +1095,16 @@ server <- function(input, output) {
             house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
             
             if (input$order == "alphabetically") {
-              house.members.a <- house.members %>% arrange(last_name)
+              house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
             } else if (input$order == "increasing") {
-              house.members.a <- factor(house.members$name, levels = house.members$name[order(house.members$percent)])
+              house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent)])
             } else if (input$order == "decreasing") {
-              house.members.a <- factor(house.members$name, levels = house.members$name[order(house.members$percent, decreasing = TRUE)])
+              house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent, 
+                                                                                                decreasing = TRUE)])
             }
-            p <- ggplot(house.members.a, aes(x = name, y = percent, fill = party)) +
+            p <- ggplot(house.members, aes(x = name, y = percent, fill = party)) +
               geom_bar(width = 1, stat = "identity") +
-              theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
+              theme(axis.text.x = element_text(size = 5, angle = 90, hjust = 1, vjust = 0.5))+
               theme(axis.ticks.x = element_blank()) +
               scale_y_continuous(limits = c(0, 100))+
               ggtitle("House of Representatives Votes With Party %")
@@ -1145,15 +1149,15 @@ server <- function(input, output) {
             senate.members$last_name <- as.factor(unlist(senate.members$last_name))
             senate.members$party <- as.factor(unlist(senate.members$party))
             senate.members$percent <- (senate.members$missed_votes_pct + 0.2)
-            
             if (input$order == "alphabetically") {
-              senate.members.a <- senate.members %>% arrange(last_name)
+              senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$last_name)])
             } else if (input$order == "increasing") {
-              senate.members.a <- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent)])
+              senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent)])
             } else if (input$order == "decreasing") {
-              senate.members.a <- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent, decreasing = TRUE)])
-            }
-            p <- ggplot(senate.members.a, aes(x = name, y = percent, fill = party)) +
+              senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent, 
+                                                                                                   decreasing = TRUE)])
+            }    
+            p <- ggplot(senate.members, aes(x = name, y = percent, fill = party)) +
               geom_bar(width = 1, stat = "identity") +
               theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
               theme(axis.ticks.x = element_blank()) +
@@ -1191,19 +1195,21 @@ server <- function(input, output) {
             house.members <- house.members.114 %>% mutate(name = paste(first_name, last_name))
             house.members$percent <- as.numeric(unlist(house.members$votes_with_party_pct))
             house.members$name <- as.factor(unlist(house.members$name))
-            house.members$last_name <- as.factor(unlist(house.members$last_name))
+            house.members$last_name <- as.vector(unlist(house.members$last_name))
             house.members$party <- as.factor(unlist(house.members$party))
-
+            house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
+            
             if (input$order == "alphabetically") {
-              house.members.a <- house.members %>% arrange(last_name)
+              house.members <- house.members %>% arrange(last_name)
             } else if (input$order == "increasing") {
-              house.members.a <- factor(house.members$name, levels = house.members$name[order(house.members$percent)])
+              house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent)])
             } else if (input$order == "decreasing") {
-              house.members.a <- factor(house.members$name, levels = house.members$name[order(house.members$percent, decreasing = TRUE)])
+              house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent, 
+                                                                                                decreasing = TRUE)])
             }
-            p <- ggplot(house.members.a, aes(x = name, y = percent, fill = party)) +
+            p <- ggplot(house.members, aes(x = name, y = percent, fill = party)) +
               geom_bar(width = 1, stat = "identity") +
-              theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
+              theme(axis.text.x = element_text(size = 5, angle = 90, hjust = 1, vjust = 0.5))+
               theme(axis.ticks.x = element_blank()) +
               scale_y_continuous(limits = c(0, 100))+
               ggtitle("House of Representatives Votes With Party %")
@@ -1215,7 +1221,7 @@ server <- function(input, output) {
             } else if (input$party == "Republican") {
               pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
             } else if (input$party == "Independent") {
-              pp <- p + scale_fill_manual(values = "#6D1FA7", labels = "Independent")
+              pp <- p
             }    
             if (input$state != "all") {
               pp <- pp + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
@@ -1246,15 +1252,17 @@ server <- function(input, output) {
             senate.members$name <- as.factor(unlist(senate.members$name))
             senate.members$last_name <- as.factor(unlist(senate.members$last_name))
             senate.members$party <- as.factor(unlist(senate.members$party))
-
+            senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$last_name)])
+            
             if (input$order == "alphabetically") {
-              senate.members.a <- senate.members %>% arrange(last_name)
+              senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$last_name)])
             } else if (input$order == "increasing") {
-              senate.members.a <- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent)])
+              senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent)])
             } else if (input$order == "decreasing") {
-              senate.members.a <- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent, decreasing = TRUE)])
+              senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent, 
+                                                                                                   decreasing = TRUE)])
             }
-            p <- ggplot(senate.members.a, aes(x = name, y = percent, fill = party)) +
+            p <- ggplot(senate.members, aes(x = name, y = percent, fill = party)) +
               geom_bar(width = 1, stat = "identity") +
               theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
               theme(axis.ticks.x = element_blank()) +
@@ -1273,4 +1281,3 @@ server <- function(input, output) {
             return(ppp)
           })
 }
-
