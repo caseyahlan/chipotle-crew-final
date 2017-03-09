@@ -14,7 +14,7 @@ library(shinyLP)
 ui <- fluidPage(
   useShinyjs(),
   # Titles the report
-  titlePanel("Congress App"),
+  titlePanel("Congress to You"),
   h3("INFO 201 Final Project"),
   h3("By Kelsey Kua, Casey Lum, and Devin Reich"),
   # Puts three patriotric images as the header
@@ -151,14 +151,14 @@ ui <- fluidPage(
                              column(4,
                                     hidden(tableOutput('vote.own'))),
                              column(4,
-                                    hidden(uiOutput("vote.title")),
-                                    hidden(tableOutput('vote.own.table')), br(), br(), br(), br(), br(), br(), br(),
-                                    hidden(uiOutput("gender.title")),
-                                    hidden(tableOutput('gender.table.own')), br(), br(), br(), 
-                                    hidden(uiOutput("party.title")),
+                                    hr(), hidden(uiOutput("vote.title")),
+                                    hidden(tableOutput('vote.own.table')), br(), br(), br(), br(), br(), br(), br(), br(), br(), br(), 
+                                    hr(), hidden(uiOutput("gender.title")),
+                                    hidden(tableOutput('gender.table.own')), br(), br(), br(), br(), br(), br(), br(), 
+                                    hr(), hidden(uiOutput("party.title")),
                                     hidden(tableOutput("party.voting"))),
                              column(4,
-                                    hidden(plotOutput('own.pie.chart')), br(), 
+                                    hidden(plotOutput('own.pie.chart')), br(), br(),
                                     hidden(plotOutput('gender.voting.own'))))),
               
                   # Creates a tab called "Gender Makeup"
@@ -235,7 +235,7 @@ ui <- fluidPage(
                            # Creates a title
                            h2("Party Makeup"),
                            h3("Examine the party makeup of the House and Senate: since the 102nd House and the 80th Senate."),
-                           p("A note about Congress numbers: each Congress spans two years, starting in every odd year. The 102nd Congress began in 1991, and the
+                           p("A note about Congress numbers: each Congress spans two years, starting in every odd year - the first Congress started in 1789. The 102nd Congress began in 1991, and the
                               80th began in 1947."),
                            
                            # Outputs plots of House data
@@ -270,7 +270,8 @@ ui <- fluidPage(
                            
                            # Creates a description
                            p("Below are bar graphs showing representatives' percentage of missed votes and how often they vote with the
-                              majority of their party. Each bar represents a member of Congress; hover over bars to see the members' information.
+                              majority of their party. The votes with party percentage is the percentage of votes that are same as the majority vote of the party.
+                              Each bar represents a member of Congress; hover over bars to see the members' information.
                               Use the widgets to display the 114th or 115th Congress, to filter by party or state, 
                               and to change the order of the bars on the graphs. It is important to note that John Boehner and Paul Ryan have high
                               percentages of votes missed in the 114th (and 115th in Ryan's case)

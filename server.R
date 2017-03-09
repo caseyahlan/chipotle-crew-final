@@ -13,7 +13,7 @@ library(shinyjs)
 library(devtools)
 source("apikey.R")
 
-
+# Reads in state data for the map
 state <- geojson_read("data/stateData.geojson", what = "sp")
 class(state)
 
@@ -26,7 +26,7 @@ propublica.base <- "https://api.propublica.org/congress/v1/"
 house.makeup <- read.csv("data/house.makeup", stringsAsFactors = FALSE)
 senate.makeup <- read.csv("data/senate.makeup", stringsAsFactors = FALSE)
 
-# Get senate 114 data
+# Gets senate 114 data
 request <- GET("https://api.propublica.org/congress/v1/114/senate/members.json", 
                add_headers("X-API-Key" = "ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT") )
 request.body.list <- content(request)
@@ -38,7 +38,7 @@ senate.114 <- flatten(fromJSON(members.json, flatten = TRUE)) %>%
 senate.114 <- senate.114[!sapply(senate.114$votes_with_party_pct,is.null),]
 
 
-# Get house 114 data
+# Gets house 114 data
 request <- GET("https://api.propublica.org/congress/v1/114/house/members.json", 
                add_headers("X-API-Key" = "ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT") )
 request.body.list <- content(request)
@@ -50,7 +50,7 @@ house.114 <- flatten(fromJSON(members.json, flatten = TRUE)) %>%
 house.114 <- house.114[!sapply(house.114$votes_with_party_pct,is.null),]
 
 
-# Get senate 115 data
+# Gets senate 115 data
 request <- GET("https://api.propublica.org/congress/v1/115/senate/members.json", 
                add_headers("X-API-Key" = "ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT") )
 request.body.list <- content(request)
@@ -62,7 +62,7 @@ senate.115 <- flatten(fromJSON(members.json, flatten = TRUE)) %>%
 senate.115 <- senate.115[!sapply(senate.115$votes_with_party_pct,is.null),]
 
 
-# Get house 115 data
+# Gets house 115 data
 request <- GET("https://api.propublica.org/congress/v1/115/house/members.json", 
                add_headers("X-API-Key" = "ApPfi2HAhD1AurYPyWXqU42XvSudAwVC3sQqvuYT") )
 request.body.list <- content(request)
@@ -141,6 +141,7 @@ server <- function(input, output) {
   ## WELCOME
   #############################
   
+  # Create reactive text for the action button
   output$hi <- eventReactive(input$welcome, {
     return("Click on one of the tabs above to get started")
   })
@@ -150,6 +151,8 @@ server <- function(input, output) {
   #############################
   ## FIND REPRESENTATIVES
   #############################
+  
+  # Renders a textInput in the UI
   output$choice <- renderUI({
     textInput('zip', "Zip code", value = "90210")
   })
@@ -189,20 +192,13 @@ server <- function(input, output) {
   })
   
   
-  
-  
+  # Renders legislators table
   output$clickleg <- renderTable({
     return(legislators.click()) 
   })
   
-  output$info <- renderPrint({
-    if (is.null(input$leaflet_click))
-      return()
-    return(input$leaflet_click)
-  })
   
-  
-  
+  # Creates leaflet map
   output$leaf.let <- renderLeaflet({
     leaflet(data = state, options = leafletOptions(minZoom = 2.5)) %>% addTiles() %>%
       addPolygons(fillColor = heat.colors(20, alpha = NULL), 
@@ -217,6 +213,7 @@ server <- function(input, output) {
   })
   
   
+  # Resets map view when action button is clicked
   observe({
     input$reset
     leafletProxy("leaf.let") %>% 
@@ -224,6 +221,7 @@ server <- function(input, output) {
   })
   
   
+  # Renders photos for when the  map is clicked
   output$photosclick <- renderUI({
     click <- input$leaf.let_shape_click
     if (is.null(click))
@@ -252,7 +250,7 @@ server <- function(input, output) {
   })
   
   
-  # Finds the photos of the representatives of a selected area
+  # Renders photos for when a zipcode is entered
   output$photos <- renderUI({
     resource <- ("legislators/locate")
     query <- paste0("?zip=", input$zip)
@@ -283,6 +281,7 @@ server <- function(input, output) {
   ## RECENT BILLS
   #############################
   
+  # Functions to hide / show widgets and tables when the action buttons are clicked
   observeEvent(input$choose.topic, {
     showElement("topic")
   })
@@ -353,8 +352,8 @@ server <- function(input, output) {
   ## VOTE
   #############################
   
-  
 
+  # Functions to show tables and plots when the "go" action button is clicked
   observeEvent(input$go.vote,{
     showElement("vote.own")
   })
@@ -439,7 +438,7 @@ server <- function(input, output) {
     return(vote.own())
   })
   
-  
+  # Creates a table that shows the count for votes
   vote.own.table <- reactive({
     votes.resource <- ("votes?roll_id=")
     votes.filters <- ("&fields=voters")
@@ -455,18 +454,22 @@ server <- function(input, output) {
     return(unique.votes)
   })
   
+  # Returns the data frame created above
   output$vote.own.table <- renderTable({
     return(vote.own.table())
   })
   
+  # Creates UI for the vote breakdown title
   output$vote.title <- renderUI({
     tags$h3("Outcome")
   })
   
+  # Creates UI for the gender breakdown title
   output$gender.title <- renderUI({
     tags$h3("Gender Breakdown")
   })
 
+  # Creates UI for the party breakdown title
   output$party.title <- renderUI({
     tagList(
       tags$h3("Party Breakdown"),
@@ -474,6 +477,7 @@ server <- function(input, output) {
     )
       })
   
+  # Creates a table to be used to make the pie chart
   own.pie.chart <- reactive({
     votes.resource <- ("votes?roll_id=")
     votes.filters <- ("&fields=voters")
@@ -488,6 +492,7 @@ server <- function(input, output) {
     return(unique.votes)
   })
   
+  # Creates a pie chart of the votes
   output$own.pie.chart <- renderPlot({
     p <- ggplot(own.pie.chart(), aes(x= "", y = n, fill=vote))+
       geom_bar(width=1, stat="identity")+
@@ -501,7 +506,7 @@ server <- function(input, output) {
     return(p)
   })
 
-  
+  # Creates a table of the gender breakdown
   gender.table.own <- reactive({
     votes.resource <- ("votes?roll_id=")
     votes.filters <- ("&fields=voters")
@@ -521,11 +526,12 @@ server <- function(input, output) {
     return(unique.votes)
   })
   
+  # Renders the table above
   output$gender.table.own <- renderTable({
     return(gender.table.own())
   })
   
-
+  # Creates a table to be used in the pie chart
   gender.voting.own <- reactive({
     votes.resource <- ("votes?roll_id=")
     votes.filters <- ("&fields=voters")
@@ -545,6 +551,7 @@ server <- function(input, output) {
     return(unique.votes)
   })
   
+  # Creates a pie chart of the gender breakdown
   output$gender.voting.own <- renderPlot({
     p <- ggplot(gender.voting.own(), aes(x=" ", y = votes, fill = demographic)) +
       geom_col(width=1)+
@@ -558,7 +565,7 @@ server <- function(input, output) {
     return(p)
   })
   
-  
+  # Creates a table of the party breakdown
   party.voting.data.plot <- reactive({  
     votes.resource <- ("votes?roll_id=")
     votes.filters <- ("&fields=voters")
@@ -595,7 +602,7 @@ server <- function(input, output) {
     return(party.voting)
   })
   
-  
+  # Returns the table above
   output$party.voting <- renderTable({
     return(party.voting.data.plot())
   })
@@ -604,10 +611,12 @@ server <- function(input, output) {
   ## GENDER MAKEUP
   #############################    
   
+  # Renders a table for the house gender makeup
   output$genderHouseTable <- renderTable({
     legislators.by.gender.house
   })
   
+  # Renders a table for the senate gender makeup
   output$genderSenateTable <- renderTable({
     legislators.by.gender.senate
   })
@@ -704,12 +713,14 @@ server <- function(input, output) {
   ## PARTY MAKEUP
   #############################  
   
+  # Creates reactive text for the senate button
   output$senate.ex <- renderText({
     return("The graphs show all the senators that served throughout each Congress, although no more than 100 senators were active at the same time")
   })
   
+  # Shows senate explanation when button is pressed
   observeEvent(input$senate.q, {
-    showElement("senate.ex", anim = TRUE, animType = "fade")
+    showElement("senate.ex")
   })
   
   # Creates an area plot of party makeup data in the House
@@ -843,6 +854,8 @@ server <- function(input, output) {
   #############################
   ## VOTER RELIABILITY  
   #############################
+  
+  # Creates functions show / hide widgets and plots when action buttons are clicked
   observeEvent(input$table.button, {
     showElement("graph.button")
   })
@@ -1047,6 +1060,7 @@ server <- function(input, output) {
     senate.table
   })
   
+  # Creates functions to toggle the tables when buttons are clicked
   observeEvent(input$table.button, {
     toggleElement("house.114")
   })
