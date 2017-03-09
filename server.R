@@ -1250,7 +1250,7 @@ server <- function(input, output) {
       theme(axis.text.x = element_text(size = 5, angle = 90, hjust = 1, vjust = 0.5)) +
       theme(axis.ticks.x = element_blank()) +
       scale_y_continuous(limits = c(0, 100)) +
-      ggtitle("House of Representatives Votes With Party %")
+      ggtitle("House of Representatives % of Votes Missed")
     if (input$party == "all") {
       pp <- p + scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
         theme(axis.text.x = element_blank())
