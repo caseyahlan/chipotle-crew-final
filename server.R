@@ -404,19 +404,19 @@ server <- function(input, output) {
   })
   
   observeEvent(input$type.roll.id.button, {
-    hideElement("choose.pietable")
+    hideElement("choose.piechart")
   })
   
   observeEvent(input$select.id.button,{
-    showElement("choose.pietable")
+    showElement("choose.piechart")
   })
   
   observeEvent(input$select.id.button, {
-    hideElement("own.pietable")
+    hideElement("own.piechart")
   })
   
   observeEvent(input$go.vote,{
-    showElement("own.pietable")
+    showElement("own.piechart")
   })
   
   output$vote.choose <- renderTable({
@@ -464,7 +464,7 @@ server <- function(input, output) {
     voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
     voters.as.data.frame$vote <- as.factor(unlist(voters.as.data.frame$vote))
     unique.votes <- tally(group_by(voters.as.data.frame, vote), sort = TRUE) 
-    colnames(unique.votes)[colnames(unique.votes) == "n"] <- "number of votes"
+    colnames(unique.votes)[colnames(unique.votes) == "n"] <- "count"
     return(unique.votes)
   })
   
@@ -480,7 +480,7 @@ server <- function(input, output) {
     voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
     voters.as.data.frame$vote <- as.factor(unlist(voters.as.data.frame$vote))
     unique.votes <- tally(group_by(voters.as.data.frame, vote), sort = TRUE) 
-    colnames(unique.votes)[colnames(unique.votes) == "n"] <- "number of votes"
+    colnames(unique.votes)[colnames(unique.votes) == "n"] <- "count"
     return(unique.votes)
   })
   
@@ -496,7 +496,6 @@ server <- function(input, output) {
     voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
     voters.as.data.frame$vote <- as.factor(unlist(voters.as.data.frame$vote))
     unique.votes <- tally(group_by(voters.as.data.frame, vote), sort = TRUE) 
-    colnames(unique.votes)[colnames(unique.votes) == "n"] <- "number of votes"
     p <- ggplot(unique.votes, aes(x= "", y = n, fill=vote))+
       geom_bar(width=1, stat="identity")+
       coord_polar("y", start=0)+
@@ -504,7 +503,8 @@ server <- function(input, output) {
       theme(legend.title = element_text(size=15))+
       theme(legend.text = element_text(size=12))+
       theme(axis.text.y = element_blank())+
-      theme(axis.ticks = element_blank())
+      theme(axis.ticks = element_blank())+
+      ggtitle("Vote Breakdown")
     return(p)
   })
   
@@ -526,7 +526,8 @@ server <- function(input, output) {
       theme(legend.title = element_text(size=15))+
       theme(legend.text = element_text(size=12))+
       theme(axis.text.y = element_blank())+
-      theme(axis.ticks = element_blank())
+      theme(axis.ticks = element_blank())+
+      ggtitle("Vote Breakdown")
     return(p)
   })
   

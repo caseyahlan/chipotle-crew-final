@@ -98,8 +98,7 @@ ui <- fluidPage(
                            ),
                            hr(),
                            h5("Click one of the buttons below to look for recent bills."),
-                           br(), br(),
-                           
+
                            # Creates two action buttons where the user can choose a topic from a dropdown menu or input a search
                            actionButton("choose.topic", "Choose Topic"),
                            actionButton("search.text", "Search Text of Bills"), br(), br(),
@@ -130,7 +129,13 @@ ui <- fluidPage(
                            h5(("View the vote breakdown of any vote that took place during or after 2009. Choose a vote from the
                               dropdown menu below or enter a specific roll id. The roll id of a vote is made up of the chamber (h or s), the vote number, and the year the vote took place.
                               To find a vote's roll id, look it up on the"), tags$a(href="https://www.govtrack.us/congress/votes", "GovTrack", target = "_blank"), ("database.")),
-                           br(),
+                           ("The choices include:"), br(),
+                           ("h2-2017: the 2017 Election of the Speaker of the House"), br(),
+                           ("h65-2017: the No Taxpayer Funding for Abortion and 
+                            Abortion Insurance Full Disclosure Act"), br(),
+                           ("s59-2017: Senate confirmation of Jeff Sessions for attorney general"), br(),
+                           ("s334-2015: Every Child Achieves Act of 2015"), br(),
+                           ("h768-2009: the Patient Protection and Affordable Care Act"), br(), br(),
                            
                            # Creates action buttons that let the user either select a bill from a dropdown menu or enter a roll id
                            actionButton("select.id.button", "Select from options", icon = icon("mouse-pointer", lib = "font-awesome")),
@@ -138,8 +143,11 @@ ui <- fluidPage(
                            
                            # Makes dropdown menu options
                            hidden(selectInput("roll.id.choose", label = "Vote", 
-                                       choices = c("h6-2017", 
-                                                   "s5-2010"))),
+                                       choices = c("h2-2017", 
+                                                   "h65-2017",
+                                                   "s59-2017",
+                                                   "s334-2015",
+                                                   "h768-2009"))),
                            
                            # Creates an input textbox and an enter button
                            fluidRow(
@@ -150,9 +158,10 @@ ui <- fluidPage(
                              column(4,
                                     hidden(tableOutput('vote.choose')),
                                     hidden(tableOutput('vote.own'))),
-                             column(6,
+                             column(2,
                                     hidden(tableOutput('vote.choose.table')),
-                                    hidden(tableOutput('vote.own.table')),
+                                    hidden(tableOutput('vote.own.table'))),
+                             column(4,
                                     hidden(plotOutput('choose.piechart')),
                                     hidden(plotOutput('own.piechart'))))),
               
@@ -163,9 +172,9 @@ ui <- fluidPage(
                            
                            # Creates a description
                            h5("This page shows how the gender makeup has changed from 2009 to 2017 in both the 
-                              House of Representatives and the Senate. Click one of the radio buttons below to see 
+                              House of Representatives and the Senate. Select one of the buttons below to see 
                               gender information about the House or the Senate."),
-                           br(), br(),
+                           br(), 
                            
                            # Creates radio buttons to view plots for the House and Senate
                            fluidRow(
