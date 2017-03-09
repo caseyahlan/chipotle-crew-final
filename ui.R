@@ -83,7 +83,11 @@ ui <- fluidPage(
                            hidden(selectInput("topic", label = NULL, 
                                               choices=c("budget", "defense", "diplomacy", "education", "guns",
                                                         "health", "immigration", "law", "taxes", "veterans", "welfare"))),
-                           hidden(textInput('search', "Search text of bills", placeholder = "e.g. immigration, Washington, taxes")),
+                           fluidRow(
+                             column(3,
+                                    hidden(textInput('search', label = NULL, placeholder = "e.g. immigration, Washington, taxes"))),
+                             column(3,
+                                    hidden(actionButton('go.table', "search bills", icon = icon("search", lib = "font-awesome"))))),
                            hidden(dataTableOutput('bills.topic')),
                            hidden(dataTableOutput('bills.search'))
                            ),
@@ -93,15 +97,16 @@ ui <- fluidPage(
                            h5("You can view the vote breakdown of any vote that took place during or after 2009. Choose a vote from the
                               dropdown menu below or enter your own roll id."),
                            br(),
-                           selectInput("roll.id.choose", label = "Vote", 
+                           actionButton("select.id.button", "Select from options", icon = icon("mouse-pointer", lib = "font-awesome")),
+                           actionButton("type.roll.id.button", "enter my own roll.id", icon = icon("i-cursor", lib = "font-awesome")), br(), br(), 
+                           hidden(selectInput("roll.id.choose", label = "Vote", 
                                        choices = c("h6-2017", 
-                                                   "s5-2010"),
-                                       selected = character(0)
+                                                   "s5-2010"))),
+                           fluidRow(
+                             column(3, hidden(textInput('own.roll.id', label = NULL, placeholder = "enter roll.id"))),
+                             column(3, hidden(actionButton('go.vote', "look up vote", icon = icon("search", lib = "font-awesome"))))
                            ),
-                           actionButton("roll.id.button", "I want to enter my own roll.id", icon = icon("i-cursor", lib = "font-awesome")),
-                           hidden(textInput('own.roll.id', "Enter roll.id")),
-                           hidden(actionButton("return.options", "Return to options", icon = icon("mouse-pointer", lib = "font-awesome"))),
-                           tableOutput('vote.choose'),
+                           hidden(tableOutput('vote.choose')),
                            hidden(tableOutput('vote.own'))
                            ),
                   
