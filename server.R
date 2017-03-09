@@ -404,19 +404,19 @@ server <- function(input, output) {
   })
   
   observeEvent(input$type.roll.id.button, {
-    hideElement("choose.pietable")
+    hideElement("choose.piechart")
   })
   
   observeEvent(input$select.id.button,{
-    showElement("choose.pietable")
+    showElement("choose.piechart")
   })
   
   observeEvent(input$select.id.button, {
-    hideElement("own.pietable")
+    hideElement("own.piechart")
   })
   
   observeEvent(input$go.vote,{
-    showElement("own.pietable")
+    showElement("own.piechart")
   })
   
   output$vote.choose <- renderTable({
@@ -464,7 +464,7 @@ server <- function(input, output) {
     voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
     voters.as.data.frame$vote <- as.factor(unlist(voters.as.data.frame$vote))
     unique.votes <- tally(group_by(voters.as.data.frame, vote), sort = TRUE) 
-    colnames(unique.votes)[colnames(unique.votes) == "n"] <- "number of votes"
+    colnames(unique.votes)[colnames(unique.votes) == "n"] <- "count"
     return(unique.votes)
   })
   
@@ -480,7 +480,7 @@ server <- function(input, output) {
     voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
     voters.as.data.frame$vote <- as.factor(unlist(voters.as.data.frame$vote))
     unique.votes <- tally(group_by(voters.as.data.frame, vote), sort = TRUE) 
-    colnames(unique.votes)[colnames(unique.votes) == "n"] <- "number of votes"
+    colnames(unique.votes)[colnames(unique.votes) == "n"] <- "count"
     return(unique.votes)
   })
   
@@ -496,7 +496,6 @@ server <- function(input, output) {
     voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
     voters.as.data.frame$vote <- as.factor(unlist(voters.as.data.frame$vote))
     unique.votes <- tally(group_by(voters.as.data.frame, vote), sort = TRUE) 
-    colnames(unique.votes)[colnames(unique.votes) == "n"] <- "number of votes"
     p <- ggplot(unique.votes, aes(x= "", y = n, fill=vote))+
       geom_bar(width=1, stat="identity")+
       coord_polar("y", start=0)+
@@ -504,7 +503,8 @@ server <- function(input, output) {
       theme(legend.title = element_text(size=15))+
       theme(legend.text = element_text(size=12))+
       theme(axis.text.y = element_blank())+
-      theme(axis.ticks = element_blank())
+      theme(axis.ticks = element_blank())+
+      ggtitle("Vote Breakdown")
     return(p)
   })
   
@@ -526,7 +526,8 @@ server <- function(input, output) {
       theme(legend.title = element_text(size=15))+
       theme(legend.text = element_text(size=12))+
       theme(axis.text.y = element_blank())+
-      theme(axis.ticks = element_blank())
+      theme(axis.ticks = element_blank())+
+      ggtitle("Vote Breakdown")
     return(p)
   })
   
@@ -1333,21 +1334,21 @@ server <- function(input, output) {
       house.members.114 <- house.114 %>% filter(party == "R")
     }
     if (input$state == "all") {
-      house.members.114 <- house.members.114
+      house.memberz <- house.members.114
     } else {
-      house.members.114 <- house.members.114 %>% 
+      house.memberz <- house.members.114 %>% 
         filter(state == input$state)
     }
-    house.members <- house.members.114 %>% 
+    house.members <- house.memberz %>% 
       mutate(name = paste(first_name, last_name))
     house.members$percent <- as.numeric(unlist(house.members$votes_with_party_pct))
     house.members$name <- as.factor(unlist(house.members$name))
-    house.members$last_name <- as.vector(unlist(house.members$last_name))
+    house.members$last_name <- as.factor(unlist(house.members$last_name))
     house.members$party <- as.factor(unlist(house.members$party))
     house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
     
     if (input$order == "alphabetically") {
-      house.members <- house.members %>% arrange(last_name)
+      house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
     } else if (input$order == "increasing") {
       house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent)])
     } else if (input$order == "decreasing") {
@@ -1359,7 +1360,7 @@ server <- function(input, output) {
       theme(axis.text.x = element_text(size = 5, angle = 90, hjust = 1, vjust = 0.5)) +
       theme(axis.ticks.x = element_blank()) +
       scale_y_continuous(limits = c(0, 100)) +
-      ggtitle("House of Representatives Votes With Party %")
+      ggtitle("House of Representatives % of Votes Missed")
     if (input$party == "all") {
       pp <- p + scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
         theme(axis.text.x = element_blank())
@@ -1376,6 +1377,7 @@ server <- function(input, output) {
     ppp <- ggplotly(pp)
     return(ppp)
   })
+  
   
   
   
