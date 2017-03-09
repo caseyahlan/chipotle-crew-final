@@ -150,13 +150,15 @@ ui <- fluidPage(
                            fluidRow(
                              column(4,
                                     hidden(tableOutput('vote.own'))),
-                             column(2,
-                                    br(), br(),
-                                    hidden(tableOutput('vote.own.table')), br(), br(), br(), br(),
-                                    hidden(uiOutput(("gender.title")),
-                                    hidden(tableOutput('gender.table.own'))),
                              column(4,
-                                    hidden(plotOutput('own.pie.chart')),
+                                    hidden(uiOutput("vote.title")),
+                                    hidden(tableOutput('vote.own.table')), br(), br(), br(), br(), br(), br(), br(),
+                                    hidden(uiOutput("gender.title")),
+                                    hidden(tableOutput('gender.table.own')), br(), br(), br(), 
+                                    hidden(uiOutput("party.title")),
+                                    hidden(tableOutput("party.voting"))),
+                             column(4,
+                                    hidden(plotOutput('own.pie.chart')), br(), 
                                     hidden(plotOutput('gender.voting.own'))))),
               
                   # Creates a tab called "Gender Makeup"
@@ -365,5 +367,5 @@ ui <- fluidPage(
       # Sets the theme of the app
       theme = "creative.css"
       
-      )
+      
 )

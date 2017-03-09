@@ -372,6 +372,17 @@ server <- function(input, output) {
     showElement("gender.title")
   })
   
+  observeEvent(input$go.vote,{
+    showElement("vote.title")
+  })
+  
+  observeEvent(input$go.vote,{
+    showElement("party.title")
+  })
+  
+  observeEvent(input$go.vote,{
+    showElement("party.voting")
+  })
   
   observeEvent(input$go.vote,{
     showElement("gender.table.own")
@@ -448,10 +459,20 @@ server <- function(input, output) {
     return(vote.own.table())
   })
   
+  output$vote.title <- renderUI({
+    tags$h3("Outcome")
+  })
+  
   output$gender.title <- renderUI({
-    tags$h3("Gender Voting")
+    tags$h3("Gender Breakdown")
   })
 
+  output$party.title <- renderUI({
+    tagList(
+      tags$h3("Party Breakdown"),
+      tags$p("This table shows how each party voted; what the majority vote was, how many members voted with the majority, and how many members of the party are in the chamber of Congress.")
+    )
+      })
   
   own.pie.chart <- reactive({
     votes.resource <- ("votes?roll_id=")
@@ -535,6 +556,48 @@ server <- function(input, output) {
       theme(axis.ticks = element_blank())+
       ggtitle("Breakdown by Gender")
     return(p)
+  })
+  
+  
+  party.voting.data.plot <- reactive({  
+    votes.resource <- ("votes?roll_id=")
+    votes.filters <- ("&fields=voters")
+    votes.response <- GET(paste0(sunlight.base, votes.resource, input$roll.id, votes.filters))
+    request.body.as.list <- content(votes.response)
+    voters.list <- request.body.as.list$results[[1]]$voters
+    names(voters.list) <- NULL
+    voters.json <- toJSON(voters.list)
+    voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
+    voters.plot <- select(voters.as.data.frame, voter.party, vote, voter.gender)
+    voters <- select(voters.as.data.frame, voter.first_name, voter.last_name, voter.party, vote)
+    colnames(voters)[colnames(voters) == "voter.party"] <- "party"
+    colnames(voters)[colnames(voters) == "voter.first_name"] <- "first name"
+    colnames(voters)[colnames(voters) == "voter.last_name"] <- "last name"
+    voters$vote <- as.factor(unlist(voters$vote))
+    voters$party <- as.factor(unlist(voters$party))
+    unique.votes <- tally(group_by(voters, vote), sort = TRUE) 
+    in.party <- tally(group_by(voters, party, vote))
+    PartyVotes <- function(party.choice) {
+      party <- in.party %>% filter(party == party.choice) %>% arrange(desc(n))
+      majority.vote <- party[1,2]
+      sum.majority <- party[1,3]
+      in.chamber <- voters %>% filter(party == party.choice) %>% nrow()
+      party.voting <- (data.frame(party.choice, majority.vote, sum.majority, in.chamber, stringsAsFactors = FALSE))
+      return(party.voting)
+    }
+    party.voting <- PartyVotes("D")
+    party.voting[(nrow(party.voting)+1),] <- PartyVotes("R")
+    party.voting[(nrow(party.voting)+1),] <- PartyVotes("I")
+    colnames(party.voting)[colnames(party.voting) == "party.choice"] <- "party"
+    colnames(party.voting)[colnames(party.voting) == "n"] <- "number of majority votes"
+    colnames(party.voting)[colnames(party.voting) == "in.chamber"] <- "number of party members in chamber"
+    colnames(party.voting)[colnames(party.voting) == "vote"] <- "majority vote"
+    return(party.voting)
+  })
+  
+  
+  output$party.voting <- renderTable({
+    return(party.voting.data.plot())
   })
   
   #############################

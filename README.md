@@ -1,7 +1,14 @@
 # chipotle-crew-final
 
-# sources used:
-area charts: http://www.r-graph-gallery.com/136-stacked-area-chart/
-writing a for loop: https://www.r-bloggers.com/how-to-write-the-first-for-loop-in-r/
-how to add to a list: https://shiny.rstudio.com/reference/shiny/latest/tag.html
-column names that are inegers: http://stackoverflow.com/questions/39299665/numeric-column-names-in-r
+# Congress to You: an app for exploring US congresssional data
+By Kelsey Kua, Casey Lum, and Devin Reich
+
+In this app, you can:
+* find your representatives by zip code or by clicking on a map
+* look up recent bills
+* view the breakdown on a vote
+* examine the gender makeup of Congress since 2009
+* examine the party makeup of Congress since 1991 for the House and 1947 for the Senate
+* inspect members of the 114th and 115th Congress and their voting habits
+
+This app uses data from the Sunlight Foundation [Congress API](https://sunlightlabs.github.io/congress/index.html), and the ProPublica [Congress API](https://propublica.github.io/congress-api-docs/#congress-api-documentation).
