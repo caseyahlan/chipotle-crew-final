@@ -213,7 +213,6 @@ ui <- fluidPage(
                           ),
                           actionButton('table.button', "Show Table", icon = icon("table", lib = "font-awesome")),
                           hidden(actionButton('graph.button', "Return to Graph", icon = icon("bar-chart", lib = "font-awesome"))),
-
                           conditionalPanel(
                             condition = "input.congress == '115th'", 
                             plotlyOutput('house.missed'), br(), br(),
