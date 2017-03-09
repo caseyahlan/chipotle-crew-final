@@ -212,15 +212,16 @@ ui <- fluidPage(
                                   radioButtons('party', "Party:", 
                                                choices = c("all", "Democrat", "Republican", "Independent"), selected = "all")),
                               column(3,
-                                  selectInput('order', "Show Members By:", 
-                                              choices = c("alphabetically", "increasing", "decreasing"))),
-                              column(3,
                                   selectInput('state', "State",
                                               choices = c("all", "AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", 
                                                           "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", 
                                                           "OH", "OK", "OR", "PA", "RI", "SC",  "SD", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV",  "WY"),
-                                              selected = "all")
-                              )
+                                              
+                                              selected = "all")),
+                              column(3,
+                                  selectInput('order', "Show Members By:", 
+                                                     choices = c("alphabetically", "increasing", "decreasing")))
+                              
                           ),
                           actionButton('table.button', "Show Table", icon = icon("table", lib = "font-awesome")),
                           hidden(actionButton('graph.button', "Return to Graph", icon = icon("bar-chart", lib = "font-awesome"))),

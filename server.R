@@ -1333,21 +1333,21 @@ server <- function(input, output) {
       house.members.114 <- house.114 %>% filter(party == "R")
     }
     if (input$state == "all") {
-      house.members.114 <- house.members.114
+      house.memberz <- house.members.114
     } else {
-      house.members.114 <- house.members.114 %>% 
+      house.memberz <- house.members.114 %>% 
         filter(state == input$state)
     }
-    house.members <- house.members.114 %>% 
+    house.members <- house.memberz %>% 
       mutate(name = paste(first_name, last_name))
     house.members$percent <- as.numeric(unlist(house.members$votes_with_party_pct))
     house.members$name <- as.factor(unlist(house.members$name))
-    house.members$last_name <- as.vector(unlist(house.members$last_name))
+    house.members$last_name <- as.factor(unlist(house.members$last_name))
     house.members$party <- as.factor(unlist(house.members$party))
     house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
     
     if (input$order == "alphabetically") {
-      house.members <- house.members %>% arrange(last_name)
+      house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
     } else if (input$order == "increasing") {
       house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent)])
     } else if (input$order == "decreasing") {
@@ -1359,7 +1359,7 @@ server <- function(input, output) {
       theme(axis.text.x = element_text(size = 5, angle = 90, hjust = 1, vjust = 0.5)) +
       theme(axis.ticks.x = element_blank()) +
       scale_y_continuous(limits = c(0, 100)) +
-      ggtitle("House of Representatives Votes With Party %")
+      ggtitle("House of Representatives % of Votes Missed")
     if (input$party == "all") {
       pp <- p + scale_fill_manual(values = c("#002868", "#BF0A30"), labels = c("Democrat", "Republican"))+
         theme(axis.text.x = element_blank())
@@ -1368,7 +1368,7 @@ server <- function(input, output) {
     } else if (input$party == "Republican") {
       pp <- p + scale_fill_manual(values = "#BF0A30", labels = "Republican")
     } else if (input$party == "Independent") {
-      pp <- p
+      pp <- p + scale_fill_manual(values = "#6D1FA7", labels = "Independent")
     }    
     if (input$state != "all") {
       pp <- pp + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
@@ -1376,6 +1376,7 @@ server <- function(input, output) {
     ppp <- ggplotly(pp)
     return(ppp)
   })
+  
   
   
   
