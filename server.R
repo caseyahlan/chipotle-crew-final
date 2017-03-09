@@ -387,6 +387,37 @@ server <- function(input, output) {
     hideElement("vote.own")
   })
   
+  observeEvent(input$type.roll.id.button, {
+    hideElement("vote.choose.table")
+  })
+  
+  observeEvent(input$select.id.button,{
+    showElement("vote.choose.table")
+  })
+  
+  observeEvent(input$select.id.button, {
+    hideElement("vote.own.table")
+  })
+  
+  observeEvent(input$go.vote,{
+    showElement("vote.own.table")
+  })
+  
+  observeEvent(input$type.roll.id.button, {
+    hideElement("choose.pietable")
+  })
+  
+  observeEvent(input$select.id.button,{
+    showElement("choose.pietable")
+  })
+  
+  observeEvent(input$select.id.button, {
+    hideElement("own.pietable")
+  })
+  
+  observeEvent(input$go.vote,{
+    showElement("own.pietable")
+  })
   
   output$vote.choose <- renderTable({
     votes.resource <- ("votes?roll_id=")
@@ -418,12 +449,86 @@ server <- function(input, output) {
       mutate(name = paste(voter.first_name, voter.last_name))
     voters.1 <- voters.1 %>% 
       select(name, voter.party, voter.state, vote)
-    colnames(voters) <- c("name", "party", "state", "vote")
+    colnames(voters.1) <- c("name", "party", "state", "vote")
     return(voters.1)
   })
   
+  output$vote.choose.table <- renderTable({
+    votes.resource <- ("votes?roll_id=")
+    votes.filters <- ("&fields=voters")
+    votes.response <- GET(paste0(sunlight.base, votes.resource, input$roll.id, votes.filters))
+    request.body.as.list <- content(votes.response)
+    voters.list <- request.body.as.list$results[[1]]$voters
+    names(voters.list) <- NULL
+    voters.json <- toJSON(voters.list)
+    voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
+    voters.as.data.frame$vote <- as.factor(unlist(voters.as.data.frame$vote))
+    unique.votes <- tally(group_by(voters.as.data.frame, vote), sort = TRUE) 
+    colnames(unique.votes)[colnames(unique.votes) == "n"] <- "number of votes"
+    return(unique.votes)
+  })
   
   
+  output$vote.own.table <- renderTable({
+    votes.resource <- ("votes?roll_id=")
+    votes.filters <- ("&fields=voters")
+    votes.response <- GET(paste0(sunlight.base, votes.resource, input$own.roll.id, votes.filters))
+    request.body.as.list <- content(votes.response)
+    voters.list <- request.body.as.list$results[[1]]$voters
+    names(voters.list) <- NULL
+    voters.json <- toJSON(voters.list)
+    voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
+    voters.as.data.frame$vote <- as.factor(unlist(voters.as.data.frame$vote))
+    unique.votes <- tally(group_by(voters.as.data.frame, vote), sort = TRUE) 
+    colnames(unique.votes)[colnames(unique.votes) == "n"] <- "number of votes"
+    return(unique.votes)
+  })
+  
+  
+  output$choose.piechart <- renderPlot({
+    votes.resource <- ("votes?roll_id=")
+    votes.filters <- ("&fields=voters")
+    votes.response <- GET(paste0(sunlight.base, votes.resource, input$roll.id, votes.filters))
+    request.body.as.list <- content(votes.response)
+    voters.list <- request.body.as.list$results[[1]]$voters
+    names(voters.list) <- NULL
+    voters.json <- toJSON(voters.list)
+    voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
+    voters.as.data.frame$vote <- as.factor(unlist(voters.as.data.frame$vote))
+    unique.votes <- tally(group_by(voters.as.data.frame, vote), sort = TRUE) 
+    colnames(unique.votes)[colnames(unique.votes) == "n"] <- "number of votes"
+    p <- ggplot(unique.votes, aes(x= "", y = n, fill=vote))+
+      geom_bar(width=1, stat="identity")+
+      coord_polar("y", start=0)+
+      labs(x=" ", y = " ") +
+      theme(legend.title = element_text(size=15))+
+      theme(legend.text = element_text(size=12))+
+      theme(axis.text.y = element_blank())+
+      theme(axis.ticks = element_blank())
+    return(p)
+  })
+  
+  output$own.piechart <- renderPlot({
+    votes.resource <- ("votes?roll_id=")
+    votes.filters <- ("&fields=voters")
+    votes.response <- GET(paste0(sunlight.base, votes.resource, input$own.roll.id, votes.filters))
+    request.body.as.list <- content(votes.response)
+    voters.list <- request.body.as.list$results[[1]]$voters
+    names(voters.list) <- NULL
+    voters.json <- toJSON(voters.list)
+    voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
+    voters.as.data.frame$vote <- as.factor(unlist(voters.as.data.frame$vote))
+    unique.votes <- tally(group_by(voters.as.data.frame, vote), sort = TRUE) 
+    p <- ggplot(unique.votes, aes(x= "", y = n, fill=vote))+
+      geom_bar(width=1, stat="identity")+
+      coord_polar("y", start=0)+
+      labs(x=" ", y = " ") +
+      theme(legend.title = element_text(size=15))+
+      theme(legend.text = element_text(size=12))+
+      theme(axis.text.y = element_blank())+
+      theme(axis.ticks = element_blank())
+    return(p)
+  })
   
   
   #############################

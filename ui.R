@@ -94,8 +94,10 @@ ui <- fluidPage(
                   
                   tabPanel("View a Vote", icon = icon("eye", lib = "font-awesome"),
                            h3("See how Congress voted on a roll call vote"),
-                           h5("You can view the vote breakdown of any vote that took place during or after 2009. Choose a vote from the
-                              dropdown menu below or enter your own roll id."),
+                           h5(("View the vote breakdown of any vote that took place during or after 2009. Choose a vote from the
+                              dropdown menu below or enter a specific roll id. The roll id of a vote is made up of the chamber (h or s), the vote number, and the year the vote took place.
+                              To find a vote's roll id, look it up on the"), tags$a(href="https://www.govtrack.us/congress/votes", "GovTrack", target = "_blank"), ("database.")),
+                           
                            br(),
                            actionButton("select.id.button", "Select from options", icon = icon("mouse-pointer", lib = "font-awesome")),
                            actionButton("type.roll.id.button", "enter my own roll.id", icon = icon("i-cursor", lib = "font-awesome")), br(), br(), 
@@ -106,9 +108,18 @@ ui <- fluidPage(
                              column(3, hidden(textInput('own.roll.id', label = NULL, placeholder = "enter roll.id"))),
                              column(3, hidden(actionButton('go.vote', "look up vote", icon = icon("search", lib = "font-awesome"))))
                            ),
-                           hidden(tableOutput('vote.choose')),
-                           hidden(tableOutput('vote.own'))
-                           ),
+                           fluidRow(
+                             column(4,
+                                    hidden(tableOutput('vote.choose')),
+                                    hidden(tableOutput('vote.own'))),
+                             column(6,
+                                    hidden(tableOutput('vote.choose.table')),
+                                    hidden(tableOutput('vote.own.table')),
+                                    hidden(plotOutput('choose.piechart')),
+                                    hidden(plotOutput('own.piechart'))))),
+                           
+                           
+
                   
                   
                   tabPanel("Gender Makeup", icon = icon("venus-mars", lib = "font-awesome"),
