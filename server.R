@@ -419,6 +419,22 @@ server <- function(input, output) {
     showElement("own.piechart")
   })
   
+  observeEvent(input$type.roll.id.button, {
+    hideElement("gender.table.choose")
+  })
+  
+  observeEvent(input$select.id.button,{
+    showElement("gender.table.choose")
+  })
+  
+  observeEvent(input$select.id.button, {
+    hideElement("gender.table.own")
+  })
+  
+  observeEvent(input$go.vote,{
+    showElement("gender.table.own")
+  })
+  
   output$vote.choose <- renderTable({
     votes.resource <- ("votes?roll_id=")
     votes.filters <- ("&fields=voters")
@@ -531,6 +547,45 @@ server <- function(input, output) {
     return(p)
   })
   
+  output$gender.table.choose <- renderTable({
+    votes.resource <- ("votes?roll_id=")
+    votes.filters <- ("&fields=voters")
+    votes.response <- GET(paste0(sunlight.base, votes.resource, input$roll.id, votes.filters))
+    request.body.as.list <- content(votes.response)
+    voters.list <- request.body.as.list$results[[1]]$voters
+    names(voters.list) <- NULL
+    voters.json <- toJSON(voters.list)
+    voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
+    voters.as.data.frame <- mutate(voters.as.data.frame, name = paste(voter.first_name, voter.last_name))
+    voters.plot <- select(voters.as.data.frame, name, voter.party, vote, voter.gender)
+    voters.plot$voter.gender <- as.factor(unlist(voters.plot$voter.gender))
+    voters.plot$vote <- as.factor(unlist(voters.plot$vote))
+    voters.plot$demographic <- paste(voters.plot$voter.gender, voters.plot$vote)
+    unique.votes <- tally(group_by(voters.plot, demographic), sort = TRUE) 
+    colnames(unique.votes)[colnames(unique.votes) == "n"] <- "votes"
+    return(unique.votes)
+    
+  })
+  
+  output$gender.table.own <- renderTable({
+    votes.resource <- ("votes?roll_id=")
+    votes.filters <- ("&fields=voters")
+    votes.response <- GET(paste0(sunlight.base, votes.resource, input$own.roll.id, votes.filters))
+    request.body.as.list <- content(votes.response)
+    voters.list <- request.body.as.list$results[[1]]$voters
+    names(voters.list) <- NULL
+    voters.json <- toJSON(voters.list)
+    voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
+    voters.as.data.frame <- mutate(voters.as.data.frame, name = paste(voter.first_name, voter.last_name))
+    voters.plot <- select(voters.as.data.frame, name, voter.party, vote, voter.gender)
+    voters.plot$voter.gender <- as.factor(unlist(voters.plot$voter.gender))
+    voters.plot$vote <- as.factor(unlist(voters.plot$vote))
+    voters.plot$demographic <- paste(voters.plot$voter.gender, voters.plot$vote)
+    unique.votes <- tally(group_by(voters.plot, demographic), sort = TRUE) 
+    colnames(unique.votes)[colnames(unique.votes) == "n"] <- "votes"
+    return(unique.votes)
+    
+  })
   
   #############################
   ## GENDER MAKEUP
@@ -1020,7 +1075,7 @@ server <- function(input, output) {
     house.members$last_name <- as.factor(unlist(house.members$last_name))
     house.members$party <- as.factor(unlist(house.members$party))
     house.members$percent <- (house.members$missed_votes_pct + 0.5)
-    if (input$order == "alphabetically") {
+    if (input$order == "alphabetical by last name") {
       house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
     } else if (input$order == "increasing") {
       house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent)])
@@ -1077,7 +1132,7 @@ server <- function(input, output) {
     senate.members$last_name <- as.factor(unlist(senate.members$last_name))
     senate.members$party <- as.factor(unlist(senate.members$party))
     senate.members$percent <- (senate.members$missed_votes_pct + 0.2)
-    if (input$order == "alphabetically") {
+    if (input$order == "alphabetical by last name") {
       senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$last_name)])
     } else if (input$order == "increasing") {
       senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent)])
@@ -1127,7 +1182,7 @@ server <- function(input, output) {
     house.members$name <- as.factor(unlist(house.members$name))
     house.members$last_name <- as.factor(unlist(house.members$last_name))
     house.members$party <- as.factor(unlist(house.members$party))
-    if (input$order == "alphabetically") {
+    if (input$order == "alphabetical by last name") {
       house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
     } else if (input$order == "increasing") {
       house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent)])
@@ -1184,7 +1239,7 @@ server <- function(input, output) {
     senate.members$name <- as.factor(unlist(senate.members$name))
     senate.members$last_name <- as.factor(unlist(senate.members$last_name))
     senate.members$party <- as.factor(unlist(senate.members$party))
-    if (input$order == "alphabetically") {
+    if (input$order == "alphabetical by last name") {
       senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$last_name)])
     } else if (input$order == "increasing") {
       senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent)])
@@ -1238,7 +1293,7 @@ server <- function(input, output) {
     house.members$party <- as.factor(unlist(house.members$party))
     house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
     
-    if (input$order == "alphabetically") {
+    if (input$order == "alphabetical by last name") {
       house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
     } else if (input$order == "increasing") {
       house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent)])
@@ -1295,7 +1350,7 @@ server <- function(input, output) {
     senate.members$last_name <- as.factor(unlist(senate.members$last_name))
     senate.members$party <- as.factor(unlist(senate.members$party))
     senate.members$percent <- (senate.members$missed_votes_pct + 0.2)
-    if (input$order == "alphabetically") {
+    if (input$order == "alphabetical by last name") {
       senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$last_name)])
     } else if (input$order == "increasing") {
       senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent)])
@@ -1347,7 +1402,7 @@ server <- function(input, output) {
     house.members$party <- as.factor(unlist(house.members$party))
     house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
     
-    if (input$order == "alphabetically") {
+    if (input$order == "alphabetical by last name") {
       house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$last_name)])
     } else if (input$order == "increasing") {
       house.members$name<- factor(house.members$name, levels = house.members$name[order(house.members$percent)])
@@ -1405,7 +1460,7 @@ server <- function(input, output) {
     senate.members$party <- as.factor(unlist(senate.members$party))
     senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$last_name)])
     
-    if (input$order == "alphabetically") {
+    if (input$order == "alphabetical by last name") {
       senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$last_name)])
     } else if (input$order == "increasing") {
       senate.members$name<- factor(senate.members$name, levels = senate.members$name[order(senate.members$percent)])

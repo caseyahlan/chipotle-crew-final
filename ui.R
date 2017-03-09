@@ -50,7 +50,7 @@ ui <- fluidPage(
                            # Creates a description
                            h5("Click on one of the radio buttons below to find representatives of a selected area. 
                               You can find representatives by entering a zip code or by clicking on a location on the map."),
-                           br(), br(),
+                           br(), 
                            
                            # Creates radio buttons to find representatives by zip code or by clicking on a map
                            radioButtons('format', label = "Find representatives by...", choices = c("zip code", "map"), selected = character(0)),
@@ -111,7 +111,7 @@ ui <- fluidPage(
                            # Creates the search input box
                            fluidRow(
                              column(3,
-                                    hidden(textInput('search', label = NULL, placeholder = "e.g. immigration, Washington, taxes"))),
+                                    hidden(textInput('search', label = NULL, placeholder = "e.g. Obama, women, China"))),
                              column(3,
                                     hidden(actionButton('go.table', "search bills", icon = icon("search", lib = "font-awesome"))))),
                            
@@ -126,10 +126,10 @@ ui <- fluidPage(
                            h3("See how Congress voted on a roll call vote"),
                            
                            # Creates a description
-                           h5(("View the vote breakdown of any vote that took place during or after 2009. Choose a vote from the
-                              dropdown menu below or enter a specific roll id. The roll id of a vote is made up of the chamber (h or s), the vote number, and the year the vote took place.
+                           h5(("View the vote breakdown of any vote that took place during or after 2009 by choosing from the options below or entering a specific roll id.
+                            The roll id of a vote is made up of the chamber (h or s), the vote number, and the year the vote took place.
                               To find a vote's roll id, look it up on the"), tags$a(href="https://www.govtrack.us/congress/votes", "GovTrack", target = "_blank"), ("database.")),
-                           ("The choices include:"), br(),
+                           ("The options include:"), br(),
                            ("h2-2017: the 2017 Election of the Speaker of the House"), br(),
                            ("h65-2017: the No Taxpayer Funding for Abortion and 
                             Abortion Insurance Full Disclosure Act"), br(),
@@ -159,8 +159,11 @@ ui <- fluidPage(
                                     hidden(tableOutput('vote.choose')),
                                     hidden(tableOutput('vote.own'))),
                              column(2,
+                                    br(), br(),
                                     hidden(tableOutput('vote.choose.table')),
-                                    hidden(tableOutput('vote.own.table'))),
+                                    hidden(tableOutput('vote.own.table')), br(), br(), br(), br(), br(), br(), br(), br(), br(),
+                                    hidden(tableOutput('gender.table.choose')),
+                                    hidden(tableOutput('gender.table.own'))),
                              column(4,
                                     hidden(plotOutput('choose.piechart')),
                                     hidden(plotOutput('own.piechart'))))),
@@ -172,8 +175,7 @@ ui <- fluidPage(
                            
                            # Creates a description
                            h5("This page shows how the gender makeup has changed from 2009 to 2017 in both the 
-                              House of Representatives and the Senate. Select one of the buttons below to see 
-                              gender information about the House or the Senate."),
+                              House of Representatives and the Senate."),
                            br(), 
                            
                            # Creates radio buttons to view plots for the House and Senate
@@ -250,7 +252,7 @@ ui <- fluidPage(
                            h3("Senate"),
                            
                            # Creates a button that explains why the plots may show more than 100 senators
-                           actionButton("senate.q", "What?? Why doesn't the senate have 100 members??"),
+                           actionButton("senate.q", "What?? Doesn't the senate have 100 members??"),
                            hidden(textOutput("senate.ex")),
                            
                            # Outputs plots of Senate data
@@ -259,9 +261,10 @@ ui <- fluidPage(
                            plotOutput("senate.pie"),
                            
                            # Creates a description
-                           h5("It appears that in both the House and the Senate, the majority party fluctuates between Democrat
+                           h5("In both the House and the Senate, the majority party fluctuates between Democrat
                               and Republican. This can be most clearly seen in the line graphs for the House and the Senate, although 
-                              the majority party in the Senate seems to change more often than the House.")
+                              the majority party in the Senate seems to change more often than the House. Historically, the Senate
+                              has more Independent members than the House, but both chambers ")
                            ),
                   
                   # Creates a tab called "Voting Reliability"
@@ -270,12 +273,20 @@ ui <- fluidPage(
                            h2("Voting Reliability: Missed Votes and Party Loyalty"), 
                            
                            # Creates a description
-                           h5("This section of the report shows the percentage of missed votes of individual representatives from both 
-                              the House and the Senate as well as how these representatives vote compared to the rest of their party. 
-                              You can filter by the 114th or 115th Congress, political party (Democrat, Republican, Independent, or all), 
-                              and state. Plots can be organized alphabetically by last name or by decreasing or increasing values. You can 
-                              scroll over a bar to view whose data is represented by that bar. You can also choose to see tables of the 
-                              data shown in the plots by clicking on the 'Show Table' button."),
+                           h5("Below are bar graphs showing representatives' percentage of missed votes and how often they vote with the
+                              majority of their party. Each bar represents a member of Congress; hover over bars to see the members' information.
+                              Use the widgets to display the 114th or 115th Congress, to filter by party or state, 
+                              and to change the order of the bars on the graphs. It is important to note that John Boehner and Paul Ryan have high
+                              percentages of votes missed in the 114th (and 115th in Ryan's case)
+                              because they served as Speaker of the House. The Speaker has the right to vote on bills, but does not regularly participate.
+                              As for the House of Representatives of the 114th Congress, Ryan Zinke, Tom Price, Mike Pompeo, and Mick Mulvaney are shown to have high
+                              percentages of votes missed, which is likely due to the fact that were recently nominated and confirmed
+                              as Secretary of the Interior, Secretary of Health and
+                              Human Services, director of the CIA, and director of the Office of Management and Budget, respectively. Xavier Becerra also has a high
+                              percentage of votes missed; he was confirmed as the Attorney General of California in January.
+                              It is also interesting to note that in the Senate of the 114th Congress, the members with the highest percentages of votes missed were
+                              Ted Cruz, Marco Rubio, and Bernie Sanders: all candidates in the presidential general election."),
+
                            br(),
                            
                            # Creates a set of filters like radio buttons and dropdown menus
@@ -291,7 +302,7 @@ ui <- fluidPage(
                                                choices = c("all", "Democrat", "Republican", "Independent"), selected = "all")),
                               
                               # Creates a dropdown menu of state selections
-                              column(3,
+                              column(2,
                                      selectInput('state', "State",
                                                  choices = c("all", "AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", 
                                                              "LA", "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", 
@@ -301,8 +312,8 @@ ui <- fluidPage(
                               
                               # Creates a dropdown menu that arranges the data in the plots
                               column(3,
-                                  selectInput('order', "Show Members By:", 
-                                              choices = c("alphabetically", "increasing", "decreasing")))),
+                                  selectInput('order', "Order:", 
+                                              choices = c("alphabetical by last name", "increasing", "decreasing")))),
                               
                           
                           # Creates a button that changes the view from plots to table and vice versa
@@ -350,6 +361,12 @@ ui <- fluidPage(
       tags$a(href="https://en.wikipedia.org/wiki/United_States_Congress", "Wikipedia", target = "_blank"), 
       ("|"),
       tags$a(href="https://www.brookings.edu/multi-chapter-report/vital-statistics-on-congress/", "Brookings", target = "_blank"), br(),
+  
+      ("This app was created with"), 
+      tags$a(href = "https://www.rstudio.com", "RStudio", target= "_blank"), ("and uses data from the"),
+      tags$a(href="https://sunlightlabs.github.io/congress/", "Sunlight Congress API", target = "_blank"),
+      ("and the"),
+      tags$a(href="https://www.propublica.org/datastore/api/propublica-congress-api", "ProPublica Congress API", target = "_blank"), hr(),
 
       # Sets the theme of the app
       theme = "creative.css"
