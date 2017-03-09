@@ -116,10 +116,14 @@ for (year in years) {
   response <- GET(paste0(sunlight.base, resource, query))
   body <- fromJSON(content(response, "text"))
   body <- flatten(body$results)
+  # Creates a data frame of gender information from 2009 to 2017
   legislators.by.gender.senate <- cbind(legislators.by.gender.senate, 
                                         select(GetGenderMakeup(body[1, "roll_id"]), n))
 }
+# Changes the column names of the data frame
 colnames(legislators.by.gender.senate) <- c("Gender", 2009:2017)
+
+# Creates a tall-oriented data frame of legislator information
 legislators.by.gender.senate.tall <- gather(legislators.by.gender.senate, 
                                             key = "Year", value = "Value",
                                             `2009`:`2017`, convert = TRUE)
@@ -150,6 +154,7 @@ server <- function(input, output) {
     textInput('zip', "Zip code", value = "90210")
   })
   
+  # Creates and returns a data frame of legislator information for a specific area
   legislators <- reactive({
     resource <- "legislators/locate"
     query <- paste0("?zip=", input$zip)
@@ -161,10 +166,12 @@ server <- function(input, output) {
     return(legislators)
   })
   
+  # Returns a table of legislator information for a specific area
   output$reps <- renderTable({
     return(legislators())
   })
   
+  # Takes a mouse click and finds the legislators of the clicked-on area
   legislators.click <- reactive({
     click <- input$leaf.let_shape_click
     if (is.null(click))
@@ -245,7 +252,7 @@ server <- function(input, output) {
   })
   
   
-  
+  # Finds the photos of the representatives of a selected area
   output$photos <- renderUI({
     resource <- ("legislators/locate")
     query <- paste0("?zip=", input$zip)
@@ -265,7 +272,7 @@ server <- function(input, output) {
     if (num.reps > 1) {
       num.reps <- 2:num.reps
       for (val in num.reps) {
-        picture <-paste0(picture.base, bio.ids[val,1], picture.query)
+        picture <- paste0(picture.base, bio.ids[val,1], picture.query)
         images <- tagAppendChild(images, tags$img(src=picture, width = size))
       }
     }
@@ -316,6 +323,7 @@ server <- function(input, output) {
     hideElement("bills.search")
   })
   
+  # Creates a data table of bill information when a topic is selected from a dropdown menu
   output$bills.topic <- renderDataTable({
     bills.resource <- ("bills/search?query=")
     filters <- ("&congress=115&order=last_action_at")
@@ -325,9 +333,9 @@ server <- function(input, output) {
     bills <- select(bills, bill_id, introduced_on, official_title)
     colnames(bills) <- c("bill", "date introduced", "full title of bill")
     return(bills)
-  }
-  )
+  })
   
+  # Creates a data table of bill information for what the user inputs as a search
   output$bills.search <- renderDataTable({
     bills.resource <- ("bills/search?query=")
     filters <- ("&congress=115&order=last_action_at")
@@ -356,7 +364,6 @@ server <- function(input, output) {
     showElement("vote.own.table")
   })
 
-  
   observeEvent(input$go.vote,{
     showElement("own.pie.chart")
   })
@@ -375,6 +382,7 @@ server <- function(input, output) {
     showElement("gender.voting.own")
   })
   
+  # Creates a data frame of vote information for each representative
   vote.choose <- reactive({
     votes.resource <- ("votes?roll_id=")
     votes.filters <- ("&fields=voters")
@@ -392,10 +400,12 @@ server <- function(input, output) {
     return(voters)
   })
   
+  # Returns the data frame above
   output$vote.choose <- renderTable({
     return(vote.choose())
   })
   
+  # Creates a data frame of the roll id that the user enters
   vote.own <- reactive({
     votes.resource.1 <- ("votes?roll_id=")
     votes.filters.1 <- ("&fields=voters")
@@ -413,6 +423,7 @@ server <- function(input, output) {
     return(voters.1)
   })
   
+  # Returns the data frame created above
   output$vote.own <- renderTable({
     return(vote.own())
   })
@@ -538,6 +549,7 @@ server <- function(input, output) {
     legislators.by.gender.senate
   })
   
+  # Creates a stacked area plot of gender data in the House
   output$genderHouseArea <- renderPlotly({
     gender.area <- ggplot(data = legislators.by.gender.house.tall, mapping = aes(x = Year, y = Value, fill = Gender)) +
       geom_area() +
@@ -549,6 +561,7 @@ server <- function(input, output) {
     return(gender.area)
   })
   
+  # Creates a stacked area plot of gender data in the Senate
   output$genderSenateArea <- renderPlotly({
     gender.area <- ggplot(data = legislators.by.gender.senate.tall, mapping = aes(x = Year, y = Value, fill = Gender)) +
       geom_area() +
@@ -560,6 +573,7 @@ server <- function(input, output) {
     return(gender.area)
   })
   
+  # Creates a line graph of gender data in the House
   output$genderHouseLine <- renderPlotly({
     gender.line <- ggplot(data = legislators.by.gender.house.tall, mapping = aes(x = Year, y = Value, color = Gender)) +
       geom_line() +
@@ -571,6 +585,7 @@ server <- function(input, output) {
     return(gender.line)
   })
   
+  # Creates a line graph of gender data in the Senate
   output$genderSenateLine <- renderPlotly({
     gender.line <- ggplot(data = legislators.by.gender.senate.tall, mapping = aes(x = Year, y = Value, color = Gender)) +
       geom_line() +
@@ -582,6 +597,7 @@ server <- function(input, output) {
     return(gender.line)
   })
   
+  # Creates pie charts of gender data in the House
   output$genderHousePie <- renderPlot({
     for (year in c(2:10)) {
       legislators.by.gender.house[,year] <- round(((legislators.by.gender.house[,year] / sum(legislators.by.gender.house[,year])) * 100), digits = 2)
@@ -601,6 +617,7 @@ server <- function(input, output) {
     return(plot)
   })
   
+  # Creates pie charts of gender data in the Senate
   output$genderSenatePie <- renderPlot({
     for (year in c(2:10)) {
       legislators.by.gender.senate[,year] <- round(((legislators.by.gender.senate[,year] / sum(legislators.by.gender.senate[,year])) * 100), digits = 2)
@@ -632,6 +649,7 @@ server <- function(input, output) {
     showElement("senate.ex", anim = TRUE, animType = "fade")
   })
   
+  # Creates an area plot of party makeup data in the House
   output$house.area <- renderPlotly({
     h.makeup <- house.makeup
     party <- c("D","I","R")
@@ -649,6 +667,7 @@ server <- function(input, output) {
     return(pplot)
   })
   
+  # Creates a line graph of party makeup data in the House
   output$house.line <- renderPlotly({
     h.makeup <- house.makeup
     party <- c("D","I","R")
@@ -666,6 +685,7 @@ server <- function(input, output) {
     return(pplot)
   })
   
+  # Creates pie charts of party makeup data in the House
   output$house.pie <- renderPlot({
     times <- 3:16
     for (val in times) {
@@ -691,6 +711,7 @@ server <- function(input, output) {
     return(plot)
   })
   
+  # Creates an area plot of party makeup data in the Senate
   output$senate.area <- renderPlotly({
     s.makeup <- senate.makeup
     party <- c("D","I","R")
@@ -708,6 +729,7 @@ server <- function(input, output) {
     return(pplot)
   })
   
+  # Creates a line graph of party makeup data in the Senate
   output$senate.line <- renderPlotly({
     s.makeup <- senate.makeup
     party <- c("D","I","R")
@@ -725,6 +747,7 @@ server <- function(input, output) {
     return(pplot)
   })
   
+  # Creates pie charts of party makeup data in the Senate
   output$senate.pie <- renderPlot({
     times <- 3:38
     for (val in times) {
@@ -815,7 +838,6 @@ server <- function(input, output) {
     toggleElement("senate.with.114")
   })
   
-  
   observeEvent(input$graph.button, {
     toggleElement("house.missed")
   })
@@ -848,7 +870,7 @@ server <- function(input, output) {
     toggleElement("senate.with.114")
   })
   
-  
+  # Creates a data table of House data from the 114th Congress
   output$house.114 <- renderTable({
     house.2 <- house.114 %>% 
       mutate(name = paste(first_name, last_name))
@@ -876,6 +898,7 @@ server <- function(input, output) {
     house.table
   })
   
+  # Creates a data table of Senate data from the 114th Congress
   output$senate.114 <- renderTable({
     senate.2 <- senate.114 %>% 
       mutate(name = paste(first_name, last_name))
@@ -904,6 +927,7 @@ server <- function(input, output) {
     senate.table
   })
   
+  # Creates a data table of House data from the 115th Congress
   output$house.115 <- renderTable({
     house.2 <- house.115 %>% 
       mutate(name = paste(first_name, last_name))
@@ -931,6 +955,7 @@ server <- function(input, output) {
     house.table
   })
   
+  # Creates a data table of Senate data from the 115th Congress
   output$senate.115 <- renderTable({
     senate.2 <- senate.115 %>% 
       mutate(name = paste(first_name, last_name))
@@ -991,6 +1016,7 @@ server <- function(input, output) {
     toggleElement("senate.115")
   })
   
+  # Creates a plot of missed votes in the House
   output$house.missed <- renderPlotly({
     if (input$party == "all") {
       house.members.115 <- house.115
@@ -1045,8 +1071,7 @@ server <- function(input, output) {
     return(ppp)
   })
   
-  
-  
+  # Creates a plot of missed votes in the Senate
   output$senate.missed <- renderPlotly({
     if (input$party == "all") {
       senate.members.115 <- senate.115
@@ -1098,6 +1123,7 @@ server <- function(input, output) {
     
   })
   
+  # Creates a plot of how House members voted with their party
   output$house.with <- renderPlotly({
     if (input$party == "all") {
       house.members.115 <- house.115
@@ -1153,8 +1179,7 @@ server <- function(input, output) {
     
   })
   
-  
-  
+  # Creates a plot of how Senate members voted with their party
   output$senate.with <- renderPlotly({
     if (input$party == "all") {
       senate.members.115 <- senate.115
@@ -1206,8 +1231,7 @@ server <- function(input, output) {
     return(ppp)
   })
   
-  
-  
+  # Creates a plot of missed votes in the House from the 114th Congress
   output$house.missed.114 <- renderPlotly({
     if (input$party == "all") {
       house.members.114 <- house.114
@@ -1263,8 +1287,7 @@ server <- function(input, output) {
     return(ppp)
   })
   
-  
-  
+  # Creates a plot of missed votes in the Senate from the 114th Congress
   output$senate.missed.114 <- renderPlotly({
     if (input$party == "all") {
       senate.members.114 <- senate.114
@@ -1317,6 +1340,7 @@ server <- function(input, output) {
     
   })
   
+  # Creates a plot of how representatives from the House voted with their party in the 114th Congress
   output$house.with.114 <- renderPlotly({
     if (input$party == "all") {
       house.members.114 <- house.114
@@ -1372,9 +1396,7 @@ server <- function(input, output) {
     return(ppp)
   })
   
-  
-  
-  
+  # Creates a plot of how representatives from the Senate voted with their party in the 114th Congress
   output$senate.with.114 <- renderPlotly({
     if (input$party == "all") {
       senate.members.114 <- senate.114

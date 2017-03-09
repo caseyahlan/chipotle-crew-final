@@ -364,5 +364,6 @@ ui <- fluidPage(
 
       # Sets the theme of the app
       theme = "creative.css"
-  
+      
+      )
 )
