@@ -26,19 +26,20 @@ ui <- fluidPage(
                   # Creates a welcome tab
                   tabPanel("Welcome", icon = icon("hand-spock-o", lib = "font-awesome"),
                            # Creates a header title
-                           h1("Welcome"),
-                           
+                           h1("Welcome to Congress to You"),
+                           h2("Explore U.S. congressional data and use our tools to:"),
                            # Creates a description
-                           "This app will allow you to explore Congress data taken from the ",
-                           tags$a(href="https://sunlightlabs.github.io/congress/", "Sunlight Congress API", target = "_blank"),
-                           "and the ",
-                           tags$a(href="https://www.propublica.org/datastore/api/propublica-congress-api", "ProPublica Congress API", target = "_blank"),
-                           ". You can view information about the representatives for a selected area, see how a representative voted, and view gender and party makeup and overall voting reliability in Congress. 
-                           Have fun exploring our app!",
-                           br(), br(),
+                          h1(tags$li("Be informed:")),
+                          fluidRow(column(6, offset = 1, h3("Look up recent bills & view the breakdown on votes"))),
+                          h1(tags$li("Be involved:")),
+                          fluidRow(column(6, offset = 1, h3("Find your representatives and how to contact them"))),
+                          h1(tags$li("Be critical:")),
+                          fluidRow(column(11, offset = 1, h3("Examine the demographic makeup of Congress over time & inspect representative's voting habits"))), br(),
+                          h2("...it's now more important than ever."),
+                           br(), 
                            
                            # Creates a cute button that doesn't do much but is still fun
-                           actionButton('welcome', "Let's get started!"),
+                           actionButton('welcome', "Awesome!"),
                            textOutput("hi")
                            ),
                   
@@ -46,14 +47,12 @@ ui <- fluidPage(
                   tabPanel("Your Representatives", icon = icon("handshake-o", lib = "font-awesome"),
                            # Creates a header title
                            h2("Your Representatives"),
+                           h3("Discover who is representing YOU in Congress."), br(),
                            
-                           # Creates a description
-                           h5("Click on one of the radio buttons below to find representatives of a selected area. 
-                              You can find representatives by entering a zip code or by clicking on a location on the map."),
-                           br(), 
                            
                            # Creates radio buttons to find representatives by zip code or by clicking on a map
-                           radioButtons('format', label = "Find representatives by...", choices = c("zip code", "map"), selected = character(0)),
+                           h4("Find representatives by:"),
+                           radioButtons('format', label = NULL, choices = c("zip code", "map"), selected = character(0)),
                            
                            # Creates a conditional panel for when the user selects the "map" radio button
                            conditionalPanel(
@@ -73,9 +72,9 @@ ui <- fluidPage(
                            conditionalPanel(
                              condition = "input.format == 'zip code'",
                              uiOutput('choice'),
-                             em(strong("Note:"), "Zip codes have varying numbers of representatives because some 
-                                zip codes span multiple congressional districts, meaning multiple members of the House are shown. 
-                                Finding your location on the map will show the representatives for that area."),
+                             em(strong("Note:"), "Some zip codes have more than representatives because they cover multiple congressional districts, which means they have 
+                              more than one member of the House of Representatives.
+                                Finding your location on the map will show your specific representatives."),
                              br(), br(),
                              tableOutput('reps'),
                              uiOutput('photos')
@@ -86,7 +85,8 @@ ui <- fluidPage(
                   # Creates a tab called "Recent Bills"
                   tabPanel("Recent Bills", icon = icon("inbox", lib = "font-awesome"),
                            # Creates a header title
-                           h3("Recent Bills"),
+                           h2("Recent Bills"),
+                           h3("See what Congress is working on."),
                            
                            # Displays the "I'm Just A Bill" video
                            fluidRow(
@@ -123,59 +123,49 @@ ui <- fluidPage(
                   # Creates a tab called "View a Vote"
                   tabPanel("View a Vote", icon = icon("eye", lib = "font-awesome"),
                            # Creates a header title
+                           h2("View a Vote"),
                            h3("See how Congress voted on a roll call vote"),
                            
                            # Creates a description
-                           h5(("View the vote breakdown of any vote that took place during or after 2009 by choosing from the options below or entering a specific roll id.
+                           p(("View the vote breakdown of any vote that took place during or after 2009 by entering the vote's roll id.
                             The roll id of a vote is made up of the chamber (h or s), the vote number, and the year the vote took place.
                               To find a vote's roll id, look it up on the"), tags$a(href="https://www.govtrack.us/congress/votes", "GovTrack", target = "_blank"), ("database.")),
-                           ("The options include:"), br(),
+                           p(("Some interesting votes to view include:"), br(),
                            ("h2-2017: the 2017 Election of the Speaker of the House"), br(),
                            ("h65-2017: the No Taxpayer Funding for Abortion and 
                             Abortion Insurance Full Disclosure Act"), br(),
                            ("s59-2017: Senate confirmation of Jeff Sessions for attorney general"), br(),
                            ("s334-2015: Every Child Achieves Act of 2015"), br(),
-                           ("h768-2009: the Patient Protection and Affordable Care Act"), br(), br(),
-                           
+                           ("h768-2009: the Patient Protection and Affordable Care Act")), br(), 
                            # Creates action buttons that let the user either select a bill from a dropdown menu or enter a roll id
-                           actionButton("select.id.button", "Select from options", icon = icon("mouse-pointer", lib = "font-awesome")),
-                           actionButton("type.roll.id.button", "Enter my own roll.id", icon = icon("i-cursor", lib = "font-awesome")), br(), br(), 
+
                            
-                           # Makes dropdown menu options
-                           hidden(selectInput("roll.id.choose", label = "Vote", 
-                                       choices = c("h2-2017", 
-                                                   "h65-2017",
-                                                   "s59-2017",
-                                                   "s334-2015",
-                                                   "h768-2009"))),
+
                            
                            # Creates an input textbox and an enter button
                            fluidRow(
-                             column(3, hidden(textInput('own.roll.id', label = NULL, placeholder = "enter roll.id"))),
-                             column(3, hidden(actionButton('go.vote', "look up vote", icon = icon("search", lib = "font-awesome"))))
+                             column(3, textInput('own.roll.id', label = NULL, placeholder = "enter roll.id")),
+                             column(3, actionButton('go.vote', "look up vote", icon = icon("search", lib = "font-awesome")))
                            ),
                            fluidRow(
                              column(4,
-                                    hidden(tableOutput('vote.choose')),
                                     hidden(tableOutput('vote.own'))),
                              column(2,
                                     br(), br(),
-                                    hidden(tableOutput('vote.choose.table')),
-                                    hidden(tableOutput('vote.own.table')), br(), br(), br(), br(), br(), br(), br(), br(), br(),
-                                    hidden(tableOutput('gender.table.choose')),
+                                    hidden(tableOutput('vote.own.table')), br(), br(), br(), br(),
+                                    hidden(uiOutput(("gender.title")),
                                     hidden(tableOutput('gender.table.own'))),
                              column(4,
-                                    hidden(plotOutput('choose.piechart')),
-                                    hidden(plotOutput('own.piechart'))))),
+                                    hidden(plotOutput('own.pie.chart')),
+                                    hidden(plotOutput('gender.voting.own'))))),
               
                   # Creates a tab called "Gender Makeup"
                   tabPanel("Gender Makeup", icon = icon("venus-mars", lib = "font-awesome"),
                            # Creates a header title
-                           h3("Gender Makeup"),
+                           h2("Gender Makeup"),
                            
                            # Creates a description
-                           h5("This page shows how the gender makeup has changed from 2009 to 2017 in both the 
-                              House of Representatives and the Senate."),
+                           h3("Examine the gender makeup of the House and Senate from 2009-2017."),
                            br(), 
                            
                            # Creates radio buttons to view plots for the House and Senate
@@ -224,7 +214,7 @@ ui <- fluidPage(
                              align = "center"
                            ),
                            br(), br(),
-                           "As seen in the data table and plots, the ratio of females to males has experienced little change from 2009 to 2017
+                           p("As seen in the data table and plots, the ratio of females to males has experienced little change from 2009 to 2017
                            for both the House and the Senate. Even though the public is becoming more aware of the gender diversity (or lack thereof) 
                            in predominantly male fields (e.g. STEM fields, politics, military), this data shows that there has been 
                            negligible change in the number of women in both the House and the Senate. What would this mean in terms of how 
@@ -236,12 +226,15 @@ ui <- fluidPage(
                            br(), br(),
                            "To learn more about women's involvement in politics, visit the ",
                            tags$a(href="http://www.cawp.rutgers.edu/facts", "Center for American Women and Politics website.", target = "_blank")
-                           ),
+                           )),
                   
                   # Creates a tab called "Party Makeup"
                   tabPanel("Party Makeup", icon = icon("birthday-cake", lib = "font-awesome"),
                            # Creates a title
-                           h3("House of Representatives"),
+                           h2("Party Makeup"),
+                           h3("Examine the party makeup of the House and Senate: since the 102nd House and the 80th Senate."),
+                           p("A note about Congress numbers: each Congress spans two years, starting in every odd year. The 102nd Congress began in 1991, and the
+                              80th began in 1947."),
                            
                            # Outputs plots of House data
                            plotlyOutput("house.area"), br(),
@@ -261,19 +254,20 @@ ui <- fluidPage(
                            plotOutput("senate.pie"),
                            
                            # Creates a description
-                           h5("In both the House and the Senate, the majority party fluctuates between Democrat
+                           p("In both the House and the Senate, the majority party fluctuates between Democrat
                               and Republican. This can be most clearly seen in the line graphs for the House and the Senate, although 
                               the majority party in the Senate seems to change more often than the House. Historically, the Senate
-                              has more Independent members than the House, but both chambers ")
+                              has more Independent members than the House, but both chambers have relatively few Independents.")
                            ),
                   
                   # Creates a tab called "Voting Reliability"
                   tabPanel("Voting Reliability", icon = icon("check-square-o", lib = "font-awesome"),
                            # Creates a header title
-                           h2("Voting Reliability: Missed Votes and Party Loyalty"), 
+                           h2("Voting Reliability"),
+                            h3("Inspect Representatives' % of Missed Votes and Party Loyalty."), 
                            
                            # Creates a description
-                           h5("Below are bar graphs showing representatives' percentage of missed votes and how often they vote with the
+                           p("Below are bar graphs showing representatives' percentage of missed votes and how often they vote with the
                               majority of their party. Each bar represents a member of Congress; hover over bars to see the members' information.
                               Use the widgets to display the 114th or 115th Congress, to filter by party or state, 
                               and to change the order of the bars on the graphs. It is important to note that John Boehner and Paul Ryan have high

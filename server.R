@@ -138,7 +138,7 @@ server <- function(input, output) {
   #############################
   
   output$hi <- eventReactive(input$welcome, {
-    return("Click on one of the tabs above to get started :)")
+    return("Click on one of the tabs above to get started")
   })
   
   
@@ -346,96 +346,36 @@ server <- function(input, output) {
   #############################
   
   
-  
-  observeEvent(input$select.id.button, {
-    showElement("roll.id.choose")
-  })
-  
-  observeEvent(input$type.roll.id.button, {
-    showElement("own.roll.id")
-  })
-  
-  observeEvent(input$type.roll.id.button, {
-    hideElement("roll.id.choose")
-  })
-  
-  observeEvent(input$type.roll.id.button, {
-    showElement("go.vote")
-  })
-  
-  observeEvent(input$select.id.button, {
-    hideElement("go.vote")
-  })
-  
-  observeEvent(input$select.id.button, {
-    hideElement("own.roll.id")
-  })
-  
-  observeEvent(input$select.id.button,{
-    showElement("vote.choose")
-  })
-  
+
   observeEvent(input$go.vote,{
     showElement("vote.own")
   })
   
-  observeEvent(input$type.roll.id.button, {
-    hideElement("vote.choose")
-  })
-  
-  observeEvent(input$select.id.button, {
-    hideElement("vote.own")
-  })
-  
-  observeEvent(input$type.roll.id.button, {
-    hideElement("vote.choose.table")
-  })
-  
-  observeEvent(input$select.id.button,{
-    showElement("vote.choose.table")
-  })
-  
-  observeEvent(input$select.id.button, {
-    hideElement("vote.own.table")
-  })
-  
+
   observeEvent(input$go.vote,{
     showElement("vote.own.table")
   })
+
   
-  observeEvent(input$type.roll.id.button, {
-    hideElement("choose.piechart")
-  })
-  
-  observeEvent(input$select.id.button,{
-    showElement("choose.piechart")
-  })
-  
-  observeEvent(input$select.id.button, {
-    hideElement("own.piechart")
+  observeEvent(input$go.vote,{
+    showElement("own.pie.chart")
   })
   
   observeEvent(input$go.vote,{
-    showElement("own.piechart")
+    showElement("gender.title")
   })
   
-  observeEvent(input$type.roll.id.button, {
-    hideElement("gender.table.choose")
-  })
-  
-  observeEvent(input$select.id.button,{
-    showElement("gender.table.choose")
-  })
-  
-  observeEvent(input$select.id.button, {
-    hideElement("gender.table.own")
-  })
   
   observeEvent(input$go.vote,{
     showElement("gender.table.own")
   })
+
   
-  output$vote.choose <- renderTable({
+  observeEvent(input$go.vote,{
+    showElement("gender.voting.own")
+  })
+  
+  vote.choose <- reactive({
     votes.resource <- ("votes?roll_id=")
     votes.filters <- ("&fields=voters")
     votes.response <- GET(paste0(sunlight.base, votes.resource, input$roll.id.choose, votes.filters))
@@ -452,7 +392,11 @@ server <- function(input, output) {
     return(voters)
   })
   
-  output$vote.own <- renderTable({
+  output$vote.choose <- renderTable({
+    return(vote.choose())
+  })
+  
+  vote.own <- reactive({
     votes.resource.1 <- ("votes?roll_id=")
     votes.filters.1 <- ("&fields=voters")
     votes.response.1 <- GET(paste0(sunlight.base, votes.resource.1, input$own.roll.id, votes.filters.1))
@@ -469,10 +413,15 @@ server <- function(input, output) {
     return(voters.1)
   })
   
-  output$vote.choose.table <- renderTable({
+  output$vote.own <- renderTable({
+    return(vote.own())
+  })
+  
+  
+  vote.own.table <- reactive({
     votes.resource <- ("votes?roll_id=")
     votes.filters <- ("&fields=voters")
-    votes.response <- GET(paste0(sunlight.base, votes.resource, input$roll.id, votes.filters))
+    votes.response <- GET(paste0(sunlight.base, votes.resource, input$own.roll.id, votes.filters))
     request.body.as.list <- content(votes.response)
     voters.list <- request.body.as.list$results[[1]]$voters
     names(voters.list) <- NULL
@@ -483,9 +432,17 @@ server <- function(input, output) {
     colnames(unique.votes)[colnames(unique.votes) == "n"] <- "count"
     return(unique.votes)
   })
-  
   
   output$vote.own.table <- renderTable({
+    return(vote.own.table())
+  })
+  
+  output$gender.title <- renderUI({
+    tags$h3("Gender Voting")
+  })
+
+  
+  own.pie.chart <- reactive({
     votes.resource <- ("votes?roll_id=")
     votes.filters <- ("&fields=voters")
     votes.response <- GET(paste0(sunlight.base, votes.resource, input$own.roll.id, votes.filters))
@@ -496,23 +453,11 @@ server <- function(input, output) {
     voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
     voters.as.data.frame$vote <- as.factor(unlist(voters.as.data.frame$vote))
     unique.votes <- tally(group_by(voters.as.data.frame, vote), sort = TRUE) 
-    colnames(unique.votes)[colnames(unique.votes) == "n"] <- "count"
     return(unique.votes)
   })
   
-  
-  output$choose.piechart <- renderPlot({
-    votes.resource <- ("votes?roll_id=")
-    votes.filters <- ("&fields=voters")
-    votes.response <- GET(paste0(sunlight.base, votes.resource, input$roll.id, votes.filters))
-    request.body.as.list <- content(votes.response)
-    voters.list <- request.body.as.list$results[[1]]$voters
-    names(voters.list) <- NULL
-    voters.json <- toJSON(voters.list)
-    voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
-    voters.as.data.frame$vote <- as.factor(unlist(voters.as.data.frame$vote))
-    unique.votes <- tally(group_by(voters.as.data.frame, vote), sort = TRUE) 
-    p <- ggplot(unique.votes, aes(x= "", y = n, fill=vote))+
+  output$own.pie.chart <- renderPlot({
+    p <- ggplot(own.pie.chart(), aes(x= "", y = n, fill=vote))+
       geom_bar(width=1, stat="identity")+
       coord_polar("y", start=0)+
       labs(x=" ", y = " ") +
@@ -523,34 +468,12 @@ server <- function(input, output) {
       ggtitle("Vote Breakdown")
     return(p)
   })
+
   
-  output$own.piechart <- renderPlot({
+  gender.table.own <- reactive({
     votes.resource <- ("votes?roll_id=")
     votes.filters <- ("&fields=voters")
     votes.response <- GET(paste0(sunlight.base, votes.resource, input$own.roll.id, votes.filters))
-    request.body.as.list <- content(votes.response)
-    voters.list <- request.body.as.list$results[[1]]$voters
-    names(voters.list) <- NULL
-    voters.json <- toJSON(voters.list)
-    voters.as.data.frame <- flatten(fromJSON(voters.json, flatten=TRUE))
-    voters.as.data.frame$vote <- as.factor(unlist(voters.as.data.frame$vote))
-    unique.votes <- tally(group_by(voters.as.data.frame, vote), sort = TRUE) 
-    p <- ggplot(unique.votes, aes(x= "", y = n, fill=vote))+
-      geom_bar(width=1, stat="identity")+
-      coord_polar("y", start=0)+
-      labs(x=" ", y = " ") +
-      theme(legend.title = element_text(size=15))+
-      theme(legend.text = element_text(size=12))+
-      theme(axis.text.y = element_blank())+
-      theme(axis.ticks = element_blank())+
-      ggtitle("Vote Breakdown")
-    return(p)
-  })
-  
-  output$gender.table.choose <- renderTable({
-    votes.resource <- ("votes?roll_id=")
-    votes.filters <- ("&fields=voters")
-    votes.response <- GET(paste0(sunlight.base, votes.resource, input$roll.id, votes.filters))
     request.body.as.list <- content(votes.response)
     voters.list <- request.body.as.list$results[[1]]$voters
     names(voters.list) <- NULL
@@ -564,10 +487,14 @@ server <- function(input, output) {
     unique.votes <- tally(group_by(voters.plot, demographic), sort = TRUE) 
     colnames(unique.votes)[colnames(unique.votes) == "n"] <- "votes"
     return(unique.votes)
-    
   })
   
   output$gender.table.own <- renderTable({
+    return(gender.table.own())
+  })
+  
+
+  gender.voting.own <- reactive({
     votes.resource <- ("votes?roll_id=")
     votes.filters <- ("&fields=voters")
     votes.response <- GET(paste0(sunlight.base, votes.resource, input$own.roll.id, votes.filters))
@@ -584,7 +511,19 @@ server <- function(input, output) {
     unique.votes <- tally(group_by(voters.plot, demographic), sort = TRUE) 
     colnames(unique.votes)[colnames(unique.votes) == "n"] <- "votes"
     return(unique.votes)
-    
+  })
+  
+  output$gender.voting.own <- renderPlot({
+    p <- ggplot(gender.voting.own(), aes(x=" ", y = votes, fill = demographic)) +
+      geom_col(width=1)+
+      coord_polar("y", start=0) +
+      theme(legend.title = element_text(size=12))+
+      theme(legend.text = element_text(size=12))+
+      labs(x = " ", y = " ")+
+      theme(axis.text.y = element_blank())+
+      theme(axis.ticks = element_blank())+
+      ggtitle("Breakdown by Gender")
+    return(p)
   })
   
   #############################
@@ -686,7 +625,7 @@ server <- function(input, output) {
   #############################  
   
   output$senate.ex <- renderText({
-    return("It appears that some Congresses had more than 100 members because all members that served during the Congress are shown, even though no more than 100 members were active at the same time.")
+    return("The graphs show all the senators that served throughout each Congress, although no more than 100 senators were active at the same time")
   })
   
   observeEvent(input$senate.q, {
