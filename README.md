@@ -11,4 +11,6 @@ In this app, you can:
 * examine the party makeup of Congress since 1991 for the House and 1947 for the Senate
 * inspect members of the 114th and 115th Congress and their voting habits
 
+[View Shiny App](https://caseyahlan.shinyapps.io/congress-to-you/)
+
 This app uses data from the Sunlight Foundation [Congress API](https://sunlightlabs.github.io/congress/index.html), and the ProPublica [Congress API](https://propublica.github.io/congress-api-docs/#congress-api-documentation).
